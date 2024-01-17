@@ -5,3 +5,10 @@
     - 요구사항 명세서 구글 시트 링크 : https://docs.google.com/spreadsheets/d/1C7pJNXHdLoR1nTblNIq3rpCiKxgurcrFm9QsJ3zkVV0/edit#gid=1624068894
 
 - 일일 감사 : 오늘 컨설팅 내용 열심히 기록해준 다인이 감사합니다!!
+
+# 🗓️ 1월 16일 (화)
+
+- [x] Jira 학습 및 이슈 등록
+- [x] 프론트엔드 개발 환경 세팅 (진행중)
+
+- 일일 감사 : 퍼즐 주요 로직을 구현하고 있는 해란이, 문서화 작성에 힘써주는 백엔드 팀원들 모두 감사합니다!!
