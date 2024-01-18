@@ -1,7 +1,13 @@
-import "./App.css";
+import MovePuzzle from "./components/playPuzzle/movePuzzle";
+import Canvas from "./components/paperCanvas";
 
 function App() {
-  return <h1>Hello World!</h1>;
+  return (
+    <>
+      <MovePuzzle />
+      <Canvas />
+    </>
+  );
 }
 
 export default App;
