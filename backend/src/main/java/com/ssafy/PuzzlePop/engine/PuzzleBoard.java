@@ -1,4 +1,4 @@
-package com.ssafy.PuzzlePop.engine;
+package com.ssafy.puzzlepop.engine;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

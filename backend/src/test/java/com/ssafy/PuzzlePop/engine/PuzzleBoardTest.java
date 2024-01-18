@@ -1,8 +1,7 @@
-package com.ssafy.PuzzlePop.engine;
+package com.ssafy.puzzlepop.engine;
 
 import org.junit.jupiter.api.Test;
 import java.util.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 class PuzzleBoardTest {
 
