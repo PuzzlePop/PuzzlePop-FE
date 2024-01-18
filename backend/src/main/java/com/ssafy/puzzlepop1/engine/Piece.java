@@ -1,4 +1,4 @@
-package com.ssafy.puzzlepop.engine;
+package com.ssafy.puzzlepop1.engine;
 
 import lombok.*;
 
