@@ -22,6 +22,7 @@
         - ERD v1.2
             <img src="./img/240115_img1.png" />
 
+
 # 🗓️ 1월 16일 (화)
 
 * ERD 마무리
@@ -35,3 +36,15 @@
 * 금주 작업 내용에 대한 Jira 이슈 등록
 
 * 커밋, 브랜치, 지라 관리 컨벤션 논의 및 결정
+
+
+# 🗓️ 1월 17일 (수)
+
+* API 명세서 v1.0 완성
+    - [240117 API 명세서 v1.0 링크](https://docs.google.com/spreadsheets/d/1C7pJNXHdLoR1nTblNIq3rpCiKxgurcrFm9QsJ3zkVV0/edit#gid=1624068894)
+
+* Jira 1주차 스프린트에 대한 이슈 등록 마무리
+
+* 로컬 PC 개발 환경 설정
+
+* 전체 코드 리뷰 규칙, 백엔드 코딩 컨벤션 논의 및 결정
