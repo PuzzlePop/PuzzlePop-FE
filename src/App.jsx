@@ -1,11 +1,9 @@
-import MovePuzzle from "./components/playPuzzle/movePuzzle";
-import Canvas from "./components/paperCanvas";
+import PlayPuzzle from "./pages/playPuzzle";
 
 function App() {
   return (
     <>
-      <MovePuzzle />
-      <Canvas />
+      <PlayPuzzle />
     </>
   );
 }

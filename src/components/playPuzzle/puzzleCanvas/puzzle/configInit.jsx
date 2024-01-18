@@ -1,5 +1,5 @@
 import { Size, Point } from "paper/dist/paper-core";
-import Puzzle from "@src/components/playPuzzle/puzzleCanvas/puzzle/index";
+import Puzzle from "./index";
 
 const constant = {
   percentageTotal: 100.0,
@@ -10,7 +10,9 @@ const constant = {
   tileMarginX: 0,
   tileMarginY: 30,
 };
+
 let config;
+
 const initConfig = () => {
   config = Puzzle.exportConfig();
   const tileRatio = config.tileWidth / constant.percentageTotal;
@@ -26,9 +28,11 @@ const initConfig = () => {
         config.tileWidth,
         config.project,
         config.imgWidth,
-        config.imgHeight
+        config.imgHeight,
       );
-      if (mask === undefined) continue;
+      if (mask === undefined) {
+        continue;
+      }
       mask.opacity = constant.maskOpacity;
       mask.strokeColor = new config.project.Color("#fff");
 
@@ -37,7 +41,7 @@ const initConfig = () => {
         cloneImg,
         new Size(config.tileWidth, config.tileWidth),
         new Point(config.tileWidth * x, config.tileWidth * y),
-        Math.max(config.imgWidth / config.originWidth, config.imgHeight / config.originHeight)
+        Math.max(config.imgWidth / config.originWidth, config.imgHeight / config.originHeight),
       );
 
       const border = mask.clone();
@@ -69,18 +73,18 @@ const initConfig = () => {
         config.project.view.center.y -
           config.tileWidth / 2 +
           config.tileWidth * y -
-          config.imgHeight / 2
+          config.imgHeight / 2,
       );
 
       const cellPosition = new Point(
         Math.round(position.x / config.tileWidth) + 1,
-        Math.round(position.y / config.tileWidth) + 1
+        Math.round(position.y / config.tileWidth) + 1,
       );
 
       tile.position = new Point(
         cellPosition.x * config.tileWidth + constant.tileMarginX,
         cellPosition.y * config.tileWidth +
-          (config.tilesPerColumn % 2 === 1 ? -constant.tileMarginY : constant.tileMarginY)
+          (config.tilesPerColumn % 2 === 1 ? -constant.tileMarginY : constant.tileMarginY),
       );
     }
   }
@@ -88,6 +92,8 @@ const initConfig = () => {
     ...config,
   });
 };
+
+// 들어갔는지 (-1) 나왔는지 (1)에 따라 curvy mask 계산
 const getMask = (
   tileRatio,
   topTab,
@@ -97,15 +103,16 @@ const getMask = (
   tileWidth,
   project,
   imgWidth,
-  imgHeight
+  imgHeight,
 ) => {
   if (
     topTab === undefined ||
     rightTab === undefined ||
     bottomTab === undefined ||
     leftTab === undefined
-  )
+  ) {
     return;
+  }
 
   const curvyCoords = [
     0, 0, 35, 15, 37, 5, 37, 5, 40, 0, 38, -5, 38, -5, 20, -20, 50, -20, 50, -20, 80, -20, 62, -5,
@@ -120,20 +127,20 @@ const getMask = (
   for (let i = 0; i < curvyCoords.length / 6; i++) {
     const p1 = new Point(
       topLeftEdge.x + curvyCoords[i * 6 + 0] * tileRatio,
-      topLeftEdge.y + topTab * curvyCoords[i * 6 + 1] * tileRatio
+      topLeftEdge.y + topTab * curvyCoords[i * 6 + 1] * tileRatio,
     );
 
     const p2 = new Point(
       topLeftEdge.x + curvyCoords[i * 6 + 2] * tileRatio,
-      topLeftEdge.y + topTab * curvyCoords[i * 6 + 3] * tileRatio
+      topLeftEdge.y + topTab * curvyCoords[i * 6 + 3] * tileRatio,
     );
 
     const p3 = new Point(
       topLeftEdge.x + curvyCoords[i * 6 + 4] * tileRatio,
-      topLeftEdge.y + topTab * curvyCoords[i * 6 + 5] * tileRatio
+      topLeftEdge.y + topTab * curvyCoords[i * 6 + 5] * tileRatio,
     );
 
-    mask.cubicCurveTo(p1, p2, p3);
+    mask.cubicCurveTo(p1, p2, p3); // 곡선의 첫점, 중앙점, 끝점
   }
 
   //Right
@@ -141,15 +148,15 @@ const getMask = (
   for (let i = 0; i < curvyCoords.length / 6; i++) {
     const p1 = new Point(
       topRightEdge.x - rightTab * curvyCoords[i * 6 + 1] * tileRatio,
-      topRightEdge.y + curvyCoords[i * 6 + 0] * tileRatio
+      topRightEdge.y + curvyCoords[i * 6 + 0] * tileRatio,
     );
     const p2 = new Point(
       topRightEdge.x - rightTab * curvyCoords[i * 6 + 3] * tileRatio,
-      topRightEdge.y + curvyCoords[i * 6 + 2] * tileRatio
+      topRightEdge.y + curvyCoords[i * 6 + 2] * tileRatio,
     );
     const p3 = new Point(
       topRightEdge.x - rightTab * curvyCoords[i * 6 + 5] * tileRatio,
-      topRightEdge.y + curvyCoords[i * 6 + 4] * tileRatio
+      topRightEdge.y + curvyCoords[i * 6 + 4] * tileRatio,
     );
 
     mask.cubicCurveTo(p1, p2, p3);
@@ -160,15 +167,15 @@ const getMask = (
   for (let i = 0; i < curvyCoords.length / 6; i++) {
     const p1 = new Point(
       bottomRightEdge.x - curvyCoords[i * 6 + 0] * tileRatio,
-      bottomRightEdge.y - bottomTab * curvyCoords[i * 6 + 1] * tileRatio
+      bottomRightEdge.y - bottomTab * curvyCoords[i * 6 + 1] * tileRatio,
     );
     const p2 = new Point(
       bottomRightEdge.x - curvyCoords[i * 6 + 2] * tileRatio,
-      bottomRightEdge.y - bottomTab * curvyCoords[i * 6 + 3] * tileRatio
+      bottomRightEdge.y - bottomTab * curvyCoords[i * 6 + 3] * tileRatio,
     );
     const p3 = new Point(
       bottomRightEdge.x - curvyCoords[i * 6 + 4] * tileRatio,
-      bottomRightEdge.y - bottomTab * curvyCoords[i * 6 + 5] * tileRatio
+      bottomRightEdge.y - bottomTab * curvyCoords[i * 6 + 5] * tileRatio,
     );
 
     mask.cubicCurveTo(p1, p2, p3);
@@ -179,15 +186,15 @@ const getMask = (
   for (let i = 0; i < curvyCoords.length / 6; i++) {
     const p1 = new Point(
       bottomLeftEdge.x + leftTab * curvyCoords[i * 6 + 1] * tileRatio,
-      bottomLeftEdge.y - curvyCoords[i * 6 + 0] * tileRatio
+      bottomLeftEdge.y - curvyCoords[i * 6 + 0] * tileRatio,
     );
     const p2 = new Point(
       bottomLeftEdge.x + leftTab * curvyCoords[i * 6 + 3] * tileRatio,
-      bottomLeftEdge.y - curvyCoords[i * 6 + 2] * tileRatio
+      bottomLeftEdge.y - curvyCoords[i * 6 + 2] * tileRatio,
     );
     const p3 = new Point(
       bottomLeftEdge.x + leftTab * curvyCoords[i * 6 + 5] * tileRatio,
-      bottomLeftEdge.y - curvyCoords[i * 6 + 4] * tileRatio
+      bottomLeftEdge.y - curvyCoords[i * 6 + 4] * tileRatio,
     );
 
     mask.cubicCurveTo(p1, p2, p3);
@@ -195,6 +202,8 @@ const getMask = (
 
   return mask;
 };
+
+// 각각의 피스의 raster 반환
 const getTileRaster = (sourceRaster, size, offset, scaleValue) => {
   const targetRaster = new config.project.Raster("empty");
   targetRaster.scale(scaleValue);
@@ -202,5 +211,6 @@ const getTileRaster = (sourceRaster, size, offset, scaleValue) => {
 
   return targetRaster;
 };
+
 const initPuzzle = { initConfig };
 export default initPuzzle;
