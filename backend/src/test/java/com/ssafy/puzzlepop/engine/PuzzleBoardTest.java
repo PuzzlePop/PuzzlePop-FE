@@ -1,4 +1,4 @@
-package com.ssafy.puzzlepop1.engine;
+package com.ssafy.puzzlepop.engine;
 
 import org.junit.jupiter.api.Test;
 import java.util.*;

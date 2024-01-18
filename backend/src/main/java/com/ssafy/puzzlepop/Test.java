@@ -1,4 +1,4 @@
-package com.ssafy.puzzlepop1;
+package com.ssafy.puzzlepop;
 
 import lombok.Getter;
 import lombok.Setter;

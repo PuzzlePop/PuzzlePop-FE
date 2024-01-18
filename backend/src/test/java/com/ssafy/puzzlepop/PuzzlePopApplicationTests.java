@@ -1,4 +1,4 @@
-package com.ssafy.puzzlepop1;
+package com.ssafy.puzzlepop;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
