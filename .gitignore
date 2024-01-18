@@ -1,4 +1,4 @@
-# OS 및 Tool 관련
+# OS 및 Editor 설정
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -8,8 +8,6 @@
 *.njsproj
 *.sln
 *.sw?
-
-# frontend
 
 # Logs
 logs
