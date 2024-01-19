@@ -61,7 +61,10 @@ const PuzzleCanvas = (props) => {
     Paper.setup(canvas);
 
     setConfig(puzzleImg, level, Paper);
+    // console.log(Puzzle.exportConfig());
     createTiles();
+
+    Puzzle.move();
   }, []);
 
   return (

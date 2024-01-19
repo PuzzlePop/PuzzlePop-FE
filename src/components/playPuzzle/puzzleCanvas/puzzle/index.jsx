@@ -1,3 +1,5 @@
+import MovePuzzle from "./movePuzzle";
+
 let config;
 let gIndex;
 
@@ -17,9 +19,15 @@ const settingValue = (key, value) => {
 // puzzle 객체 config export
 const exportConfig = () => config;
 
+const move = () => {
+  MovePuzzle.moveTile();
+  MovePuzzle.findNearTile();
+};
+
 const Puzzle = {
   setting,
   settingValue,
   exportConfig,
+  move,
 };
 export default Puzzle;
