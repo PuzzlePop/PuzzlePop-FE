@@ -50,8 +50,8 @@ const PlayPuzzle = () => {
             <PuzzleCanvas
               puzzleImg={imgRef}
               level={puzzleInfo.level}
-              width={screen.width}
-              height={screen.height}
+              width={screen.width * 0.8}
+              height={screen.height * 0.8}
             />
           </>
         )}

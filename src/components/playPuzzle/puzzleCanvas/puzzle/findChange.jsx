@@ -1,10 +1,10 @@
-const findXUp = (nowShape, preShape) => {
-  console.log(nowShape, preShape);
+const findXUp = (nowShape, preShape, width) => {
+  // console.log(nowShape, preShape);
   const nL = nowShape.leftTab;
   const nR = nowShape.rightTab;
   const pL = preShape.leftTab;
   const pR = preShape.rightTab;
-  console.log("nL, nR, pL, pR: ", nL, nR, pL, pR);
+  // console.log("nL, nR, pL, pR: ", nL, nR, pL, pR);
   let xUp = 0;
 
   if (nL === pL && nR === pR) {
@@ -13,36 +13,36 @@ const findXUp = (nowShape, preShape) => {
     xUp = 0;
   } else {
     if (nR === 0 || (nR === 1 && pR === 1)) {
-      xUp = 5 * nL * -1;
+      xUp = 0.05 * width * nL * -1;
     } else if (nR === 1 && pR === -1) {
-      xUp = nL === pL ? 5 : 10;
+      xUp = nL === pL ? width * 0.05 : width * 0.1;
     } else if (nR === -1 && pR === 1) {
-      xUp = nL === pL ? -5 : -10;
+      xUp = nL === pL ? width * -0.05 : width * -0.1;
     } else {
-      xUp = 5 * nL * -1;
+      xUp = width * -0.05 * nL;
     }
   }
-  console.log("xUp: ", xUp);
+  // console.log("xUp: ", xUp);
   return xUp;
 };
 
-const findYUp = (nowShape, preShape) => {
+const findYUp = (nowShape, preShape, width) => {
   const sum = nowShape.topTab + nowShape.bottomTab + preShape.topTab + preShape.bottomTab;
 
   let yUp = 0;
 
   if (sum === 1 || sum === -2) {
-    yUp = -5;
+    yUp = width * -0.05;
   } else if (sum === 2) {
-    yUp = 5;
+    yUp = width * 0.05;
   } else if (sum === -1) {
-    yUp = -10;
+    yUp = width * -0.1;
   }
 
   return yUp;
 };
 
-const findYChange = (nowShape, preShape) => {
+const findYChange = (nowShape, preShape, width) => {
   const nT = nowShape.topTab;
   const nB = nowShape.bottomTab;
   const pT = preShape.topTab;
@@ -57,35 +57,36 @@ const findYChange = (nowShape, preShape) => {
     yChange = 0;
   } else {
     if (nT === 0) {
-      yChange = 5 * nB;
+      yChange = 0.05 * width * nB;
     } else if (nB === 0) {
-      yChange = 5 * pT;
+      yChange = 0.05 * width * pT;
     } else if (pT === nB) {
-      yChange = 5 * pT;
+      yChange = 0.05 * width * pT;
     } else {
       if (Math.abs(sum) === 1) {
-        yChange = sum * -5;
+        yChange = sum * width * -0.05;
       } else {
-        yChange = (sum * -5) / 2;
+        yChange = (sum * width * -0.05) / 2;
       }
     }
   }
   return yChange;
 };
 
-const findXChange = (nowShape, preShape) => {
+const findXChange = (nowShape, preShape, width) => {
   const sum = nowShape.leftTab + nowShape.rightTab + preShape.leftTab + preShape.rightTab;
 
-  let xChange = -5;
+  let xChange = width * -0.05;
+  // console.log(sum);
 
   if (sum === -1) {
-    xChange = -10;
+    xChange = width * -0.1;
   } else if (sum === -2) {
-    xChange = -7;
+    xChange = width * -0.7;
   } else if (sum === 0) {
     xChange = 0;
   } else if (sum === 2) {
-    xChange = 5;
+    xChange = width * -0.05;
   }
 
   return xChange;
