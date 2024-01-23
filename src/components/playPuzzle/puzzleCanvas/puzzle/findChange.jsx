@@ -1,4 +1,5 @@
-const findXUp = (nowShape, preShape, width) => {
+// 상하 피스를 맞출때 x축 기준 보정값 계산
+const findXUp = (nowShape, preShape) => {
   // console.log(nowShape, preShape);
   const nL = nowShape.leftTab;
   const nR = nowShape.rightTab;
@@ -13,36 +14,41 @@ const findXUp = (nowShape, preShape, width) => {
     xUp = 0;
   } else {
     if (nR === 0 || (nR === 1 && pR === 1)) {
-      xUp = 0.05 * width * nL * -1;
+      xUp = 5 * nL * -1;
     } else if (nR === 1 && pR === -1) {
-      xUp = nL === pL ? width * 0.05 : width * 0.1;
+      xUp = nL === pL ? 5 : 10;
     } else if (nR === -1 && pR === 1) {
-      xUp = nL === pL ? width * -0.05 : width * -0.1;
+      xUp = nL === pL ? -5 : -10;
     } else {
-      xUp = width * -0.05 * nL;
+      xUp = 5 * nL * -1;
     }
   }
   // console.log("xUp: ", xUp);
   return xUp;
 };
 
-const findYUp = (nowShape, preShape, width) => {
+// 상하 피스를 맞출때 y축 기준 보정값 계산
+const findYUp = (nowShape, preShape) => {
   const sum = nowShape.topTab + nowShape.bottomTab + preShape.topTab + preShape.bottomTab;
+  console.log(nowShape, preShape, sum);
 
   let yUp = 0;
 
   if (sum === 1 || sum === -2) {
-    yUp = width * -0.05;
+    yUp = -5;
   } else if (sum === 2) {
-    yUp = width * 0.05;
+    yUp = 5;
   } else if (sum === -1) {
-    yUp = width * -0.1;
+    yUp = -10;
+  } else if (sum === 0) {
+    yUp = -13;
   }
 
   return yUp;
 };
 
-const findYChange = (nowShape, preShape, width) => {
+// 좌우 피스를 맞출때 y축 기준 보정값 계산
+const findYChange = (nowShape, preShape) => {
   const nT = nowShape.topTab;
   const nB = nowShape.bottomTab;
   const pT = preShape.topTab;
@@ -57,36 +63,36 @@ const findYChange = (nowShape, preShape, width) => {
     yChange = 0;
   } else {
     if (nT === 0) {
-      yChange = 0.05 * width * nB;
+      yChange = 5 * nB;
     } else if (nB === 0) {
-      yChange = 0.05 * width * pT;
+      yChange = 5 * pT;
     } else if (pT === nB) {
-      yChange = 0.05 * width * pT;
+      yChange = 5 * pT;
     } else {
       if (Math.abs(sum) === 1) {
-        yChange = sum * width * -0.05;
+        yChange = sum * -5;
       } else {
-        yChange = (sum * width * -0.05) / 2;
+        yChange = (sum * -5) / 2;
       }
     }
   }
   return yChange;
 };
 
-const findXChange = (nowShape, preShape, width) => {
+// 좌우 피스를 맞출때 x축 기준 보정값 계산
+const findXChange = (nowShape, preShape) => {
   const sum = nowShape.leftTab + nowShape.rightTab + preShape.leftTab + preShape.rightTab;
 
-  let xChange = width * -0.05;
-  // console.log(sum);
+  let xChange = -5;
 
   if (sum === -1) {
-    xChange = width * -0.1;
+    xChange = -10;
   } else if (sum === -2) {
-    xChange = width * -0.7;
+    xChange = -7;
   } else if (sum === 0) {
     xChange = 0;
   } else if (sum === 2) {
-    xChange = width * -0.05;
+    xChange = 5;
   }
 
   return xChange;

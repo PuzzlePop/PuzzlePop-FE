@@ -9,6 +9,8 @@ const levelSize = { 1: 400, 2: 500, 3: 600 };
 const setConfig = (img, level, Paper) => {
   const originHeight = img.current.height;
   const originWidth = img.current.width;
+  // const imgWidth = originWidth;
+  // const imgHeight = originHeight;
   const imgWidth =
     originHeight >= originWidth
       ? Math.round((levelSize[level] * originWidth) / originHeight / 100) * 100
@@ -17,7 +19,7 @@ const setConfig = (img, level, Paper) => {
     originHeight >= originWidth
       ? levelSize[level]
       : Math.round((levelSize[level] * originHeight) / originWidth / 100) * 100;
-  const tileWidth = 50;
+  const tileWidth = 100;
 
   const config = {
     originHeight: originHeight, // 실제 사진의 높이

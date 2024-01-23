@@ -12,11 +12,11 @@ const PlayPuzzle = () => {
   const imgRef = useRef(null);
   const onLoad = () => setLoaded(true);
 
-  const setPuzzle = () => {
+  const setPuzzle = (img = "https://img.onnada.com/2022/0202/5f21eef217.jpg") => {
     const res = {
       // 임시 데이터
       // 추후에 API 붙일때 여기 붙이기
-      img: "https://img.onnada.com/2022/0202/5f21eef217.jpg",
+      img: img,
       level: 3,
     };
     setPuzzleInfo({ img: res.img, level: res.level });
