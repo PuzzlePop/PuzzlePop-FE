@@ -4,13 +4,11 @@ import Puzzle from "./puzzle/index";
 import { createTiles } from "./puzzle/createPuzzle";
 
 // level 임의로 3단계로
-const levelSize = { 1: 400, 2: 500, 3: 600 };
+const levelSize = { 1: 500, 2: 600, 3: 800 };
 
 const setConfig = (img, level, Paper) => {
   const originHeight = img.current.height;
   const originWidth = img.current.width;
-  // const imgWidth = originWidth;
-  // const imgHeight = originHeight;
   const imgWidth =
     originHeight >= originWidth
       ? Math.round((levelSize[level] * originWidth) / originHeight / 100) * 100
@@ -72,7 +70,7 @@ const PuzzleCanvas = (props) => {
   return (
     <div>
       {showCanvas ? (
-        <canvas ref={canvasRef} id="canvas" width={props.width} height={props.height} />
+        <canvas ref={canvasRef} id="canvas" style={{ width: props.width, height: props.height }} />
       ) : (
         <img src={puzzleImg.current.src} alt="puzzleImage" />
       )}

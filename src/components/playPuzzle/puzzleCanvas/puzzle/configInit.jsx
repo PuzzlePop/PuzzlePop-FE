@@ -48,14 +48,16 @@ const initConfig = () => {
       border.strokeColor = new config.project.Color("#ddd");
       border.strokeWidth = constant.borderStrokeWidth;
 
+      // 피스 생성
       const tile = new config.project.Group([mask, img, border]);
       tile.clipped = true;
       tile.opacity = constant.tileOpacity;
       tile.position = new Point(constant.orgTileLoc, constant.orgTileLoc);
       config.tiles.push(tile);
-      config.groupTiles.push([tile, undefined]);
+      config.groupTiles.push([tile, undefined, config.tileIndexes.length]);
       config.groupArr.push(undefined);
       config.tileIndexes.push(config.tileIndexes.length);
+      // console.log(config.tileIndexes);
     }
   }
 

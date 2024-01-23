@@ -23,7 +23,9 @@ const PlayPuzzle = () => {
   };
 
   useEffect(() => {
-    setPuzzle();
+    setPuzzle(
+      "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+    );
     setLoaded(true);
   }, []);
 
@@ -50,8 +52,8 @@ const PlayPuzzle = () => {
             <PuzzleCanvas
               puzzleImg={imgRef}
               level={puzzleInfo.level}
-              width={screen.width * 0.8}
-              height={screen.height * 0.8}
+              width={"100vw"}
+              height={"100vh"}
             />
           </>
         )}

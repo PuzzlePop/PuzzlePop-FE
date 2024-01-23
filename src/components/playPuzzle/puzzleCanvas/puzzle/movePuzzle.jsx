@@ -15,7 +15,7 @@ const moveTile = () => {
 
   config.groupTiles.forEach((gtile, gtileIdx) => {
     gtile[0].onMouseDown = (event) => {
-      // console.log(gtile, gtileIdx, config.groupTiles);
+      event.target.bringToFront();
     };
 
     gtile[0].onMouseDrag = (event) => {
@@ -67,17 +67,18 @@ const findNearTile = () => {
   config = Puzzle.exportConfig();
   const xTileCount = config.tilesPerRow;
   const yTileCount = config.tilesPerColumn;
-  console.log(config.groupTiles);
+  // console.log(config.groupTiles);
   config.groupTiles.forEach((tile, tileIndex) => {
     // console.log(tile);
     tile[0].onMouseUp = (event) => {
-      console.log(tile[0]);
-      let nowIndex = 0;
-      if (first) {
-        nowIndex = tile[0].index - (xTileCount * yTileCount + 1);
-      } else {
-        nowIndex = tile[0].index - 1;
-      }
+      console.log(tile);
+      const nowIndex = tile[2];
+      // let nowIndex = 0;
+      // if (first) {
+      //   nowIndex = tile[2] - (xTileCount * yTileCount + 1);
+      // } else {
+      //   nowIndex = tile[2] - 1;
+      // }
       const nextIndexArr = [
         nowIndex % xTileCount === 0 ? -1 : nowIndex - 1,
         (nowIndex + 1) % xTileCount === 0 ? -1 : nowIndex + 1,
@@ -88,6 +89,7 @@ const findNearTile = () => {
       const tileArr = []; // 맞춰야하는 피스 그룹 들어감 (좌우상하 순)
       const tileShape = []; // 맞춰야하는 피스의 탭 모양 들어감 (좌우상하 순)
       const nowShape = config.shapes[nowIndex];
+      console.log(nowIndex, nextIndexArr);
       nextIndexArr.forEach((nextIndex, index) => {
         // 해당 방향에서 (0: 좌, 1: 우, 2: 상, 3: 하)
         // 피스가 이미 맞춰졌거나 테두리 방향이라면
@@ -102,8 +104,9 @@ const findNearTile = () => {
       // console.log(tileArr, tileShape);
       tileArr.forEach((nowIndexTile, index) => {
         if (nowIndexTile !== undefined) {
-          // console.log(tile);
           fitTiles(
+            tile[2],
+            nextIndexArr[index],
             tile[0],
             nowIndexTile,
             nowShape,
@@ -130,7 +133,7 @@ const checkUndefined = (nowIndex, nextIndex, direction) => {
 
   const nowTile = groupTiles[nowIndex];
   const nextTile = groupTiles[nextIndex];
-
+  // console.log(groupTiles, nowIndex, nowTile, nextIndex, nextTile);
   if (nextTile !== undefined && nowTile !== undefined) {
     const nowGroup = nowTile[1];
     const nextGroup = nextTile[1];
@@ -152,7 +155,8 @@ const checkUndefined = (nowIndex, nextIndex, direction) => {
   return flag;
 };
 
-const fitTiles = (nowTile, preTile, nowShape, preShape, dir, flag, width) => {
+const fitTiles = (nowIndex, preIndex, nowTile, preTile, nowShape, preShape, dir, flag, width) => {
+  // console.log("fitTiles: ", nowIndex, preIndex);
   const xChange = FindChange.findXChange(nowShape, preShape, width);
   const yChange = FindChange.findYChange(nowShape, preShape, width);
   const xUp = FindChange.findXUp(nowShape, preShape, width);
@@ -219,19 +223,11 @@ const fitTiles = (nowTile, preTile, nowShape, preShape, dir, flag, width) => {
       break;
   }
   if (flag && uniteFlag) {
-    uniteTiles(nowTile, preTile);
+    uniteTiles(nowIndex, preIndex, nowTile, preTile);
   }
 };
 
-const uniteTiles = (nowTile, preTile) => {
-  let substract = 0;
-  if (first) {
-    substract = config.tilesPerRow * config.tilesPerColumn + 1;
-  } else {
-    substract = 1;
-  }
-  const nowIndex = nowTile.index - substract;
-  const preIndex = preTile.index - substract;
+const uniteTiles = (nowIndex, preIndex) => {
   const nowGroup = config.groupTiles[nowIndex][1];
   const preGroup = config.groupTiles[preIndex][1];
 
@@ -289,9 +285,9 @@ const groupFit = (nowGroup) => {
     let nowIndex = 0;
     if (tile[1] === nowGroup) {
       if (first) {
-        nowIndex = tile[0].index - (xTileCount * yTileCount + 1);
+        nowIndex = tile[2] - (xTileCount * yTileCount + 1);
       } else {
-        nowIndex = tile[0].index - 1;
+        nowIndex = tile[2] - 1;
       }
       groupArr.push(tile[0]);
       groupObj[nowIndex] = tile[0];
@@ -305,9 +301,9 @@ const groupFit = (nowGroup) => {
   groupArr.forEach((tile) => {
     let nowIndex = 0;
     if (first) {
-      nowIndex = tile.index - (xTileCount * yTileCount + 1);
+      nowIndex = tile[2] - (xTileCount * yTileCount + 1);
     } else {
-      nowIndex = tile.index - 1;
+      nowIndex = tile[2] - 1;
     }
     const up = nowIndex - xTileCount < 0 ? undefined : nowIndex - xTileCount;
     const left = nowIndex % xTileCount === 0 ? undefined : nowIndex - 1;
@@ -329,8 +325,10 @@ const groupFit = (nowGroup) => {
         groupObj[dir[0]] !== undefined &&
         index < 1
       ) {
-        // console.log(tile);
+        // console.log(groupObj[dir]);
         fitTiles(
+          tile[2],
+          groupObj[dir[2]],
           tile,
           groupObj[dir[0]],
           config.shapes[nowIndex],

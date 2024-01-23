@@ -1,11 +1,10 @@
 // 상하 피스를 맞출때 x축 기준 보정값 계산
 const findXUp = (nowShape, preShape) => {
-  // console.log(nowShape, preShape);
   const nL = nowShape.leftTab;
   const nR = nowShape.rightTab;
   const pL = preShape.leftTab;
   const pR = preShape.rightTab;
-  // console.log("nL, nR, pL, pR: ", nL, nR, pL, pR);
+
   let xUp = 0;
 
   if (nL === pL && nR === pR) {
@@ -23,14 +22,12 @@ const findXUp = (nowShape, preShape) => {
       xUp = 5 * nL * -1;
     }
   }
-  // console.log("xUp: ", xUp);
   return xUp;
 };
 
 // 상하 피스를 맞출때 y축 기준 보정값 계산
 const findYUp = (nowShape, preShape) => {
   const sum = nowShape.topTab + nowShape.bottomTab + preShape.topTab + preShape.bottomTab;
-  console.log(nowShape, preShape, sum);
 
   let yUp = 0;
 
@@ -40,8 +37,6 @@ const findYUp = (nowShape, preShape) => {
     yUp = 5;
   } else if (sum === -1) {
     yUp = -10;
-  } else if (sum === 0) {
-    yUp = -13;
   }
 
   return yUp;
