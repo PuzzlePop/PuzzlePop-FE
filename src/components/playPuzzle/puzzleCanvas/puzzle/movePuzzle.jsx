@@ -15,7 +15,19 @@ const moveTile = () => {
 
   config.groupTiles.forEach((gtile, gtileIdx) => {
     gtile[0].onMouseDown = (event) => {
-      event.target.bringToFront();
+      const group = gtile[1];
+      // console.log(config.groupTiles);
+      // console.log(group);
+      if (group !== undefined) {
+        config.groupTiles.forEach((tile) => {
+          if (tile[1] === group) {
+            // console.log(tile);
+            tile[0].bringToFront();
+          }
+        });
+      } else {
+        event.target.bringToFront();
+      }
     };
 
     gtile[0].onMouseDrag = (event) => {
