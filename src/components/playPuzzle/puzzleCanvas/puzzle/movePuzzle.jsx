@@ -75,63 +75,79 @@ const indexUpdate = (groupIndex) => {
   }
 };
 
-const findNearTile = () => {
+const findNearTileGroup = () => {
   config = Puzzle.exportConfig();
-  const xTileCount = config.tilesPerRow;
-  const yTileCount = config.tilesPerColumn;
-  // console.log(config.groupTiles);
+
   config.groupTiles.forEach((tile, tileIndex) => {
-    // console.log(tile);
     tile[0].onMouseUp = (event) => {
-      console.log(tile);
-      const nowIndex = tile[2];
-      // let nowIndex = 0;
-      // if (first) {
-      //   nowIndex = tile[2] - (xTileCount * yTileCount + 1);
-      // } else {
-      //   nowIndex = tile[2] - 1;
-      // }
-      const nextIndexArr = [
-        nowIndex % xTileCount === 0 ? -1 : nowIndex - 1,
-        (nowIndex + 1) % xTileCount === 0 ? -1 : nowIndex + 1,
-        nowIndex - xTileCount < 0 ? -1 : nowIndex - xTileCount,
-        nowIndex + xTileCount >= xTileCount * yTileCount ? -1 : nowIndex + xTileCount,
-      ];
-      // console.log(nextIndexArr);
-      const tileArr = []; // 맞춰야하는 피스 그룹 들어감 (좌우상하 순)
-      const tileShape = []; // 맞춰야하는 피스의 탭 모양 들어감 (좌우상하 순)
-      const nowShape = config.shapes[nowIndex];
-      console.log(nowIndex, nextIndexArr);
-      nextIndexArr.forEach((nextIndex, index) => {
-        // 해당 방향에서 (0: 좌, 1: 우, 2: 상, 3: 하)
-        // 피스가 이미 맞춰졌거나 테두리 방향이라면
-        if (!checkUndefined(nowIndex, nextIndex, index)) {
-          tileArr[index] = undefined;
-        } else {
-          // 아니라면, 즉 피스가 더 들어와야 한다면
-          tileArr[index] = config.tiles[nextIndex];
-          tileShape[index] = config.shapes[nextIndex];
-        }
-      });
-      // console.log(tileArr, tileShape);
-      tileArr.forEach((nowIndexTile, index) => {
-        if (nowIndexTile !== undefined) {
-          fitTiles(
-            tile[2],
-            nextIndexArr[index],
-            tile[0],
-            nowIndexTile,
-            nowShape,
-            tileShape[index],
-            index,
-            true,
-            tile[0].bounds.width,
-          );
-        }
-      });
+      const group = tile[1];
+      // console.log(tile);
+      // console.log("group: ", group);
+      if (group !== undefined) {
+        config.groupTiles.forEach((gtile) => {
+          // console.log(gtile);
+          if (gtile[1] === group) {
+            // console.log("gtile: ", gtile, group);
+            findNearTile(gtile);
+          }
+        });
+      } else {
+        findNearTile(tile);
+      }
     };
   });
-  // console.log("------------------");
+};
+
+const findNearTile = (tile) => {
+  const xTileCount = config.tilesPerRow;
+  const yTileCount = config.tilesPerColumn;
+
+  const nowIndex = tile[2];
+  // let nowIndex = 0;
+  // if (first) {
+  //   nowIndex = tile[2] - (xTileCount * yTileCount + 1);
+  // } else {
+  //   nowIndex = tile[2] - 1;
+  // }
+  const nextIndexArr = [
+    nowIndex % xTileCount === 0 ? -1 : nowIndex - 1,
+    (nowIndex + 1) % xTileCount === 0 ? -1 : nowIndex + 1,
+    nowIndex - xTileCount < 0 ? -1 : nowIndex - xTileCount,
+    nowIndex + xTileCount >= xTileCount * yTileCount ? -1 : nowIndex + xTileCount,
+  ];
+  // console.log(nextIndexArr);
+  const tileArr = []; // 맞춰야하는 피스 그룹 들어감 (좌우상하 순)
+  const tileShape = []; // 맞춰야하는 피스의 탭 모양 들어감 (좌우상하 순)
+  const nowShape = config.shapes[nowIndex];
+  // console.log(nowIndex, nextIndexArr);
+  nextIndexArr.forEach((nextIndex, index) => {
+    // 해당 방향에서 (0: 좌, 1: 우, 2: 상, 3: 하)
+    // 피스가 이미 맞춰졌거나 테두리 방향이라면
+    if (!checkUndefined(nowIndex, nextIndex, index)) {
+      tileArr[index] = undefined;
+    } else {
+      // 아니라면, 즉 피스가 더 들어와야 한다면
+      tileArr[index] = config.tiles[nextIndex];
+      tileShape[index] = config.shapes[nextIndex];
+    }
+  });
+  // console.log(tileArr, tileShape);
+  tileArr.forEach((nowIndexTile, index) => {
+    if (nowIndexTile !== undefined) {
+      console.log(tile);
+      fitTiles(
+        tile[2],
+        nextIndexArr[index],
+        tile[0],
+        nowIndexTile,
+        nowShape,
+        tileShape[index],
+        index,
+        true,
+        tile[0].bounds.width,
+      );
+    }
+  });
 };
 
 // 현재 피스에서 상하좌우 각 방향(direction)에서 비어있으면 true 아니면 false 반환
@@ -234,6 +250,8 @@ const fitTiles = (nowIndex, preIndex, nowTile, preTile, nowShape, preShape, dir,
       }
       break;
   }
+
+  // console.log("flag && uniteFlag: ", flag && uniteFlag);
   if (flag && uniteFlag) {
     uniteTiles(nowIndex, preIndex, nowTile, preTile);
   }
@@ -264,7 +282,9 @@ const uniteTiles = (nowIndex, preIndex) => {
       }
     }
   }
+  // console.log(dismantling(config.groupTiles[preIndex][1]));
   if (!dismantling(config.groupTiles[preIndex][1])) {
+    // console.log(config.groupTiles[preIndex][1]);
     groupFit(config.groupTiles[preIndex][1]);
   }
 };
@@ -381,7 +401,7 @@ const checkComplete = () => {
 
 const MovePuzzle = {
   moveTile,
-  findNearTile,
+  findNearTileGroup,
   moveUpdate,
   checkComplete,
   indexUpdate,

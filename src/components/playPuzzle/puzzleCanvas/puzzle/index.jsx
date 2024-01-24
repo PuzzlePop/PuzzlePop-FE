@@ -21,7 +21,7 @@ const exportConfig = () => config;
 
 const move = () => {
   MovePuzzle.moveTile();
-  MovePuzzle.findNearTile();
+  MovePuzzle.findNearTileGroup();
 };
 
 const Puzzle = {
