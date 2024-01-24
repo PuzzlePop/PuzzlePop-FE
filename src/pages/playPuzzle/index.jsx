@@ -19,44 +19,31 @@ const PlayPuzzle = () => {
       img: img,
       level: 3,
     };
-    setPuzzleInfo({ img: res.img, level: res.level });
+    setPuzzleInfo({ crossOrigin: "anonymous", img: res.img, level: res.level });
+    console.log("in setPuzzle: ", puzzleInfo, loaded);
   };
 
   useEffect(() => {
+    console.log(loaded);
     setPuzzle(
       "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
     );
-    setLoaded(true);
+    console.log(loaded, puzzleInfo);
   }, []);
 
   return (
     <div>
       <div>
-        {loaded && (
-          <>
-            <img
-              ref={imgRef}
-              id="puzzleImage"
-              src={puzzleInfo.img}
-              alt="puzzleImage"
-              onLoad={onLoad}
-              style={{ display: "none" }}
-            />
-            <img
-              id="empty"
-              src={puzzleInfo.img}
-              alt="emptyImage"
-              onLoad={onLoad}
-              style={{ display: "none" }}
-            />
-            <PuzzleCanvas
-              puzzleImg={imgRef}
-              level={puzzleInfo.level}
-              width={"100vw"}
-              height={"100vh"}
-            />
-          </>
-        )}
+        <img
+          ref={imgRef}
+          id="puzzleImage"
+          src={puzzleInfo.img}
+          alt="puzzleImage"
+          onLoad={onLoad}
+          style={{ display: "none" }}
+        />
+        <img id="empty" src={puzzleInfo.img} alt="emptyImage" style={{ display: "none" }} />
+        {loaded && <PuzzleCanvas puzzleImg={imgRef} level={puzzleInfo.level} />}
       </div>
     </div>
   );

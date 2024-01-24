@@ -30,7 +30,7 @@ const setConfig = (img, level, Paper) => {
     tileMarginWidth: tileWidth * 0.203125, // 피스가 딱 맞기 위한 margin 값
     level: level, // 난이도
     imgName: "puzzleImage", // img 태그의 id 값
-    groupTiles: [], // 해당 피스와 그룹인 피스들 배열
+    groupTiles: [], // [피스Group, 해당 피스의 그룹 번호, 해당 피스의 정답인덱스]의 모음
     shapes: [], // 피스의 shape 정보들
     tiles: [], // 만들어진 피스들 배열
     complete: false, // 퍼즐 완성 여부
@@ -68,9 +68,13 @@ const PuzzleCanvas = (props) => {
   }, []);
 
   return (
-    <div>
+    <div style={{ width: "100vw", display: "flex", justifyContent: "center" }}>
       {showCanvas ? (
-        <canvas ref={canvasRef} id="canvas" style={{ width: props.width, height: props.height }} />
+        <canvas
+          ref={canvasRef}
+          id="canvas"
+          style={{ width: "2580px", height: "1440px", border: "1px solid #ccc" }}
+        />
       ) : (
         <img src={puzzleImg.current.src} alt="puzzleImage" />
       )}
