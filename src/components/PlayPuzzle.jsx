@@ -20,16 +20,12 @@ const PlayPuzzle = () => {
       level: 3,
     };
     setPuzzleInfo({ crossOrigin: "anonymous", img: res.img, level: res.level });
-    console.log("in setPuzzle: ", puzzleInfo, loaded);
   };
 
   useEffect(() => {
-    console.log(loaded);
     setPuzzle(
       "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
     );
-    console.log(loaded, puzzleInfo);
-    // eslint-disable-next-line
   }, []);
 
   return (

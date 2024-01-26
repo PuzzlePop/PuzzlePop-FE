@@ -13,24 +13,25 @@ const moveTile = () => {
     }
   });
 
+  // 모든 타일을 돌면서 마우스 이벤트 등록
   config.groupTiles.forEach((gtile, gtileIdx) => {
     gtile[0].onMouseDown = (event) => {
       const group = gtile[1];
-      // console.log(config.groupTiles);
-      // console.log(group);
       if (group !== undefined) {
+        // 그룹이면 해당 그룹의 타일들 모두 앞으로 이동
         config.groupTiles.forEach((tile) => {
           if (tile[1] === group) {
-            // console.log(tile);
             tile[0].bringToFront();
           }
         });
       } else {
+        // 그룹이 아닐땐 클릭된 타일만 앞으로 이동
         event.target.bringToFront();
       }
     };
 
     gtile[0].onMouseDrag = (event) => {
+      // 캔버스 사이즈를 벗어나지 않는 범위내로 이동
       const newPosition = {
         x: Math.min(
           Math.max(gtile[0].position._x + event.delta.x, Math.floor(config.tileWidth / 2)),
@@ -41,10 +42,12 @@ const moveTile = () => {
           config.project.view._viewSize._height - Math.floor(config.tileWidth / 2),
         ),
       };
+
       const originalPosition = {
         x: gtile[0].position._x,
         y: gtile[0].position._y,
       };
+
       if (gtile[1] === undefined) {
         gtile[0].position = new Point(newPosition.x, newPosition.y);
       } else {
@@ -134,7 +137,7 @@ const findNearTile = (tile) => {
   // console.log(tileArr, tileShape);
   tileArr.forEach((nowIndexTile, index) => {
     if (nowIndexTile !== undefined) {
-      console.log(tile);
+      // console.log(tile);
       fitTiles(
         tile[2],
         nextIndexArr[index],
@@ -196,10 +199,10 @@ const fitTiles = (nowIndex, preIndex, nowTile, preTile, nowShape, preShape, dir,
   let uniteFlag = false;
 
   switch (dir) {
+    // 좌
     case 0:
       if (
-        (nowTile.position._x - preTile.position._x < range &&
-          nowTile.position._x - preTile.position._x > -range &&
+        (Math.abs(nowTile.position._x - range - preTile.position._x) < errorRange &&
           Math.abs(nowTile.position._y - preTile.position._y) < errorRange) ||
         flag === false
       ) {
@@ -210,10 +213,10 @@ const fitTiles = (nowIndex, preIndex, nowTile, preTile, nowShape, preShape, dir,
         uniteFlag = true;
       }
       break;
+    // 우
     case 1:
       if (
-        (preTile.position._x - nowTile.position._x < range &&
-          preTile.position._x - nowTile.position._x > -range &&
+        (Math.abs(preTile.position._x - range - nowTile.position._x) < errorRange &&
           Math.abs(nowTile.position._y - preTile.position._y) < errorRange) ||
         flag === false
       ) {
@@ -224,10 +227,10 @@ const fitTiles = (nowIndex, preIndex, nowTile, preTile, nowShape, preShape, dir,
         uniteFlag = true;
       }
       break;
+    // 상
     case 2:
       if (
-        (preTile.position._y - nowTile.position._y < range &&
-          preTile.position._y - nowTile.position._y > -range &&
+        (Math.abs(preTile.position._y + range - nowTile.position._y) < errorRange &&
           Math.abs(nowTile.position._x - preTile.position._x) < errorRange) ||
         flag === false
       ) {
@@ -235,10 +238,10 @@ const fitTiles = (nowIndex, preIndex, nowTile, preTile, nowShape, preShape, dir,
         uniteFlag = true;
       }
       break;
+    // 하
     case 3:
       if (
-        (nowTile.position._y - preTile.position._y < range &&
-          nowTile.position._y - preTile.position._y > -range &&
+        (Math.abs(nowTile.position._y + range - preTile.position._y) < errorRange &&
           Math.abs(nowTile.position._x - preTile.position._x) < errorRange) ||
         flag === false
       ) {

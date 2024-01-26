@@ -16,7 +16,7 @@ module.exports = {
     "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
     "import/no-duplicates": "error",
     "getter-return": "warn",
-    "prefer-const": "error",
+    "prefer-const": "warn",
     "no-implicit-coercion": "error",
     "no-undef": "off",
     "no-extra-boolean-cast": "off",
@@ -29,6 +29,7 @@ module.exports = {
       },
     ],
     "no-var": "error",
+    "no-unused-vars": "warn",
     curly: ["error", "all"],
     eqeqeq: ["error", "always", { null: "ignore" }],
 
