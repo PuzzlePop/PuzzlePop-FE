@@ -84,45 +84,35 @@ const findNearTileGroup = () => {
   config.groupTiles.forEach((tile, tileIndex) => {
     tile[0].onMouseUp = (event) => {
       const group = tile[1];
-      // console.log(tile);
-      // console.log("group: ", group);
       if (group !== undefined) {
         config.groupTiles.forEach((gtile) => {
-          // console.log(gtile);
-          if (gtile[1] === group) {
-            // console.log("gtile: ", gtile, group);
+          if (gtile[1] === group && gtile[2] !== tile[2]) {
             findNearTile(gtile);
           }
         });
-      } else {
-        findNearTile(tile);
       }
+      findNearTile(tile);
     };
   });
 };
 
-const findNearTile = (tile) => {
+const findNearTile = (tile, flag = true) => {
   const xTileCount = config.tilesPerRow;
   const yTileCount = config.tilesPerColumn;
 
   const nowIndex = tile[2];
-  // let nowIndex = 0;
-  // if (first) {
-  //   nowIndex = tile[2] - (xTileCount * yTileCount + 1);
-  // } else {
-  //   nowIndex = tile[2] - 1;
-  // }
+
   const nextIndexArr = [
     nowIndex % xTileCount === 0 ? -1 : nowIndex - 1,
     (nowIndex + 1) % xTileCount === 0 ? -1 : nowIndex + 1,
     nowIndex - xTileCount < 0 ? -1 : nowIndex - xTileCount,
     nowIndex + xTileCount >= xTileCount * yTileCount ? -1 : nowIndex + xTileCount,
   ];
-  // console.log(nextIndexArr);
+
   const tileArr = []; // 맞춰야하는 피스 그룹 들어감 (좌우상하 순)
   const tileShape = []; // 맞춰야하는 피스의 탭 모양 들어감 (좌우상하 순)
   const nowShape = config.shapes[nowIndex];
-  // console.log(nowIndex, nextIndexArr);
+
   nextIndexArr.forEach((nextIndex, index) => {
     // 해당 방향에서 (0: 좌, 1: 우, 2: 상, 3: 하)
     // 피스가 이미 맞춰졌거나 테두리 방향이라면
@@ -146,7 +136,7 @@ const findNearTile = (tile) => {
         nowShape,
         tileShape[index],
         index,
-        true,
+        flag,
         tile[0].bounds.width,
       );
     }
@@ -187,12 +177,15 @@ const checkUndefined = (nowIndex, nextIndex, direction) => {
 };
 
 const fitTiles = (nowIndex, preIndex, nowTile, preTile, nowShape, preShape, dir, flag, width) => {
-  // console.log("fitTiles: ", nowIndex, preIndex);
   const xChange = FindChange.findXChange(nowShape, preShape, width);
   const yChange = FindChange.findYChange(nowShape, preShape, width);
   const xUp = FindChange.findXUp(nowShape, preShape, width);
   const yUp = FindChange.findYUp(nowShape, preShape, width);
-  // console.log("xChange, yChange, xUp, yUp: ", xChange, yChange, xUp, yUp);
+
+  if (flag === false) {
+    console.log("fitTiles: ", nowIndex, preIndex);
+    console.log("xChange, yChange, xUp, yUp: ", xChange, yChange, xUp, yUp);
+  }
   const range = config.tileWidth;
   // 오차 범위
   const errorRange = range * 0.2;
@@ -206,10 +199,12 @@ const fitTiles = (nowIndex, preIndex, nowTile, preTile, nowShape, preShape, dir,
           Math.abs(nowTile.position._y - preTile.position._y) < errorRange) ||
         flag === false
       ) {
+        console.log("좌", nowTile.position, range, xChange, yChange);
         nowTile.position = new Point(
           preTile.position._x + range + xChange,
           preTile.position._y + yChange,
         );
+        console.log(nowTile.position);
         uniteFlag = true;
       }
       break;
@@ -220,10 +215,12 @@ const fitTiles = (nowIndex, preIndex, nowTile, preTile, nowShape, preShape, dir,
           Math.abs(nowTile.position._y - preTile.position._y) < errorRange) ||
         flag === false
       ) {
+        console.log("우", nowTile.position, range, xChange, yChange);
         nowTile.position = new Point(
           preTile.position._x - (range + xChange),
           preTile.position._y + yChange,
         );
+        console.log(nowTile.position);
         uniteFlag = true;
       }
       break;
@@ -234,8 +231,10 @@ const fitTiles = (nowIndex, preIndex, nowTile, preTile, nowShape, preShape, dir,
           Math.abs(nowTile.position._x - preTile.position._x) < errorRange) ||
         flag === false
       ) {
+        console.log("상", nowTile.position, range, xUp, yUp);
         nowTile.position = new Point(preTile.position._x + xUp, preTile.position._y + range + yUp);
         uniteFlag = true;
+        console.log(nowTile.position);
       }
       break;
     // 하
@@ -245,10 +244,12 @@ const fitTiles = (nowIndex, preIndex, nowTile, preTile, nowShape, preShape, dir,
           Math.abs(nowTile.position._x - preTile.position._x) < errorRange) ||
         flag === false
       ) {
+        // console.log("하", nowTile.position, range, xUp, yUp);
         nowTile.position = new Point(
           preTile.position._x + xUp,
           preTile.position._y - (range + yUp),
         );
+        // console.log(nowTile.position);
         uniteFlag = true;
       }
       break;
@@ -288,7 +289,7 @@ const uniteTiles = (nowIndex, preIndex) => {
   // console.log(dismantling(config.groupTiles[preIndex][1]));
   if (!dismantling(config.groupTiles[preIndex][1])) {
     // console.log(config.groupTiles[preIndex][1]);
-    groupFit(config.groupTiles[preIndex][1]);
+    groupFit(config.groupTiles[preIndex][1], nowIndex);
   }
 };
 
@@ -310,21 +311,16 @@ const dismantling = (groupIndexNow) => {
   return false;
 };
 
-const groupFit = (nowGroup) => {
+const groupFit = (nowGroup, nowIdx) => {
   const xTileCount = config.tilesPerRow;
   const yTileCount = config.tilesPerColumn;
   const groupArr = [];
   const groupObj = {};
 
   config.groupTiles.forEach((tile) => {
-    let nowIndex = 0;
+    const nowIndex = tile[2];
     if (tile[1] === nowGroup) {
-      if (first) {
-        nowIndex = tile[2] - (xTileCount * yTileCount + 1);
-      } else {
-        nowIndex = tile[2] - 1;
-      }
-      groupArr.push(tile[0]);
+      groupArr.push(tile);
       groupObj[nowIndex] = tile[0];
     }
   });
@@ -334,21 +330,17 @@ const groupFit = (nowGroup) => {
   }
 
   groupArr.forEach((tile) => {
-    let nowIndex = 0;
-    if (first) {
-      nowIndex = tile[2] - (xTileCount * yTileCount + 1);
-    } else {
-      nowIndex = tile[2] - 1;
-    }
+    const nowIndex = tile[2];
+
     const up = nowIndex - xTileCount < 0 ? undefined : nowIndex - xTileCount;
     const left = nowIndex % xTileCount === 0 ? undefined : nowIndex - 1;
     const right = nowIndex % xTileCount === xTileCount - 1 ? undefined : nowIndex + 1;
     const down = nowIndex >= xTileCount * (yTileCount - 1) ? undefined : nowIndex + xTileCount;
 
     const directionArr = [
-      [up, 2],
       [left, 0],
       [right, 1],
+      [up, 2],
       [down, 3],
     ];
 
@@ -358,19 +350,19 @@ const groupFit = (nowGroup) => {
         dir[0] !== undefined &&
         dir[1] !== undefined &&
         groupObj[dir[0]] !== undefined &&
-        index < 1
+        index < 1 &&
+        nowIndex !== nowIdx
       ) {
-        // console.log(groupObj[dir]);
         fitTiles(
-          tile[2],
-          groupObj[dir[2]],
-          tile,
+          nowIndex,
+          dir[0],
+          tile[0],
           groupObj[dir[0]],
           config.shapes[nowIndex],
           config.shapes[dir[0]],
           dir[1],
           false,
-          tile.bounds.width,
+          tile[0].bounds.width,
         );
         index++;
       }
