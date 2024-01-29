@@ -1,21 +1,25 @@
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
 
 export default function GameCard(props) {
+  const navigate = useNavigate();
   const { roomId, img, title, isPlaying, totalPieceCount, curPlayerCount, maxPlayerCount } =
     props.data;
 
   const chipMessage = `${parseInt(maxPlayerCount / 2)} : ${parseInt(maxPlayerCount / 2)}`;
+
+  const handleClick = (event) => {
+    navigate(`/game/${props.category}/${event.currentTarget.id}`);
+  };
   return (
-    <MyCard>
+    <MyCard onClick={handleClick} id={roomId}>
       <CardMedia component="img" sx={{ width: 151 }} image={img} alt={title} />
       <Box sx={{ display: "flex", flexDirection: "column", paddingLeft: 2 }}>
         {props.category === "battle" && <MyChip label={chipMessage} />}
@@ -66,7 +70,6 @@ const MyChip = styled(Chip)`
 const RoomState = styled(Typography)`
   font-weight: bold;
   color: ${(props) => {
-    console.log(props);
     if (props.children === "Playing") {
       return "#f44336";
     } else {

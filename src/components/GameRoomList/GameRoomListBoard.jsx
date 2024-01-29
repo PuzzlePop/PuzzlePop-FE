@@ -95,7 +95,6 @@ export default function GameRoomListBoard(props) {
     const result = [];
 
     for (let i = 0; i < 6 - rooms.length; i++) {
-      console.log(`empty ${i}`);
       result.push(
         <Grid xs={6} key={`empty ${i}`}>
           <EmptyCard></EmptyCard>
