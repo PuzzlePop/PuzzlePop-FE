@@ -68,13 +68,24 @@ const dummyData = [
   },
 ];
 
-export default function GameRoomListBoard() {
+export default function GameRoomListBoard(props) {
   return (
-    <Grid container spacing={2}>
+    <Grid
+      container
+      spacing={2}
+      sx={{
+        margin: "5% auto",
+        backgroundColor: "white",
+        borderRadius: "2%",
+        padding: "3%",
+        width: "80%",
+        border: "1px solid #ccc",
+      }}
+    >
       {dummyData.map((data) => {
         return (
           <Grid xs={6} key={data.roomId}>
-            <GameCard data={data} />
+            <GameCard data={data} category={props.category} />
           </Grid>
         );
       })}
