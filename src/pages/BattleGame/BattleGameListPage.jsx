@@ -15,7 +15,7 @@ export default function BattleGameListPage() {
 }
 
 const Header = styled.div`
-  width: 80%;
+  width: 950px;
   margin: 5% auto;
 `;
 
