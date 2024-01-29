@@ -1,23 +1,36 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import GamePageNavigation from "../../components/GamePageNavigation";
 import Header from "../../components/Header";
 import { request } from "../../apis/requestBuilder";
-import { useEffect, useState } from "react";
 
 export default function CooperationGameListPage() {
+  const navigate = useNavigate();
   const userId = 1;
   const [roomList, setRoomList] = useState([]);
   const [roomTitle, setRoomTitle] = useState("");
 
+  const enterRoom = async (roomId) => {
+    const sender = window.prompt("닉네임을 입력해주세요");
+    if (sender) {
+      localStorage.setItem("wschat.sender", sender);
+      localStorage.setItem("wschat.roomId", roomId);
+      navigate(`/game/cooperation/${roomId}`);
+    }
+  };
+
   const createRoom = async () => {
-    request.post("/game/room", { name: roomTitle, userid: userId }).then((res) => {
-      const { gameId, gameName, gameType, admin, redTeam, blueTeam, isStarted } = res;
-      setRoomTitle("");
-      setRoomList((prev) => [...prev, { gameId, gameName }]);
-    });
+    const res = await request.post("/game/room", { name: roomTitle, userid: userId, type: "TEAM" });
+    const { gameId, gameName, gameType, admin, redTeam, blueTeam, isStarted } = res;
+    console.log(res);
+    setRoomTitle("");
+    await findAllRoom();
   };
 
   const findAllRoom = async () => {
-    request.get("/game/rooms").then(({ data }) => setRoomList(data));
+    const res = await request.get("/game/rooms");
+    const { data } = res;
+    setRoomList(data);
   };
 
   useEffect(() => {
@@ -35,8 +48,10 @@ export default function CooperationGameListPage() {
       />
       <button onClick={createRoom}>방 만들기</button>
       <ul>
-        {roomList.map((room) => (
-          <div key={room.gameId}>{room.gameName}</div>
+        {roomList.map((room, index) => (
+          <div key={index} onClick={() => enterRoom(room.gameId)}>
+            {room.gameName}
+          </div>
         ))}
       </ul>
     </>
