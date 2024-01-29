@@ -8,7 +8,6 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
-import { style } from "@mui/system";
 
 export default function GameCard(props) {
   const { roomId, img, title, isPlaying, totalPieceCount, curPlayerCount, maxPlayerCount } =
@@ -16,7 +15,7 @@ export default function GameCard(props) {
 
   const chipMessage = `${parseInt(maxPlayerCount / 2)} : ${parseInt(maxPlayerCount / 2)}`;
   return (
-    <MyCard sx={{ display: "flex" }}>
+    <MyCard>
       <CardMedia component="img" sx={{ width: 151 }} image={img} alt={title} />
       <Box sx={{ display: "flex", flexDirection: "column", paddingLeft: 2 }}>
         {props.category === "battle" && <MyChip label={chipMessage} />}
@@ -48,6 +47,9 @@ export default function GameCard(props) {
 }
 
 const MyCard = styled(Card)`
+  width: 460px;
+  height: 150px;
+  display: flex;
   position: relative;
   &:hover {
     box-shadow: 5px 5px 10px lightgray;
