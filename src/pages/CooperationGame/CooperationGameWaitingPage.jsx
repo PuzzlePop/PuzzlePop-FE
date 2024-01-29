@@ -62,12 +62,18 @@ export default function CooperationGameWaitingPage() {
   const handleMessageSend = () => {
     if (stompClient && sender) {
       const message = {
+        roomId: roomId.toString(),
         sender: sender.toString(),
-        content: messages.body,
+        message: messages.toString(),
+        type: "GAME",
       };
-      stompClient.send(`/app/room/${roomId}`, {}, JSON.stringify(message));
+      stompClient.send(`/app/game/message`, {}, JSON.stringify(message));
     }
   };
+
+  const handleInput = (e) => {
+      setMessages(e.target.value);
+  }
 
 
   return (
@@ -88,7 +94,7 @@ export default function CooperationGameWaitingPage() {
       </div> */}
 
       <div>
-        <input type="text" placeholder="Type your message" onChange={(e) => setMessages(e.target.value)}/>
+        <input type="text" placeholder="Type your message" onChange={handleInput}/>
         <button onClick={handleMessageSend}>Send</button>
       </div>
     </>
