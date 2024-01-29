@@ -145,7 +145,7 @@ const Wrapper = styled.div`
   width: 950px;
   margin: 5% auto;
   background-color: white;
-  border-radius: 2%;
+  border-radius: 20px;
   padding: 3%;
   border: 1px solid #ccc;
   display: flex;
