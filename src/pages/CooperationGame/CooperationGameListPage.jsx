@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import GamePageNavigation from "../../components/GamePageNavigation";
 import Header from "../../components/Header";
 import { request } from "../../apis/requestBuilder";
+import GameRoomListBoard from "@/components/GameRoomList/GameRoomListBoard";
 
 export default function CooperationGameListPage() {
   const navigate = useNavigate();
@@ -54,6 +55,7 @@ export default function CooperationGameListPage() {
           </div>
         ))}
       </ul>
+      <GameRoomListBoard category="cooperation" />
     </>
   );
 }

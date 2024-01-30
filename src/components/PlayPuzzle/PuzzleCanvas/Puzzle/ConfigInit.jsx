@@ -1,5 +1,5 @@
 import { Size, Point } from "paper/dist/paper-core";
-import Puzzle from "./index";
+import Puzzle from "@/components/PlayPuzzle/PUzzleCanvas/Puzzle/Index";
 
 const constant = {
   percentageTotal: 100.0,

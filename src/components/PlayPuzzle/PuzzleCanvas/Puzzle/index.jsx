@@ -1,4 +1,4 @@
-import MovePuzzle from "./movePuzzle";
+import MovePuzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/MovePuzzle";
 
 let config;
 let gIndex;

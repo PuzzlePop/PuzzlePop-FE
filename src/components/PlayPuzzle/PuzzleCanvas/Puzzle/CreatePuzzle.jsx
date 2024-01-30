@@ -1,5 +1,5 @@
-import Puzzle from "./index";
-import initPuzzle from "./configInit";
+import Puzzle from "@/components/playPuzzle/puzzleCanvas/puzzle/index";
+import initPuzzle from "@/components/playPuzzle/puzzleCanvas/puzzle/ConfigInit";
 
 let config;
 

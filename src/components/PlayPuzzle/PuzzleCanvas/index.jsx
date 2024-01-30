@@ -1,7 +1,8 @@
 import { useRef, useEffect, useState } from "react";
+import styled from "styled-components";
 import Paper from "paper";
-import Puzzle from "./puzzle/index";
-import { createTiles } from "./puzzle/createPuzzle";
+import Puzzle from "@/components/PlayPuzzle/PUzzleCanvas/Puzzle/index";
+import { createTiles } from "@/components/PlayPuzzle/PUzzleCanvas/Puzzle/CreatePuzzle";
 
 // level 임의로 3단계로
 const levelSize = { 1: 500, 2: 600, 3: 800 };
@@ -71,16 +72,18 @@ const PuzzleCanvas = (props) => {
   return (
     <div style={{ width: "100vw", display: "flex", justifyContent: "center" }}>
       {showCanvas ? (
-        <canvas
-          ref={canvasRef}
-          id="canvas"
-          style={{ width: "2580px", height: "1440px", border: "1px solid #ccc" }}
-        />
+        <Canvas ref={canvasRef} id="canvas" />
       ) : (
         <img src={puzzleImg.current.src} alt="puzzleImage" />
       )}
     </div>
   );
 };
+
+const Canvas = styled.canvas`
+  width: 2580px;
+  height: 1440px;
+  border: 1px solid #ccc;
+`;
 
 export default PuzzleCanvas;
