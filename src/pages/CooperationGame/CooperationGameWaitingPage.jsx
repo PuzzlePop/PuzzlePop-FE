@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { request } from "../../apis/requestBuilder";
 import SockJS from "sockjs-client";
 import StompJS from "stompjs";
+import PlayPuzzle from "@/components/PlayPuzzle"
 
 export default function CooperationGameWaitingPage() {
   const { roomId } = useParams();
@@ -19,7 +20,7 @@ export default function CooperationGameWaitingPage() {
     let socket;
     let stomp;
     let subscription;
-    
+
     // 방 정보 가져오기
     request.get(`/game/room/${storedRoomId}`)
       .then((res) => {
@@ -103,6 +104,7 @@ export default function CooperationGameWaitingPage() {
         <input type="text" placeholder="Type your message" onChange={handleInput}/>
         <button onClick={handleMessageSend}>Send</button>
       </div>
+      <PlayPuzzle/>
     </>
   );
 }
