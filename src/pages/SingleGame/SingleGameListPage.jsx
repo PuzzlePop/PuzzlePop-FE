@@ -7,7 +7,7 @@ export default function SingleGameListPage() {
   return (
     <>
       <GamePageNavigation />
-      {/* <PlayPuzzle /> */}
+      <PlayPuzzle />
     </>
   );
 }

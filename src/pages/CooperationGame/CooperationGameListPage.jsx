@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import GamePageNavigation from "../../components/GamePageNavigation";
+import GameRoomListBoard from "@/components/GameRoomList/GameRoomListBoard";
 
 const request = axios.create({
   baseURL: "http://localhost:8080",
@@ -75,7 +76,7 @@ const SocketTestComponent = () => {
         />
         <button onClick={createRoom}>방 생성하기</button>
       </div>
-      <div></div>
+      <GameRoomListBoard category="cooperation" />
     </>
   );
 };

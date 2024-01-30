@@ -132,7 +132,7 @@ export default function GameRoomListBoard(props) {
         renderItem={(item) => (
           <PaginationItem
             component={Link}
-            to={`/game/battle${item.page === 1 ? "" : `?page=${item.page}`}`}
+            to={`/game/${props.category}${item.page === 1 ? "" : `?page=${item.page}`}`}
             {...item}
           />
         )}

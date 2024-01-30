@@ -58,6 +58,7 @@ export default function GameWaitingBoard(props) {
   return (
     <Wrapper container spacing={4}>
       <ColGrid xs={8}>
+        {/* 방 번호, 방 제목, 인원수 header */}
         <InnerBox sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Typography component="div" variant="subtitle2">
             {data.roomId}번방
@@ -70,6 +71,7 @@ export default function GameWaitingBoard(props) {
           </Typography>
         </InnerBox>
 
+        {/* 대기실에 있는 player들 card */}
         <InnerBox>
           {category === "battle" ? (
             // 왜 여기서 unique key warning이 뜨는지 모르겠음...
@@ -107,6 +109,7 @@ export default function GameWaitingBoard(props) {
         </InnerBox>
       </ColGrid>
 
+      {/* 퍼즐 이미지 선택, 피스 수 선택 */}
       <ColGrid xs={4}>
         <InnerBox>hi</InnerBox>
       </ColGrid>
