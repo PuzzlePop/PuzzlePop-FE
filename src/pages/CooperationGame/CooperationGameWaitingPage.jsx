@@ -16,7 +16,10 @@ export default function CooperationGameWaitingPage() {
     const storedRoomId = localStorage.getItem('wschat.roomId');
 
     setSender(storedSender);
-
+    let socket;
+    let stomp;
+    let subscription;
+    
     // 방 정보 가져오기
     request.get(`/game/room/${storedRoomId}`)
       .then((res) => {
@@ -24,8 +27,8 @@ export default function CooperationGameWaitingPage() {
         setRoomInfo(res.data);
         
         // WebSocket 연결
-        const socket = new SockJS(`http://localhost:8080/game`);
-        const stomp = StompJS.over(socket);
+        socket = new SockJS(`http://localhost:8080/game`);
+        stomp = StompJS.over(socket);
 
         // 연결 시도
         stomp.connect({}, () => {
@@ -33,7 +36,7 @@ export default function CooperationGameWaitingPage() {
           setStompClient(stomp);
 
           // 메시지 구독
-          const subscription = stomp.subscribe(`/topic/game/room/${storedRoomId}`, (message) => {
+          subscription = stomp.subscribe(`/topic/game/room/${storedRoomId}`, (message) => {
             const newMessage = JSON.parse(message.body);
             setMessages((prevMessages) => [...prevMessages, newMessage]);
 
@@ -49,15 +52,15 @@ export default function CooperationGameWaitingPage() {
           }));
 
           // 컴포넌트 언마운트 시 연결 종료
-          return () => {
-            subscription.unsubscribe();
-            stomp.disconnect();
-            console.log('WebSocket 연결 종료');
-          };
+          
         });
       })
       .catch((error) => console.error('Error fetching room info:', error));
-
+      return () => {
+        subscription.unsubscribe();
+        stomp.disconnect();
+        console.log('WebSocket 연결 종료');
+      };
     // eslint-disable-next-line
   }, []);
 
