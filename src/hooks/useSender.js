@@ -1,27 +1,22 @@
 import { useEffect } from "react";
-import { atom, useRecoilState } from "recoil";
+import { useLocation } from "react-router-dom";
 
 const webStorage = sessionStorage;
-
-const SenderState = atom({
-  key: "SenderState",
-  default: webStorage.getItem("wschat.sender"),
-});
+const SENDER_KEY = "wschat.sender";
 
 export default function useSender() {
-  const [_sender, setSender] = useRecoilState(SenderState);
+  const location = useLocation();
 
   useEffect(() => {
-    if (!_sender || _sender === "null") {
-      const sender = window.prompt("닉네임을 입력해주세요");
-      if (sender) {
-        setSender(sender);
-        webStorage.setItem("wschat.sender", sender);
-      }
+    const existingSender = webStorage.getItem(SENDER_KEY);
+    if (existingSender) {
+      return;
     }
-  }, [_sender, setSender]);
-
-  return {
-    sender: _sender,
-  };
+    const sender = window.prompt("닉네임을 입력해주세요");
+    if (sender) {
+      webStorage.setItem(SENDER_KEY, sender);
+    }
+  }, [location.pathname]);
 }
+
+export const getSender = () => webStorage.getItem(SENDER_KEY);

@@ -1,3 +1,10 @@
+import Header from "../components/Header";
+
 export default function ShopPage() {
-  return <h1>ShopPage</h1>;
+  return (
+    <>
+      <Header />
+      <h1>Shop Page</h1>
+    </>
+  );
 }
