@@ -50,7 +50,7 @@ const setConfig = (img, level, Paper) => {
 
 const PuzzleCanvas = (props) => {
   const canvasRef = useRef(null);
-  const { puzzleImg, level } = props;
+  const { puzzleImg, level, stomp } = props;
   // eslint-disable-next-line
   const [showCanvas, setShowCanvas] = useState(true);
 
@@ -65,8 +65,8 @@ const PuzzleCanvas = (props) => {
     // console.log(Puzzle.exportConfig());
     createTiles();
 
-    Puzzle.move();
-  }, [level, puzzleImg]);
+    Puzzle.move(stomp);
+  }, [level, puzzleImg, stomp]);
 
   return (
     <div style={{ width: "100vw", display: "flex", justifyContent: "center" }}>
