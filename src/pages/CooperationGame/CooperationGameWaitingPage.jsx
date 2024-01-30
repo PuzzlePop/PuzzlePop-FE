@@ -11,49 +11,52 @@ export default function CooperationGameWaitingPage() {
   const [stompClient, setStompClient] = useState(null);
   const [messages, setMessages] = useState('');
 
-  const findRoom = async () => {
-    request.get(`/game/room/${roomId}`).then((res) => setRoomInfo(res.data));
-  };
-
   useEffect(() => {
-    const storedSender = localStorage.getItem("wschat.sender");
-    const storedRoomId = localStorage.getItem("wschat.roomId");
+    const storedSender = localStorage.getItem('wschat.sender');
+    const storedRoomId = localStorage.getItem('wschat.roomId');
 
     setSender(storedSender);
-    findRoom();
 
-    const socket = new SockJS(`http://localhost:8080/game`);
+    // 방 정보 가져오기
+    request.get(`/game/room/${storedRoomId}`)
+      .then((res) => {
+        console.log('Room info:', res.data);
+        setRoomInfo(res.data);
+        
+        // WebSocket 연결
+        const socket = new SockJS(`http://localhost:8080/game`);
+        const stomp = StompJS.over(socket);
 
-    const stomp = StompJS.over(socket);
+        // 연결 시도
+        stomp.connect({}, () => {
+          console.log('WebSocket 연결 성공');
+          setStompClient(stomp);
 
-    // 연결 시도
-    stomp.connect({}, () => {
-      console.log("WebSocket 연결 성공");
-      setStompClient(stomp);
+          // 메시지 구독
+          const subscription = stomp.subscribe(`/topic/game/room/${storedRoomId}`, (message) => {
+            const newMessage = JSON.parse(message.body);
+            setMessages((prevMessages) => [...prevMessages, newMessage]);
 
-      stomp.subscribe(`/topic/game/room/${roomId}`, (message) => {
-        const newMessage = JSON.parse(message.body);
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
+            // 서버에서 받은 game 객체를 콘솔에 출력
+            console.log('Received game object:', newMessage);
+          });
 
-        // 서버에서 받은 game 객체를 콘솔에 출력
-        console.log("Received game object:", newMessage);
-      });
+          // 서버로 메시지 전송
+          stomp.send('/app/game/message', {}, JSON.stringify({
+            type: 'ENTER',
+            roomId: storedRoomId,
+            sender: storedSender
+          }));
 
-      // 서버로 메시지 전송
-      stomp.send("/app/game/message", {}, JSON.stringify({
-        type: 'ENTER',
-        roomId: roomId,
-        sender: storedSender
-      }));
-    });
-
-    // 컴포넌트 언마운트 시 연결 종료
-    return () => {
-      if (stomp.connected) {
-        stomp.disconnect();
-        console.log("WebSocket 연결 종료");
-      }
-    };
+          // 컴포넌트 언마운트 시 연결 종료
+          return () => {
+            subscription.unsubscribe();
+            stomp.disconnect();
+            console.log('WebSocket 연결 종료');
+          };
+        });
+      })
+      .catch((error) => console.error('Error fetching room info:', error));
 
     // eslint-disable-next-line
   }, []);
