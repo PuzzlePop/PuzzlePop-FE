@@ -4,13 +4,14 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
+import { red, blue } from "@mui/material/colors";
 
 function PlayerCard(props) {
-  const { player } = props;
+  const { player, color } = props;
   const state = player.isCaptain ? "방 장" : player.isReady ? "준 비 완 료" : "준 비 중";
 
   return (
-    <WrapperCard>
+    <WrapperCard className={color}>
       <CardMedia
         sx={{ width: "110px", height: "110px" }}
         component="img"
@@ -33,6 +34,14 @@ function PlayerCard(props) {
 function EmptyPlayerCard() {
   return (
     <WrapperCard sx={{ height: "85%" }}>
+      <CardContent sx={{ margin: "auto" }}></CardContent>
+    </WrapperCard>
+  );
+}
+
+function XPlayerCard() {
+  return (
+    <WrapperCard sx={{ height: "85%" }}>
       <CardContent sx={{ margin: "auto" }}>
         <Typography sx={{ color: "#ccc" }} component="div" variant="h1">
           X
@@ -52,6 +61,14 @@ const WrapperCard = styled(Card)`
   & img {
     border-radius: 10px;
   }
+
+  background-color: ${(props) => {
+    if (props.className === "red") {
+      return red[100];
+    } else if (props.className === "blue") {
+      return blue[100];
+    }
+  }};
 `;
 
 const Content = styled(CardContent)`
@@ -74,14 +91,14 @@ const State = styled(Typography)`
     } else if (props.children === "준 비 완 료") {
       return "#333";
     } else {
-      return "#ddd";
+      return "#aaa";
     }
   }};
   font-weight: ${(props) => {
     if (props.children === "방 장") {
-      return "bold";
+      return "800";
     }
   }};
 `;
 
-export { PlayerCard, EmptyPlayerCard };
+export { PlayerCard, EmptyPlayerCard, XPlayerCard };

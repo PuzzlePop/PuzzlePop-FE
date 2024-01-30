@@ -2,10 +2,58 @@ import styled from "styled-components";
 import Grid from "@mui/material/Unstable_Grid2";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { PlayerCard, EmptyPlayerCard } from "@/components/GameWaiting/PlayerCard";
+import { PlayerCard, EmptyPlayerCard, XPlayerCard } from "@/components/GameWaiting/PlayerCard";
 
 export default function GameWaitingBoard(props) {
   const { data, allowedPiece, category } = props;
+  const redTeams = data.player.filter((player) => player.isRedTeam);
+  const blueTeams = data.player.filter((player) => !player.isRedTeam);
+
+  // 배틀의 경우 [red팀 빈칸 수, blue팀 빈칸 수]
+  // 협동의 경우 방 빈칸 수
+  let emptyPlayerCount = 0;
+  if (category === "battle") {
+    emptyPlayerCount = [0, 0];
+    emptyPlayerCount[0] = parseInt(data.maxPlayerCount / 2) - redTeams.length;
+    emptyPlayerCount[1] = parseInt(data.maxPlayerCount / 2) - blueTeams.length;
+  } else if (category === "cooperation") {
+    emptyPlayerCount = data.maxPlayerCount - data.curPlayerCount;
+  }
+
+  let xPlayerCount = 0;
+  if (category === "battle") {
+    xPlayerCount = 4 - parseInt(data.maxPlayerCount / 2);
+  } else if (category === "cooperation") {
+    xPlayerCount = 8 - data.maxPlayerCount;
+  }
+
+  const makeEmptyPlayer = (count) => {
+    const result = [];
+
+    for (let i = 0; i < count; i++) {
+      result.push(
+        <Grid xs={3}>
+          <EmptyPlayerCard></EmptyPlayerCard>
+        </Grid>,
+      );
+    }
+
+    return result;
+  };
+
+  const makeXPlayer = () => {
+    const result = [];
+
+    for (let i = 0; i < xPlayerCount; i++) {
+      result.push(
+        <Grid xs={3}>
+          <XPlayerCard></XPlayerCard>
+        </Grid>,
+      );
+    }
+
+    return result;
+  };
 
   return (
     <Wrapper container spacing={4}>
@@ -22,20 +70,43 @@ export default function GameWaitingBoard(props) {
           </Typography>
         </InnerBox>
 
-        {/* battle 일땐 red team, blue team 나뉘어야 함 */}
         <InnerBox>
-          <Grid container spacing={2}>
-            {data.player.map((player) => (
-              <Grid key={player.nickname} xs={3}>
-                <PlayerCard player={player} />
-              </Grid>
-            ))}
-            <Grid xs={3}>
-              <EmptyPlayerCard />
+          {category === "battle" ? (
+            // 왜 여기서 unique key warning이 뜨는지 모르겠음...
+            <Grid container spacing={2}>
+              {redTeams.map((player) => (
+                <Grid key={player.nickname} xs={3}>
+                  <PlayerCard player={player} color="red" />
+                </Grid>
+              ))}
+              {makeEmptyPlayer(emptyPlayerCount[0])}
+              {makeXPlayer()}
+              {blueTeams.map((player) => (
+                <Grid key={player.nickname} xs={3}>
+                  <PlayerCard player={player} color="blue" />
+                </Grid>
+              ))}
+              {makeEmptyPlayer(emptyPlayerCount[1])}
+              {makeXPlayer()}
             </Grid>
-          </Grid>
+          ) : (
+            // 왜 여기서 unique key warning이 뜨는지 모르겠음...22
+            <Grid container spacing={2}>
+              {data.player.map((player) => {
+                // console.log(player.nickname);
+                return (
+                  <Grid key={player.nickname} xs={3}>
+                    <PlayerCard player={player} />
+                  </Grid>
+                );
+              })}
+              {makeEmptyPlayer(emptyPlayerCount)}
+              {makeXPlayer()}
+            </Grid>
+          )}
         </InnerBox>
       </ColGrid>
+
       <ColGrid xs={4}>
         <InnerBox>hi</InnerBox>
       </ColGrid>

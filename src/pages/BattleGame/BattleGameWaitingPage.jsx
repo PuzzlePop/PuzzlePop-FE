@@ -8,8 +8,8 @@ const dummyData = {
   title: "방 제목입니다.",
   isPlaying: false,
   totalPieceCount: 300,
-  curPlayerCount: 3,
-  maxPlayerCount: 4,
+  curPlayerCount: 4,
+  maxPlayerCount: 6,
   player: [
     {
       nickname: "용상윤",
@@ -38,20 +38,6 @@ const dummyData = {
       isCaptain: false,
       isReady: true,
       isRedTeam: false,
-    },
-    {
-      nickname: "이주연",
-      img: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
-      isCaptain: false,
-      isReady: false,
-      isRedTeam: false,
-    },
-    {
-      nickname: "조시훈",
-      img: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
-      isCaptain: false,
-      isReady: true,
-      isRedTeam: true,
     },
   ],
 };
