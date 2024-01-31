@@ -2,8 +2,13 @@ import { Point } from "paper/dist/paper-core";
 import Puzzle from "@/components/PlayPuzzle/PUzzleCanvas/Puzzle/Index";
 import FindChange from "@/components/PlayPuzzle/PUzzleCanvas/Puzzle/FindChange";
 
+import SockJS from "sockjs-client";
+import StompJS from "stompjs";
+
 let first = true;
 let config;
+let socket = new SockJS(`http://localhost:8080/game`);
+let stomp = StompJS.over(socket);
 
 const moveTile = () => {
   config = Puzzle.exportConfig();
@@ -13,9 +18,23 @@ const moveTile = () => {
     }
   });
 
+  const storedSender = localStorage.getItem('wschat.sender');
+  const storedRoomId = localStorage.getItem('wschat.roomId');
+  
+
+
+
   // 모든 타일을 돌면서 마우스 이벤트 등록
   config.groupTiles.forEach((gtile, gtileIdx) => {
     gtile[0].onMouseDown = (event) => {
+        stomp.send('/app/game/message', {}, JSON.stringify({
+            type: 'GAME',
+            roomId: storedRoomId,
+            sender: storedSender,
+            message: "MOVE",
+            targets: gtile[2]
+
+        }));
       const group = gtile[1];
       if (group !== undefined) {
         // 그룹이면 해당 그룹의 타일들 모두 앞으로 이동
@@ -261,7 +280,21 @@ const fitTiles = (nowIndex, preIndex, nowTile, preTile, nowShape, preShape, dir,
   }
 };
 
+//ADD_PIECE
 const uniteTiles = (nowIndex, preIndex) => {
+  const storedSender = localStorage.getItem('wschat.sender');
+  const storedRoomId = localStorage.getItem('wschat.roomId');
+  
+
+  stomp.send('/app/game/message', {}, JSON.stringify({
+    type: 'GAME',
+    roomId: storedRoomId,
+    sender: storedSender,
+    message: "ADD_PIECE",
+    targets: nowIndex.toString() + "," + preIndex.toString()
+
+}));
+
   const nowGroup = config.groupTiles[nowIndex][1];
   const preGroup = config.groupTiles[preIndex][1];
 

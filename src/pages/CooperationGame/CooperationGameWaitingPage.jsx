@@ -48,6 +48,8 @@ const dummyData = {
   ],
 };
 const allowedPiece = [100, 200, 300, 400, 500];
+import PlayPuzzle from "@/components/PlayPuzzle";
+import ItemController from "../../components/ItemController";
 
 export default function CooperationGameWaitingPage() {
   const { roomId } = useParams();
@@ -87,7 +89,9 @@ export default function CooperationGameWaitingPage() {
             setMessages((prevMessages) => [...prevMessages, newMessage]);
 
             // 서버에서 받은 game 객체를 콘솔에 출력
-            console.log("Received game object:", newMessage);
+            if (newMessage.message === "combo") {
+              console.log("Received game object:", newMessage);
+            }
           });
 
           // 서버로 메시지 전송
@@ -132,6 +136,7 @@ export default function CooperationGameWaitingPage() {
   return (
     <>
       <GamePageNavigation />
+      <ItemController />
       <h1>CooperationGameWaitingPage</h1>
       <div>roomId : {roomId}</div>
       {/* <div>
@@ -150,6 +155,7 @@ export default function CooperationGameWaitingPage() {
         <button onClick={handleMessageSend}>Send</button>
       </div>
       {/* <GameWaitingBoard data={dummyData} allowedPiece={allowedPiece} category="cooperation" />{" "} */}
+      <PlayPuzzle />
     </>
   );
 }

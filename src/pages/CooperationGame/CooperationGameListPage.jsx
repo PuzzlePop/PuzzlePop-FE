@@ -11,13 +11,13 @@ export default function CooperationGameListPage() {
   const navigate = useNavigate();
   const [roomList, setRoomList] = useState([]);
   const [roomTitle, setRoomTitle] = useState("");
-  const [roomCount, setRoomCount] = useState(1);
+  const [roomSize, setRoomSize] = useState(2);
   const [isOpenedModal, setIsOpenedModal] = useState(false);
 
-  const handleRoomCount = (e) => {
+  const handleRoomSize = (e) => {
     const count = Number(e.target.value);
-    if (1 <= count && count <= 6) {
-      setRoomCount(count);
+    if (2 <= count && count <= 6) {
+      setRoomSize(count);
     }
   };
 
@@ -46,6 +46,7 @@ export default function CooperationGameListPage() {
       name: roomTitle,
       userid: sender,
       type: "TEAM",
+      roomSize,
     });
     // 방 속성 정보
     const { blueTeam, gameId, gameName, gameType, isStarted, redTeam, sessionToUser, startTime } =
@@ -106,7 +107,7 @@ export default function CooperationGameListPage() {
               value={roomTitle}
               onChange={(e) => setRoomTitle(e.target.value)}
             />
-            <input type="number" value={roomCount} onChange={handleRoomCount} />
+            <input type="number" value={roomSize} onChange={handleRoomSize} />
             <button disabled={!roomTitle} onClick={createRoom}>
               방 만들기
             </button>
