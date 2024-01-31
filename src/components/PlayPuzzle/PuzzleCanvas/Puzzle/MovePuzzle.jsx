@@ -1,6 +1,6 @@
 import { Point } from "paper/dist/paper-core";
-import Puzzle from "@/components/PlayPuzzle/PUzzleCanvas/Puzzle/index";
-import FindChange from "@/components/PlayPuzzle/PUzzleCanvas/Puzzle/FindChange";
+import Puzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/index";
+import FindChange from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/FindChange";
 
 let first = true;
 let config;
