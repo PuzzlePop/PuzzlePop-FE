@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { request } from "../../apis/requestBuilder";
 import SockJS from "sockjs-client";
 import StompJS from "stompjs";
+import { getSender, getRoomId } from "../../socket-utils/storage";
 
 // 더미 데이터
 const dummyData = {
@@ -56,8 +57,8 @@ export default function CooperationGameWaitingPage() {
   const [messages, setMessages] = useState("");
 
   useEffect(() => {
-    const storedSender = localStorage.getItem("wschat.sender");
-    const storedRoomId = localStorage.getItem("wschat.roomId");
+    const storedSender = getSender();
+    const storedRoomId = getRoomId();
 
     setSender(storedSender);
     let socket;
@@ -148,8 +149,7 @@ export default function CooperationGameWaitingPage() {
         <input type="text" placeholder="Type your message" onChange={handleInput} />
         <button onClick={handleMessageSend}>Send</button>
       </div>
-      <GameWaitingBoard data={dummyData} allowedPiece={allowedPiece} category="cooperation" />{" "}
-      develop
+      {/* <GameWaitingBoard data={dummyData} allowedPiece={allowedPiece} category="cooperation" />{" "} */}
     </>
   );
 }

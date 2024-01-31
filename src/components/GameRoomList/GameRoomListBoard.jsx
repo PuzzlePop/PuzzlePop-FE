@@ -83,7 +83,7 @@ const dummyData = [
   },
 ];
 
-export default function GameRoomListBoard(props) {
+export default function GameRoomListBoard({ category, roomList }) {
   const [rooms, setRooms] = useState([]);
   const [totalPage, setTotalPage] = useState(0);
 
@@ -106,20 +106,20 @@ export default function GameRoomListBoard(props) {
   };
 
   useEffect(() => {
-    setTotalPage(parseInt(dummyData.length / 6) + 1);
-  }, []);
+    setTotalPage(parseInt(roomList.length / 6) + 1);
+  }, [roomList]);
 
   useEffect(() => {
-    setRooms(dummyData.slice((page - 1) * 6, page * 6));
-  }, [page]);
+    setRooms(roomList.slice((page - 1) * 6, page * 6));
+  }, [page, roomList]);
 
   return (
     <Wrapper>
       <Grid container spacing={4}>
-        {rooms.map((data) => {
+        {rooms.map(({ gameId, ...room }) => {
           return (
-            <Grid xs={6} key={data.roomId}>
-              <GameCard data={data} category={props.category} />
+            <Grid xs={6} key={gameId}>
+              <GameCard data={room} category={props.category} />
             </Grid>
           );
         })}

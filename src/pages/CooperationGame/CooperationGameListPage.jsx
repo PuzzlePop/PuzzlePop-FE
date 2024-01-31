@@ -4,9 +4,8 @@ import GamePageNavigation from "../../components/GamePageNavigation";
 import Header from "../../components/Header";
 import { request } from "../../apis/requestBuilder";
 import GameRoomListBoard from "@/components/GameRoomList/GameRoomListBoard";
-import { Modal, Typography, Box } from "@mui/material";
-
-const USER_ID = "1"; // sample
+import { Modal, Typography, Box, TextField, Button } from "@mui/material";
+import { setRoomId, setSender } from "../../socket-utils/storage";
 
 export default function CooperationGameListPage() {
   const navigate = useNavigate();
@@ -24,11 +23,12 @@ export default function CooperationGameListPage() {
 
   const enterRoom = async (roomId) => {
     const sender = window.prompt("닉네임을 입력해주세요");
-    if (sender) {
-      localStorage.setItem("wschat.sender", sender);
-      localStorage.setItem("wschat.roomId", roomId);
-      navigate(`/game/cooperation/${roomId}`);
+    if (!sender) {
+      return;
     }
+    setSender(sender);
+    setRoomId(roomId);
+    navigate(`/game/cooperation/${roomId}`);
   };
 
   const createRoom = async () => {
@@ -36,21 +36,28 @@ export default function CooperationGameListPage() {
       return;
     }
 
-    const res = await request.post("/game/room", {
+    const sender = window.prompt("닉네임을 입력해주세요");
+    if (!sender) {
+      return;
+    }
+    setSender(sender);
+
+    const { data } = await request.post("/game/room", {
       name: roomTitle,
-      userid: USER_ID,
+      userid: sender,
       type: "TEAM",
     });
-    const { gameId, gameName, gameType, admin, redTeam, blueTeam, isStarted } = res;
-    console.log(res);
-    setRoomTitle("");
-    await findAllRoom();
+    // 방 속성 정보
+    const { blueTeam, gameId, gameName, gameType, isStarted, redTeam, sessionToUser, startTime } =
+      data;
+    setRoomId(gameId);
+    navigate(`/game/cooperation/${gameId}`);
   };
 
   const findAllRoom = async () => {
     const res = await request.get("/game/rooms");
-    const { data } = res;
-    setRoomList(data);
+    const { data: fetchedRoomList } = res;
+    setRoomList(fetchedRoomList);
   };
 
   useEffect(() => {
@@ -63,13 +70,13 @@ export default function CooperationGameListPage() {
       <GamePageNavigation />
       <button onClick={() => setIsOpenedModal(true)}>방 만들기</button>
       <ul>
-        {roomList.map((room, index) => (
-          <div key={index} onClick={() => enterRoom(room.gameId)}>
+        {roomList.map((room) => (
+          <div key={room.gameId} onClick={() => enterRoom(room.gameId)}>
             {room.gameName}
           </div>
         ))}
       </ul>
-      <GameRoomListBoard category="cooperation" />
+      {/* <GameRoomListBoard category="cooperation" /> */}
       <Modal
         open={isOpenedModal}
         onClose={() => setIsOpenedModal(false)}
