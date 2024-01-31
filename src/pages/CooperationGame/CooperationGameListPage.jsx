@@ -9,6 +9,7 @@ export default function CooperationGameListPage() {
   const userId = 1;
   const [roomList, setRoomList] = useState([]);
   const [roomTitle, setRoomTitle] = useState("");
+  const [roomSize, setRoomSize] = useState(8);
 
   const enterRoom = async (roomId) => {
     const sender = window.prompt("닉네임을 입력해주세요");
@@ -20,7 +21,7 @@ export default function CooperationGameListPage() {
   };
 
   const createRoom = async () => {
-    const res = await request.post("/game/room", { name: roomTitle, userid: userId, type: "TEAM" });
+    const res = await request.post("/game/room", { name: roomTitle, userid: userId, type: "TEAM", roomSize: roomSize});
     const { gameId, gameName, gameType, admin, redTeam, blueTeam, isStarted } = res;
     console.log(res);
     setRoomTitle("");
@@ -45,6 +46,11 @@ export default function CooperationGameListPage() {
         placeholder="방 제목"
         value={roomTitle}
         onChange={(e) => setRoomTitle(e.target.value)}
+      />
+      <input
+        placeholder="방 인원"
+        value={roomSize}
+        onChange={(e) => setRoomSize(e.target.value)}
       />
       <button onClick={createRoom}>방 만들기</button>
       <ul>
