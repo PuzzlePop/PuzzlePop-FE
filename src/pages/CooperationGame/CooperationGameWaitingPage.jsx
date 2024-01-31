@@ -44,7 +44,9 @@ export default function CooperationGameWaitingPage() {
             setMessages((prevMessages) => [...prevMessages, newMessage]);
 
             // 서버에서 받은 game 객체를 콘솔에 출력
-            console.log("Received game object:", newMessage);
+            if (newMessage.message === 'combo'){
+              console.log("Received game object:", newMessage);
+            }
           });
 
           // 서버로 메시지 전송
