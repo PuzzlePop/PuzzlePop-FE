@@ -1,8 +1,8 @@
 import { useRef, useEffect, useState } from "react";
 import styled from "styled-components";
 import Paper from "paper";
-import Puzzle from "@/components/PlayPuzzle/PUzzleCanvas/Puzzle/index";
-import { createTiles } from "@/components/PlayPuzzle/PUzzleCanvas/Puzzle/CreatePuzzle";
+import Puzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/index";
+import { createTiles } from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/CreatePuzzle";
 
 // level 임의로 3단계로
 const levelSize = { 1: 500, 2: 600, 3: 800 };
