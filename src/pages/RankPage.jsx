@@ -1,10 +1,10 @@
 import Header from "../components/Header";
 
-export default function HomePage() {
+export default function RankPage() {
   return (
     <>
       <Header />
-      <h1>HomePage</h1>
+      <h3>Ranking Page</h3>
     </>
   );
 }

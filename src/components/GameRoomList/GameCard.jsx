@@ -9,10 +9,20 @@ import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
 import CardActionArea from "@mui/material/CardActionArea";
 
-export default function GameCard(props) {
+export default function GameCard({
+  blueTeam,
+  gameId,
+  gameName,
+  gameType,
+  isStarted,
+  redTeam,
+  sessionToUser,
+  startTime,
+  ...room
+}) {
   const navigate = useNavigate();
-  const { roomId, img, title, isPlaying, totalPieceCount, curPlayerCount, maxPlayerCount } =
-    props.data;
+  // const { roomId, img, title, isPlaying, totalPieceCount, curPlayerCount, maxPlayerCount } =
+  //   props.data;
 
   const chipMessage = `${parseInt(maxPlayerCount / 2)} : ${parseInt(maxPlayerCount / 2)}`;
   const chipColorArray = ["error", "warning", "success", "info"];
@@ -90,3 +100,6 @@ const RoomState = styled(Typography)`
     }
   }};
 `;
+
+const SAMPLE_IMAGE =
+  "https://img1.daumcdn.net/thumb/R1280x0.fjpg/?fname=http://t1.daumcdn.net/brunch/service/user/cnoC/image/R7FVHsxQscWuMqj6TtNhHLSH8do";
