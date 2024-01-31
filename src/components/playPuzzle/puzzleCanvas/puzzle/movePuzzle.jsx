@@ -35,7 +35,7 @@ const moveTile = () => {
             message: "MOVE",
             targets: gtile[2],
             position_x: gtile[0].position.x,
-            potision_y: gtile[0].position.y
+            position_y: gtile[0].position.y
         }));
       const group = gtile[1];
       if (group !== undefined) {
