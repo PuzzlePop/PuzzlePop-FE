@@ -21,7 +21,8 @@ export default function CooperationGameListPage() {
   };
 
   const createRoom = async () => {
-    const res = await request.post("/game/room", { name: roomTitle, userid: userId, type: "TEAM", roomSize: roomSize});
+    console.log({ name: roomTitle, userid: userId, type: "TEAM", roomSize: roomSize, gameType: "COOPERATION"})
+    const res = await request.post("/game/room", { name: roomTitle, userid: userId, type: "TEAM", roomSize: roomSize, gameType: "COOPERATION"});
     const { gameId, gameName, gameType, admin, redTeam, blueTeam, isStarted } = res;
     console.log(res);
     setRoomTitle("");
