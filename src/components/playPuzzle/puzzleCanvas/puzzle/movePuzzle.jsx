@@ -27,13 +27,15 @@ const moveTile = () => {
   // 모든 타일을 돌면서 마우스 이벤트 등록
   config.groupTiles.forEach((gtile, gtileIdx) => {
     gtile[0].onMouseDown = (event) => {
+      console.log(gtile[0].position.x)
         stomp.send('/app/game/message', {}, JSON.stringify({
             type: 'GAME',
             roomId: storedRoomId,
             sender: storedSender,
             message: "MOVE",
-            targets: gtile[2]
-
+            targets: gtile[2],
+            position_x: gtile[0].position.x,
+            potision_y: gtile[0].position.y
         }));
       const group = gtile[1];
       if (group !== undefined) {
