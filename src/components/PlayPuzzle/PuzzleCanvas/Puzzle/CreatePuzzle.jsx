@@ -1,5 +1,5 @@
-import Puzzle from "@/components/playPuzzle/puzzleCanvas/puzzle/index.jsx";
-import initPuzzle from "@/components/playPuzzle/puzzleCanvas/puzzle/ConfigInit";
+import Puzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/index.jsx";
+import initPuzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/ConfigInit";
 
 let config;
 
