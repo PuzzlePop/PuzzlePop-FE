@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import PuzzleCanvas from "@/components/PlayPuzzle/PuzzleCanvas/index";
+import PuzzleCanvas from "@/components/PlayPuzzle/PuzzleCanvas/index.jsx";
 
 const PlayPuzzle = () => {
   const [loaded, setLoaded] = useState(false);
