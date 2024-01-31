@@ -1,4 +1,4 @@
-import Puzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/index.jsx";
+import Puzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/index";
 import initPuzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/ConfigInit";
 
 let config;
