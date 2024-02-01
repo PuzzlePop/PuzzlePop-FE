@@ -3,6 +3,8 @@ import styled from "styled-components";
 import Paper from "paper";
 import Puzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/index";
 import { createTiles } from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/CreatePuzzle";
+import { config } from "./Puzzle/MovePuzzle";
+import { Point } from "paper/dist/paper-core";
 
 // level 임의로 3단계로
 const levelSize = { 1: 500, 2: 600, 3: 800 };
@@ -69,14 +71,36 @@ const PuzzleCanvas = (props) => {
     Puzzle.move();
   }, [level, puzzleImg]);
 
+  const intervalHandler = (tile, x, y) => {
+    tile.position = new Point(x, y);
+  };
+
+  const handleClickButton = () => {
+    // const tile = config.tiles.find((tile) => tile.id === 7);
+    // let x = 0;
+    // let y = 0;
+    // setInterval(() => {
+    //   if (x >= 1000 || y >= 1000) {
+    //     return;
+    //   }
+    //   tile.position = new Point(x, y);
+    //   x += 40;
+    //   y += 40;
+    // }, 100);
+  };
+
   return (
-    <div style={{ width: "100vw", display: "flex", justifyContent: "center" }}>
-      {showCanvas ? (
-        <Canvas ref={canvasRef} id="canvas" />
-      ) : (
-        <img src={puzzleImg.current.src} alt="puzzleImage" />
-      )}
-    </div>
+    <>
+      <button onClick={() => console.log(config)}>퍼즐 정보 체크</button>
+      <button onClick={handleClickButton}>퍼즐 순간이동!</button>
+      <div style={{ width: "100vw", display: "flex", justifyContent: "center" }}>
+        {showCanvas ? (
+          <Canvas ref={canvasRef} id="canvas" />
+        ) : (
+          <img src={puzzleImg.current.src} alt="puzzleImage" />
+        )}
+      </div>
+    </>
   );
 };
 
