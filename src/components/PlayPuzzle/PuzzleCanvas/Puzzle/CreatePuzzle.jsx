@@ -66,9 +66,6 @@ const getRandomShapes = () => {
       }
     }
   }
-
-  // TODO: 상우하좌 퍼즐 모양을 나타내는 배열
-  // console.log(config.shapes);
 };
 
 // -1 or 1 (들어간 모양인지 나온 모양인지) 결정

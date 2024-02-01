@@ -67,32 +67,13 @@ const PuzzleCanvas = (props) => {
     setConfig(puzzleImg, level, Paper);
     // console.log(Puzzle.exportConfig());
     createTiles();
-
     Puzzle.move();
+
+    console.log(config);
   }, [level, puzzleImg]);
-
-  const intervalHandler = (tile, x, y) => {
-    tile.position = new Point(x, y);
-  };
-
-  const handleClickButton = () => {
-    // const tile = config.tiles.find((tile) => tile.id === 7);
-    // let x = 0;
-    // let y = 0;
-    // setInterval(() => {
-    //   if (x >= 1000 || y >= 1000) {
-    //     return;
-    //   }
-    //   tile.position = new Point(x, y);
-    //   x += 40;
-    //   y += 40;
-    // }, 100);
-  };
 
   return (
     <>
-      <button onClick={() => console.log(config)}>퍼즐 정보 체크</button>
-      <button onClick={handleClickButton}>퍼즐 순간이동!</button>
       <div style={{ width: "100vw", display: "flex", justifyContent: "center" }}>
         {showCanvas ? (
           <Canvas ref={canvasRef} id="canvas" />
