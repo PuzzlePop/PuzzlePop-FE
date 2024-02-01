@@ -1,13 +1,14 @@
 import { useCallback, useEffect } from "react";
 import SockJS from "sockjs-client";
 import StompJS from "stompjs";
+import { getRoomId, getSender } from "../socket-utils/storage";
 
 let socket = new SockJS(`http://localhost:8080/game`);
 let stomp = StompJS.over(socket);
 
 export default function ItemController() {
-  const storedSender = localStorage.getItem('wschat.sender');
-  const storedRoomId = localStorage.getItem('wschat.roomId');
+  const storedSender = getSender();
+  const storedRoomId = getRoomId();
   
 
   
