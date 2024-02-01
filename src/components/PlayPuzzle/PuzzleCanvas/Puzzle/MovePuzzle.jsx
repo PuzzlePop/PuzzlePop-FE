@@ -1,15 +1,14 @@
 import { Point } from "paper/dist/paper-core";
 import Puzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/index";
 import FindChange from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/FindChange";
-
-import SockJS from "sockjs-client";
-import StompJS from "stompjs";
 import { getRoomId, getSender } from "../../../../socket-utils/storage";
+import { socket } from "../../../../socket-utils/socket";
 
-let first = true;
+// let first = true;
+
+const { send } = socket;
+
 export let config;
-const socket = new SockJS(`http://localhost:8080/game`);
-const stomp = StompJS.over(socket);
 
 const getPuzzleGroup = (paperEvent) => {
   const puzzleUniqueId = paperEvent.target.id;
@@ -40,9 +39,6 @@ const moveTile = () => {
     }
   });
 
-  const sender = getSender();
-  const roomId = getRoomId();
-
   // 모든 타일을 돌면서 마우스 이벤트 등록
   config.groupTiles.forEach((gtile, gtileIdx) => {
     gtile[0].onMouseDown = (event) => {
@@ -62,13 +58,13 @@ const moveTile = () => {
       const puzzleGroup = getPuzzleGroup(event);
 
       // socket 전송
-      stomp.send(
+      send(
         "/app/game/message",
         {},
         JSON.stringify({
           type: "GAME",
-          roomId,
-          sender,
+          roomId: getRoomId(),
+          sender: getSender(),
           message: "MOUSE_DOWN",
           targets: JSON.stringify(puzzleGroup),
           position_x: gtile[0].position.x,
@@ -111,13 +107,13 @@ const moveTile = () => {
       const puzzleGroup = getPuzzleGroup(event);
 
       // socket 전송
-      stomp.send(
+      send(
         "/app/game/message",
         {},
         JSON.stringify({
           type: "GAME",
-          roomId,
-          sender,
+          roomId: getRoomId(),
+          sender: getSender(),
           message: "MOUSE_DRAG",
           targets: JSON.stringify(puzzleGroup),
           position_x: gtile[0].position.x,
@@ -151,22 +147,19 @@ const indexUpdate = (groupIndex) => {
 };
 
 const findNearTileGroup = () => {
-  const sender = getSender();
-  const roomId = getRoomId();
-
   config = Puzzle.exportConfig();
 
   config.groupTiles.forEach((tile, tileIndex) => {
     tile[0].onMouseUp = (event) => {
       const puzzleGroup = getPuzzleGroup(event);
       // socket 전송
-      stomp.send(
+      send(
         "/app/game/message",
         {},
         JSON.stringify({
           type: "GAME",
-          roomId,
-          sender,
+          roomId: getRoomId(),
+          sender: getSender(),
           message: "MOUSE_UP",
           targets: JSON.stringify(puzzleGroup),
           position_x: tile[0].position.x,
@@ -354,16 +347,13 @@ const fitTiles = (nowIndex, preIndex, nowTile, preTile, nowShape, preShape, dir,
 
 //ADD_PIECE
 const uniteTiles = (nowIndex, preIndex) => {
-  const sender = getSender();
-  const roomId = getRoomId();
-
-  stomp.send(
+  send(
     "/app/game/message",
     {},
     JSON.stringify({
       type: "GAME",
-      roomId,
-      sender,
+      roomId: getRoomId(),
+      sender: getSender(),
       message: "ADD_PIECE",
       targets: nowIndex.toString() + "," + preIndex.toString(),
     }),
