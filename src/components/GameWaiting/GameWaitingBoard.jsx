@@ -3,9 +3,9 @@ import Grid from "@mui/material/Unstable_Grid2";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { PlayerCard, EmptyPlayerCard, XPlayerCard } from "@/components/GameWaiting/PlayerCard";
+import SelectImgAndPiece from "@/components/GameWaiting/SelectImgAndPiece";
 
-export default function GameWaitingBoard(props) {
-  const { data, allowedPiece, category } = props;
+export default function GameWaitingBoard({ data, allowedPiece, category }) {
   const redTeams = data.player.filter((player) => player.isRedTeam);
   const blueTeams = data.player.filter((player) => !player.isRedTeam);
 
@@ -111,7 +111,7 @@ export default function GameWaitingBoard(props) {
 
       {/* 퍼즐 이미지 선택, 피스 수 선택 */}
       <ColGrid xs={4}>
-        <InnerBox>hi</InnerBox>
+        <SelectImgAndPiece src={data.img} allowedPiece={allowedPiece} />
       </ColGrid>
     </Wrapper>
   );
