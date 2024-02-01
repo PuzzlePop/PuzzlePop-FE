@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import GamePageNavigation from "@/components/GamePageNavigation";
 import GameWaitingBoard from "@/components/GameWaiting/GameWaitingBoard";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { useParams } from "react-router-dom";
 import { request } from "../../apis/requestBuilder";
 import SockJS from "sockjs-client";
@@ -135,6 +137,7 @@ export default function CooperationGameWaitingPage() {
 
   return (
     <>
+      <Header />
       <GamePageNavigation />
       <ItemController />
       <h1>CooperationGameWaitingPage</h1>
@@ -154,8 +157,9 @@ export default function CooperationGameWaitingPage() {
         <input type="text" placeholder="Type your message" onChange={handleInput} />
         <button onClick={handleMessageSend}>Send</button>
       </div>
-      {/* <GameWaitingBoard data={dummyData} allowedPiece={allowedPiece} category="cooperation" />{" "} */}
+      {/* <GameWaitingBoard data={dummyData} allowedPiece={allowedPiece} category="cooperation" /> */}
       <PlayPuzzle />
+      <Footer />
     </>
   );
 }

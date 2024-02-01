@@ -1,6 +1,7 @@
 import GamePageNavigation from "@/components/GamePageNavigation";
 import GameRoomListBoard from "@/components/GameRoomList/GameRoomListBoard";
-import Header from "../../components/Header";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 export default function BattleGameListPage() {
   return (
@@ -11,6 +12,7 @@ export default function BattleGameListPage() {
         <h1>배틀 플레이</h1>
       </div>
       <GameRoomListBoard category="battle" />
+      <Footer />
     </>
   );
 }

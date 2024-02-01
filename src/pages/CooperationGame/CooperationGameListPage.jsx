@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GamePageNavigation from "../../components/GamePageNavigation";
-import Header from "../../components/Header";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { request } from "../../apis/requestBuilder";
 import GameRoomListBoard from "@/components/GameRoomList/GameRoomListBoard";
 import { Modal, Typography, Box, TextField, Button } from "@mui/material";
@@ -115,6 +116,8 @@ export default function CooperationGameListPage() {
           </Box>
         </Box>
       </Modal>
+
+      <Footer />
     </>
   );
 }
