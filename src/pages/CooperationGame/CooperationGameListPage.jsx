@@ -47,6 +47,7 @@ export default function CooperationGameListPage() {
       userid: sender,
       type: "TEAM",
       roomSize,
+      gameType: "COOPERATION",
     });
     // 방 속성 정보
     const { blueTeam, gameId, gameName, gameType, isStarted, redTeam, sessionToUser, startTime } =
