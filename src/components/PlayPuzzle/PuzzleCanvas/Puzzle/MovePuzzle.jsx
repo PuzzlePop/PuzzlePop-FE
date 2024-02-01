@@ -4,6 +4,7 @@ import FindChange from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/FindChange";
 
 import SockJS from "sockjs-client";
 import StompJS from "stompjs";
+import { getRoomId, getSender } from "../../../../socket-utils/storage";
 
 let first = true;
 let config;
@@ -18,23 +19,23 @@ const moveTile = () => {
     }
   });
 
-  const storedSender = localStorage.getItem('wschat.sender');
-  const storedRoomId = localStorage.getItem('wschat.roomId');
-  
-
-
+  const storedSender = getSender();
+  const storedRoomId = getRoomId();
 
   // 모든 타일을 돌면서 마우스 이벤트 등록
   config.groupTiles.forEach((gtile, gtileIdx) => {
     gtile[0].onMouseDown = (event) => {
-        stomp.send('/app/game/message', {}, JSON.stringify({
-            type: 'GAME',
-            roomId: storedRoomId,
-            sender: storedSender,
-            message: "MOVE",
-            targets: gtile[2]
-
-        }));
+      stomp.send(
+        "/app/game/message",
+        {},
+        JSON.stringify({
+          type: "GAME",
+          roomId: storedRoomId,
+          sender: storedSender,
+          message: "MOVE",
+          targets: gtile[2],
+        }),
+      );
       const group = gtile[1];
       if (group !== undefined) {
         // 그룹이면 해당 그룹의 타일들 모두 앞으로 이동
@@ -50,6 +51,7 @@ const moveTile = () => {
     };
 
     gtile[0].onMouseDrag = (event) => {
+      console.log(event);
       // 캔버스 사이즈를 벗어나지 않는 범위내로 이동
       const newPosition = {
         x: Math.min(
@@ -282,18 +284,20 @@ const fitTiles = (nowIndex, preIndex, nowTile, preTile, nowShape, preShape, dir,
 
 //ADD_PIECE
 const uniteTiles = (nowIndex, preIndex) => {
-  const storedSender = localStorage.getItem('wschat.sender');
-  const storedRoomId = localStorage.getItem('wschat.roomId');
-  
+  const storedSender = getSender();
+  const storedRoomId = getRoomId();
 
-  stomp.send('/app/game/message', {}, JSON.stringify({
-    type: 'GAME',
-    roomId: storedRoomId,
-    sender: storedSender,
-    message: "ADD_PIECE",
-    targets: nowIndex.toString() + "," + preIndex.toString()
-
-}));
+  stomp.send(
+    "/app/game/message",
+    {},
+    JSON.stringify({
+      type: "GAME",
+      roomId: storedRoomId,
+      sender: storedSender,
+      message: "ADD_PIECE",
+      targets: nowIndex.toString() + "," + preIndex.toString(),
+    }),
+  );
 
   const nowGroup = config.groupTiles[nowIndex][1];
   const preGroup = config.groupTiles[preIndex][1];
