@@ -56,14 +56,18 @@ export default function CooperationGameListPage() {
     navigate(`/game/cooperation/${gameId}`);
   };
 
-  const findAllRoom = async () => {
+  const refetchAllRoom = () => {
+    fetchAllRoom();
+  };
+
+  const fetchAllRoom = async () => {
     const res = await request.get("/game/rooms");
     const { data: fetchedRoomList } = res;
     setRoomList(fetchedRoomList);
   };
 
   useEffect(() => {
-    findAllRoom();
+    fetchAllRoom();
   }, []);
 
   return (
@@ -71,6 +75,7 @@ export default function CooperationGameListPage() {
       <Header />
       <GamePageNavigation />
       <button onClick={() => setIsOpenedModal(true)}>방 만들기</button>
+      <button onClick={refetchAllRoom}>새로고침</button>
       <ul>
         {roomList.map((room) => (
           <div key={room.gameId} onClick={() => enterRoom(room.gameId)}>

@@ -1,3 +1,13 @@
+import { useParams } from "react-router-dom";
+import PlayPuzzle from "../../components/PlayPuzzle";
+
 export default function CooperationGameIngamePage() {
-  return <h1>CooperationGameIngamePage</h1>;
+  const { roomId } = useParams();
+
+  return (
+    <>
+      <h1>CooperationGameIngamePage : {roomId}</h1>
+      <PlayPuzzle shapes={null} />
+    </>
+  );
 }

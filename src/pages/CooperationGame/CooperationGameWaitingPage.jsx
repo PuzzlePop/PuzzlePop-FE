@@ -6,24 +6,52 @@ import { request } from "../../apis/requestBuilder";
 import { getSender, getRoomId } from "../../socket-utils/storage";
 import { socket } from "../../socket-utils/socket";
 import PlayPuzzle from "../../components/PlayPuzzle";
+import CooperationGameIngamePage from "./CooperationGameIngamePage";
 
 const { connect, send, subscribe, unsubscribe, disconnect } = socket;
 
 export default function CooperationGameWaitingPage() {
+  const [isIngame, setIsIngame] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [roomInfo, setRoomInfo] = useState(null);
 
   const connectSocket = async () => {
+    setLoading(true);
+
     try {
       const { data: fetchedRoomInfo } = await request.get(`/game/room/${roomId}`);
+      const { isStarted } = fetchedRoomInfo;
+
+      if (isStarted) {
+        setLoading(false);
+        setIsIngame(true);
+        return;
+      }
+
       setRoomInfo(fetchedRoomInfo);
+
+      console.log(fetchedRoomInfo);
 
       // websocket 연결 시도
       connect(() => {
         // console.log("WebSocket 연결 성공");
 
-        subscribe(`/topic/game/room/${roomId}`, (message) => {});
+        subscribe(`/topic/game/room/${roomId}`, (message) => {
+          const data = JSON.parse(message.body);
+
+          // 게임이 시작했을 경우
+          if (data.redPuzzle) {
+            setLoading(true);
+            const puzzleBoard = data.redPuzzle.board;
+            console.log(puzzleBoard);
+
+            setIsIngame(true);
+            setLoading(false);
+            return;
+          }
+        });
 
         // 서버로 메시지 전송
         send(
@@ -36,6 +64,8 @@ export default function CooperationGameWaitingPage() {
           }),
         );
       });
+
+      setLoading(false);
     } catch (e) {
       console.log("room fetch error");
       navigate("/game/cooperation", {
@@ -77,6 +107,14 @@ export default function CooperationGameWaitingPage() {
     }
   };
 
+  if (loading) {
+    return <h1>Loading...</h1>;
+  }
+
+  if (isIngame) {
+    return <CooperationGameIngamePage />;
+  }
+
   return (
     <>
       <GamePageNavigation />
@@ -87,7 +125,6 @@ export default function CooperationGameWaitingPage() {
         <button onClick={handleGameStart}>GAME START</button>
       </div>
       {/* <GameWaitingBoard data={dummyData} allowedPiece={allowedPiece} category="cooperation" />{" "} */}
-      <PlayPuzzle category="single" />
     </>
   );
 }

@@ -3,9 +3,13 @@ import initPuzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/ConfigInit";
 
 let config;
 
-export const createTiles = () => {
+export const createTiles = (shapes) => {
   config = Puzzle.exportConfig();
-  getRandomShapes();
+  if (shapes) {
+    //
+  } else {
+    getRandomShapes();
+  }
   initPuzzle.initConfig();
 };
 

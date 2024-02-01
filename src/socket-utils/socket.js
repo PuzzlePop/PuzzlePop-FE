@@ -31,11 +31,11 @@ const createSocket = () => {
     stomp.send(destination, obj, message);
   };
 
-  const subscribe = (detination, onMessageReceiverCallback) => {
+  const subscribe = (destination, onMessageReceiverCallback) => {
     if (!stomp) {
       return;
     }
-    const subscription = stomp.subscribe(detination, onMessageReceiverCallback);
+    const subscription = stomp.subscribe(destination, onMessageReceiverCallback);
     subscriptions.add(subscription);
     return subscription;
   };
