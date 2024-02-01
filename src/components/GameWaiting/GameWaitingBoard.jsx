@@ -77,7 +77,7 @@ export default function GameWaitingBoard({ data, allowedPiece, category }) {
             // 왜 여기서 unique key warning이 뜨는지 모르겠음...
             <Grid container spacing={2}>
               {redTeams.map((player) => (
-                <Grid key={player.nickname} xs={3}>
+                <Grid key={player.nickname} item xs={3}>
                   <PlayerCard player={player} color="red" />
                 </Grid>
               ))}
@@ -97,7 +97,7 @@ export default function GameWaitingBoard({ data, allowedPiece, category }) {
               {data.player.map((player) => {
                 // console.log(player.nickname);
                 return (
-                  <Grid key={player.nickname} xs={3}>
+                  <Grid key={player.nickname} item xs={3}>
                     <PlayerCard player={player} />
                   </Grid>
                 );
