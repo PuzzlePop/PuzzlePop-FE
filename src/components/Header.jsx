@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
 import ImageIcon from "./ImageIcon";
 import HeaderPuzzleImage from "@/assets/icons/header_puzzle.png";
 import HeaderRankImage from "@/assets/icons/header_rank.png";
@@ -10,12 +11,7 @@ export default function Header() {
   const navigate = useNavigate();
 
   return (
-    <AppBar
-      position="static"
-      color="default"
-      elevation={0}
-      sx={{ borderBottom: (theme) => `1px solid ${theme.palette.divider}` }}
-    >
+    <HeaderBar>
       <Toolbar sx={{ flexWrap: "wrap" }}>
         <div style={{ flexGrow: 1 }}>
           <ImageIcon imageSource={Logo} size="lg" onClick={() => navigate("/")} />
@@ -29,9 +25,14 @@ export default function Header() {
           </Button>
         </nav>
       </Toolbar>
-    </AppBar>
+    </HeaderBar>
   );
 }
+
+const HeaderBar = styled(AppBar)`
+  position: static;
+  background-color: transparent;
+`;
 
 {
   /* <ImageIcon imageSource={headerPuzzleImage} size="lg" onClick={() => navigate("/game")} />
