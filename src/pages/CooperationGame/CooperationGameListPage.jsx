@@ -61,7 +61,7 @@ export default function CooperationGameListPage() {
   };
 
   const fetchAllRoom = async () => {
-    const res = await request.get("/game/rooms");
+    const res = await request.get("/game/rooms/cooperation");
     const { data: fetchedRoomList } = res;
     setRoomList(fetchedRoomList);
   };
