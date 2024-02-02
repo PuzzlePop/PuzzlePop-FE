@@ -21,7 +21,11 @@ export default function CooperationGameWaitingPage() {
     setLoading(true);
 
     try {
-      const { data: fetchedRoomInfo } = await request.get(`/game/room/${roomId}`);
+      const { data: fetchedRoomInfo } = await request.post(`/game/room/${roomId}`, 
+      {
+          id : getSender()
+
+      });
       const { isStarted } = fetchedRoomInfo;
 
       if (isStarted) {

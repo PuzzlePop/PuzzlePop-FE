@@ -5,7 +5,7 @@ import Header from "../../components/Header";
 import { request } from "../../apis/requestBuilder";
 import GameRoomListBoard from "@/components/GameRoomList/GameRoomListBoard";
 import { Modal, Typography, Box, TextField, Button } from "@mui/material";
-import { setRoomId, setSender } from "../../socket-utils/storage";
+import { getSender, setRoomId, setSender } from "../../socket-utils/storage";
 
 export default function CooperationGameListPage() {
   const navigate = useNavigate();
@@ -61,7 +61,7 @@ export default function CooperationGameListPage() {
   };
 
   const fetchAllRoom = async () => {
-    const res = await request.get("/game/rooms/cooperation");
+    const res = await request.get("/game/rooms/cooperation", {id : getSender()});
     const { data: fetchedRoomList } = res;
     setRoomList(fetchedRoomList);
   };
