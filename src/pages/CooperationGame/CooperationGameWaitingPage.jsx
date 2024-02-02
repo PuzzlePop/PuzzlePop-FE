@@ -1,77 +1,45 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import GamePageNavigation from "@/components/GamePageNavigation";
-import GameWaitingBoard from "@/components/GameWaiting/GameWaitingBoard";
-import { redirect, useNavigate, useParams } from "react-router-dom";
-import { request } from "../../apis/requestBuilder";
 import { getSender, getRoomId } from "../../socket-utils/storage";
 import { socket } from "../../socket-utils/socket";
-import PlayPuzzle from "../../components/PlayPuzzle";
-import CooperationGameIngamePage from "./CooperationGameIngamePage";
 
-const { connect, send, subscribe, unsubscribe, disconnect } = socket;
+const { connect, send, subscribe, disconnect } = socket;
 
 export default function CooperationGameWaitingPage() {
-  const [isIngame, setIsIngame] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const [roomInfo, setRoomInfo] = useState(null);
+  const [gameData, setGameData] = useState(null);
 
   const connectSocket = async () => {
-    setLoading(true);
+    // websocket 연결 시도
+    connect(() => {
+      // console.log("WebSocket 연결 성공");
 
-    try {
-      const { data: fetchedRoomInfo } = await request.get(`/game/room/${roomId}`);
-      const { isStarted } = fetchedRoomInfo;
+      subscribe(`/topic/game/room/${roomId}`, (message) => {
+        const { admin, gameId, gameName, picture, redTeam, roomSize, started, ...fetchedGameData } =
+          JSON.parse(message.body);
+        // 1. 게임이 시작되면 인게임 화면으로 보낸다.
+        if (started === true) {
+          window.location.href = `/game/cooperation/ingame/${gameId}`;
+          return;
+        }
 
-      if (isStarted) {
-        setLoading(false);
-        setIsIngame(true);
-        return;
-      }
-
-      setRoomInfo(fetchedRoomInfo);
-
-      console.log(fetchedRoomInfo);
-
-      // websocket 연결 시도
-      connect(() => {
-        // console.log("WebSocket 연결 성공");
-
-        subscribe(`/topic/game/room/${roomId}`, (message) => {
-          const data = JSON.parse(message.body);
-
-          // 게임이 시작했을 경우
-          if (data.redPuzzle) {
-            setLoading(true);
-            const puzzleBoard = data.redPuzzle.board;
-            console.log(puzzleBoard);
-
-            setIsIngame(true);
-            setLoading(false);
-            return;
-          }
-        });
-
-        // 서버로 메시지 전송
-        send(
-          "/app/game/message",
-          {},
-          JSON.stringify({
-            type: "ENTER",
-            roomId: getRoomId(),
-            sender: getSender(),
-          }),
-        );
+        setGameData(fetchedGameData);
       });
 
-      setLoading(false);
-    } catch (e) {
-      console.log("room fetch error");
-      navigate("/game/cooperation", {
-        replace: true,
-      });
-    }
+      // 서버로 메시지 전송
+      send(
+        "/app/game/message",
+        {},
+        JSON.stringify({
+          type: "ENTER",
+          roomId: getRoomId(),
+          sender: getSender(),
+        }),
+      );
+    });
   };
 
   useEffect(() => {
@@ -83,6 +51,7 @@ export default function CooperationGameWaitingPage() {
     }
 
     connectSocket();
+    setLoading(false);
 
     return () => {
       disconnect();
@@ -108,12 +77,10 @@ export default function CooperationGameWaitingPage() {
   };
 
   if (loading) {
-    return <h1>Loading...</h1>;
+    return <h1>대기실에 입장 중...</h1>;
   }
 
-  if (isIngame) {
-    return <CooperationGameIngamePage />;
-  }
+  console.log(gameData);
 
   return (
     <>
