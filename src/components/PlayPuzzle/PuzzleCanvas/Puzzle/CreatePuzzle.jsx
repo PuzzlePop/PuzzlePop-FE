@@ -5,8 +5,9 @@ let config;
 
 export const createTiles = (shapes) => {
   config = Puzzle.exportConfig();
-  if (shapes) {
-    //
+  if (shapes && Array.isArray(shapes)) {
+    // getRandomShapes();
+    config.shapes = shapes;
   } else {
     getRandomShapes();
   }

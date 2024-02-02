@@ -8,6 +8,7 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0 .",
     "format": "npm run prettier && npm run lint",
     "dev": "vite",
+    "test": "vitest",
     "build": "vite build",
     "preview": "vite preview"
   },
@@ -39,6 +40,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "prettier": "^3.0.3",
-    "vite": "^5.0.8"
+    "vite": "^5.0.8",
+    "vitest": "^1.2.2"
   }
 }
