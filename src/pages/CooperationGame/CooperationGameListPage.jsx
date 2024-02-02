@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Modal, Typography, Box } from "@mui/material";
 import GamePageNavigation from "../../components/GamePageNavigation";
 import Header from "../../components/Header";
 import { request } from "../../apis/requestBuilder";
-import GameRoomListBoard from "@/components/GameRoomList/GameRoomListBoard";
-import { Modal, Typography, Box, TextField, Button } from "@mui/material";
-import { getSender, setRoomId, setSender } from "../../socket-utils/storage";
+import { setRoomId, setSender } from "../../socket-utils/storage";
 
 export default function CooperationGameListPage() {
   const navigate = useNavigate();
@@ -28,7 +27,7 @@ export default function CooperationGameListPage() {
     }
     setSender(sender);
     setRoomId(roomId);
-    navigate(`/game/cooperation/${roomId}`);
+    navigate(`/game/cooperation/waiting/${roomId}`);
   };
 
   const createRoom = async () => {
@@ -53,7 +52,7 @@ export default function CooperationGameListPage() {
     const { blueTeam, gameId, gameName, gameType, isStarted, redTeam, sessionToUser, startTime } =
       data;
     setRoomId(gameId);
-    navigate(`/game/cooperation/${gameId}`);
+    navigate(`/game/cooperation/waiting/${gameId}`);
   };
 
   const refetchAllRoom = () => {
@@ -61,7 +60,7 @@ export default function CooperationGameListPage() {
   };
 
   const fetchAllRoom = async () => {
-    const res = await request.get("/game/rooms/cooperation", {id : getSender()});
+    const res = await request.get("/game/rooms/cooperation", { id: getSender() });
     const { data: fetchedRoomList } = res;
     setRoomList(fetchedRoomList);
   };
