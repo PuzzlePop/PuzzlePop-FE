@@ -7,7 +7,6 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue } from "@mui/material/colors";
 import { PlayerCard, EmptyPlayerCard, XPlayerCard } from "@/components/GameWaiting/PlayerCard";
 import SelectImgAndPiece from "@/components/GameWaiting/SelectImgAndPiece";
-import { style } from "@mui/system";
 
 export default function GameWaitingBoard({ data, allowedPiece, category }) {
   const redTeams = data.player.filter((player) => player.isRedTeam);
