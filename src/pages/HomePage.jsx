@@ -27,7 +27,7 @@ export default function HomePage() {
 const HomeImg = styled.img`
   width: 100vw;
   position: fixed;
-  top: 20;
+  top: 67px;
   z-index: -1;
   opacity: 0.3;
 `;
@@ -39,9 +39,11 @@ const SubTitle = styled.div`
 `;
 
 const Container = styled.div`
-  margin: 8% auto;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
 
   -webkit-animation: bounce-in-bck 1.1s both;
@@ -154,7 +156,7 @@ const Container = styled.div`
 `;
 
 const Logo = styled.img`
-  width: 20%;
+  width: 260px;
 `;
 
 const LogoTitle = styled.h1`

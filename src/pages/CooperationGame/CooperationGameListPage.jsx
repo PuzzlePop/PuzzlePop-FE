@@ -70,7 +70,7 @@ export default function CooperationGameListPage() {
   return (
     <>
       <Header />
-      <GamePageNavigation />
+      {/* <GamePageNavigation /> */}
       <button onClick={() => setIsOpenedModal(true)}>방 만들기</button>
       <ul>
         {roomList.map((room) => (

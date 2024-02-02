@@ -7,7 +7,7 @@ export default function BattleGameListPage() {
   return (
     <>
       <Header />
-      <GamePageNavigation />
+      {/* <GamePageNavigation /> */}
       <div style={{ width: "950px", margin: "5% auto" }}>
         <h1>배틀 플레이</h1>
       </div>

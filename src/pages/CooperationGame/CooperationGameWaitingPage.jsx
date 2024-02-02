@@ -138,7 +138,7 @@ export default function CooperationGameWaitingPage() {
   return (
     <>
       <Header />
-      <GamePageNavigation />
+      {/* <GamePageNavigation /> */}
       <ItemController />
       <h1>CooperationGameWaitingPage</h1>
       <div>roomId : {roomId}</div>

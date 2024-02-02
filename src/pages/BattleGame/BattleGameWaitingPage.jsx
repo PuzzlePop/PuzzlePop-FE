@@ -49,7 +49,7 @@ export default function BattleGameWaitingPage() {
   return (
     <>
       <Header />
-      <GamePageNavigation />
+      {/* <GamePageNavigation /> */}
       <GameWaitingBoard data={dummyData} allowedPiece={allowedPiece} category="battle" />
       <Footer />
     </>
