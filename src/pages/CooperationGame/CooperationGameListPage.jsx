@@ -4,7 +4,7 @@ import { Modal, Typography, Box } from "@mui/material";
 import GamePageNavigation from "../../components/GamePageNavigation";
 import Header from "../../components/Header";
 import { request } from "../../apis/requestBuilder";
-import { setRoomId, setSender } from "../../socket-utils/storage";
+import { getSender, setRoomId, setSender } from "../../socket-utils/storage";
 
 export default function CooperationGameListPage() {
   const navigate = useNavigate();
