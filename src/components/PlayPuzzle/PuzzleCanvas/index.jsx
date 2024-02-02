@@ -67,11 +67,7 @@ const PuzzleCanvas = ({ puzzleImg, level, category, shapes }) => {
     setConfig(puzzleImg, level, Paper);
     // console.log(Puzzle.exportConfig());
 
-    if (category === "single") {
-      createTiles();
-    } else {
-      createTiles(shapes);
-    }
+    createTiles(shapes);
 
     Puzzle.move();
     console.log(config);

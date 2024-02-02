@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import PlayPuzzle from "../../components/PlayPuzzle";
 import { getRoomId, getSender } from "../../socket-utils/storage";
 import { socket } from "../../socket-utils/socket";
+import { parsePuzzleShapes } from "../../socket-utils/parsePuzzleShapes";
 
 const { connect, send, subscribe, disconnect } = socket;
 
@@ -18,15 +19,20 @@ export default function CooperationGameIngamePage() {
       // console.log("WebSocket 연결 성공");
 
       subscribe(`/topic/game/room/${roomId}`, (message) => {
+        const data = JSON.parse(message.body);
         const { admin, gameId, gameName, picture, redTeam, roomSize, started, ...fetchedGameData } =
           JSON.parse(message.body);
         // 1. 게임이 끝나면 대기실 화면으로 보낸다.
-        if (started === false) {
+        if (data.started && data.started === false) {
           window.location.href = `/game/cooperation/waiting/${gameId}`;
           return;
         }
 
-        setGameData(fetchedGameData);
+        // 2. 게임정보 받기
+        if (data.gameType && data.gameType === "COOPERATION") {
+          setGameData(fetchedGameData);
+          return;
+        }
       });
 
       // 서버로 메시지 전송
@@ -70,7 +76,9 @@ export default function CooperationGameIngamePage() {
   return (
     <>
       <h1>CooperationGameIngamePage : {roomId}</h1>
-      <PlayPuzzle shapes={null} />
+      {gameData && gameData.redPuzzle && gameData.redPuzzle.board && (
+        <PlayPuzzle shapes={parsePuzzleShapes(gameData.redPuzzle.board[0])} />
+      )}
     </>
   );
 }

@@ -63,7 +63,8 @@ const initConfig = () => {
 
   for (let y = 0; y < config.tilesPerColumn; y++) {
     for (let x = 0; x < config.tilesPerRow; x++) {
-      const index1 = Math.floor(Math.random() * config.tileIndexes.length);
+      // const index1 = Math.floor(Math.random() * config.tileIndexes.length);
+      const index1 = Math.floor(0.5 * config.tileIndexes.length); // 멀티 플레이를 위해 그냥 0.5로 고정
       const index2 = config.tileIndexes[index1];
       const tile = config.tiles[index2];
       config.tileIndexes.splice(index1, 1);
