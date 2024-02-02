@@ -2,10 +2,13 @@ import styled from "styled-components";
 import Grid from "@mui/material/Unstable_Grid2";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { red, blue } from "@mui/material/colors";
 import { PlayerCard, EmptyPlayerCard, XPlayerCard } from "@/components/GameWaiting/PlayerCard";
+import SelectImgAndPiece from "@/components/GameWaiting/SelectImgAndPiece";
 
-export default function GameWaitingBoard(props) {
-  const { data, allowedPiece, category } = props;
+export default function GameWaitingBoard({ data, allowedPiece, category }) {
   const redTeams = data.player.filter((player) => player.isRedTeam);
   const blueTeams = data.player.filter((player) => !player.isRedTeam);
 
@@ -55,9 +58,28 @@ export default function GameWaitingBoard(props) {
     return result;
   };
 
+  const theme = createTheme({
+    palette: {
+      redTeam: {
+        light: red[300],
+        main: red[400],
+        dark: red[500],
+        darker: red[600],
+        contrastText: "#fff",
+      },
+      blueTeam: {
+        light: blue[300],
+        main: blue[400],
+        dark: blue[500],
+        darker: blue[600],
+        contrastText: "#fff",
+      },
+    },
+  });
+
   return (
     <Wrapper container spacing={4}>
-      <ColGrid xs={8}>
+      <ColGrid item xs={8}>
         {/* 방 번호, 방 제목, 인원수 header */}
         <InnerBox sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Typography component="div" variant="subtitle2">
@@ -75,16 +97,16 @@ export default function GameWaitingBoard(props) {
         <InnerBox>
           {category === "battle" ? (
             // 왜 여기서 unique key warning이 뜨는지 모르겠음...
-            <Grid container spacing={2}>
+            <Grid container item spacing={2}>
               {redTeams.map((player) => (
-                <Grid key={player.nickname} xs={3}>
+                <Grid key={player.nickname} item xs={3}>
                   <PlayerCard player={player} color="red" />
                 </Grid>
               ))}
               {makeEmptyPlayer(emptyPlayerCount[0])}
               {makeXPlayer()}
               {blueTeams.map((player) => (
-                <Grid key={player.nickname} xs={3}>
+                <Grid key={player.nickname} item xs={3}>
                   <PlayerCard player={player} color="blue" />
                 </Grid>
               ))}
@@ -93,11 +115,11 @@ export default function GameWaitingBoard(props) {
             </Grid>
           ) : (
             // 왜 여기서 unique key warning이 뜨는지 모르겠음...22
-            <Grid container spacing={2}>
+            <Grid container item spacing={2}>
               {data.player.map((player) => {
                 // console.log(player.nickname);
                 return (
-                  <Grid key={player.nickname} xs={3}>
+                  <Grid key={player.nickname} item xs={3}>
                     <PlayerCard player={player} />
                   </Grid>
                 );
@@ -110,8 +132,25 @@ export default function GameWaitingBoard(props) {
       </ColGrid>
 
       {/* 퍼즐 이미지 선택, 피스 수 선택 */}
-      <ColGrid xs={4}>
-        <InnerBox>hi</InnerBox>
+      <ColGrid item xs={4}>
+        <SelectImgAndPiece src={data.img} allowedPiece={allowedPiece} />
+
+        <InnerBox>
+          <Typography variant="subtitle1" sx={{ textAlign: "center" }}>
+            팀 선택
+          </Typography>
+          <ThemeProvider theme={theme}>
+            <Box sx={{ display: "flex" }}>
+              {/* 팀 선택 버튼들, 추후 socket 연결하여 플레이어의 팀 정보 수정해야 함 */}
+              <TeamButton variant="contained" color="redTeam" disableElevation>
+                Red
+              </TeamButton>
+              <TeamButton variant="contained" color="blueTeam" disableElevation>
+                Blue
+              </TeamButton>
+            </Box>
+          </ThemeProvider>
+        </InnerBox>
       </ColGrid>
     </Wrapper>
   );
@@ -137,4 +176,9 @@ const InnerBox = styled(Box)`
   margin: 5px 0;
   background-color: #eee;
   border-radius: 10px;
+`;
+
+const TeamButton = styled(Button)`
+  width: 50%;
+  margin: 2% 3%;
 `;

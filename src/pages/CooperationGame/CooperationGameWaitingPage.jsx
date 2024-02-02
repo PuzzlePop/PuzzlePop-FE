@@ -3,6 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import GamePageNavigation from "@/components/GamePageNavigation";
 import { getSender, getRoomId } from "../../socket-utils/storage";
 import { socket } from "../../socket-utils/socket";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 
 const { connect, send, subscribe, disconnect } = socket;
 
@@ -84,6 +86,7 @@ export default function CooperationGameWaitingPage() {
 
   return (
     <>
+      <Header />
       <GamePageNavigation />
       <SocketMessageTestComponent />
       <h1>CooperationGameWaitingPage</h1>
@@ -92,6 +95,7 @@ export default function CooperationGameWaitingPage() {
         <button onClick={handleGameStart}>GAME START</button>
       </div>
       {/* <GameWaitingBoard data={dummyData} allowedPiece={allowedPiece} category="cooperation" />{" "} */}
+      <Footer />
     </>
   );
 }

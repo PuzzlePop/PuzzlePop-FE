@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Modal, Typography, Box } from "@mui/material";
 import GamePageNavigation from "../../components/GamePageNavigation";
-import Header from "../../components/Header";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { request } from "../../apis/requestBuilder";
 import { getSender, setRoomId, setSender } from "../../socket-utils/storage";
 
@@ -72,7 +73,7 @@ export default function CooperationGameListPage() {
   return (
     <>
       <Header />
-      <GamePageNavigation />
+      {/* <GamePageNavigation /> */}
       <button onClick={() => setIsOpenedModal(true)}>방 만들기</button>
       <button onClick={refetchAllRoom}>새로고침</button>
       <ul>
@@ -119,6 +120,8 @@ export default function CooperationGameListPage() {
           </Box>
         </Box>
       </Modal>
+
+      <Footer />
     </>
   );
 }
