@@ -8,11 +8,7 @@ const createSocket = () => {
   let stomp;
   const subscriptions = new Set();
 
-  const onError = () => {
-    console.log("socket error...");
-  };
-
-  const connect = (onConnectCallback) => {
+  const connect = (onConnectCallback, onError) => {
     if (!sock) {
       sock = new SockJS(SOCKET_END_POINT);
     }

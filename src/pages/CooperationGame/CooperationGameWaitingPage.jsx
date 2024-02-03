@@ -16,7 +16,6 @@ export default function CooperationGameWaitingPage() {
 
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState([]); // 채팅 기록을 저장하는 상태 추가
-  
 
   const connectSocket = async () => {
     // websocket 연결 시도
@@ -37,9 +36,9 @@ export default function CooperationGameWaitingPage() {
       subscribe(`/topic/chat/room/${roomId}`, (message) => {
         // const { admin, gameId, gameName, picture, redTeam, roomSize, started, ...fetchedGameData } =
         //   JSON.parse(message.body);
-          const {userid, chatMessage, time} = JSON.parse(message.body);
-          const receivedMessage = { userid: userid, chatMessage: chatMessage, time: time}; // 받은 채팅
-          setChatHistory(prevChat => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
+        const { userid, chatMessage, time } = JSON.parse(message.body);
+        const receivedMessage = { userid: userid, chatMessage: chatMessage, time: time }; // 받은 채팅
+        setChatHistory((prevChat) => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
       });
 
       // 서버로 메시지 전송
@@ -89,8 +88,6 @@ export default function CooperationGameWaitingPage() {
     }
   };
 
-  
-
   if (loading) {
     return <h1>대기실에 입장 중...</h1>;
   }
@@ -98,14 +95,11 @@ export default function CooperationGameWaitingPage() {
   console.log(gameData);
 
   /*
-  ***************************채팅 로직*********************************** 
-  */
-  
+   ***************************채팅 로직***********************************
+   */
 
-
-  
   const handleMessageSend = (e) => {
-    e.preventDefault()  
+    e.preventDefault();
     if (getSender()) {
       send(
         `/app/game/message`,
@@ -117,7 +111,7 @@ export default function CooperationGameWaitingPage() {
           type: "CHAT",
         }),
       );
-      setMessage("")
+      setMessage("");
     }
   };
 
@@ -125,32 +119,35 @@ export default function CooperationGameWaitingPage() {
     <>
       <Header />
       <GamePageNavigation />
-      
+
       <h1>CooperationGameWaitingPage</h1>
       <div>roomId : {roomId}</div>
       <div>
         <button onClick={handleGameStart}>GAME START</button>
       </div>
-      
+
       {/*채팅 관련*/}
       <div>
-        <div style={{ marginBottom: '10px' }}>
+        <div style={{ marginBottom: "10px" }}>
           {/* 채팅 기록을 화면에 출력 */}
           {chatHistory.map((chat, index) => (
             <div key={index}>
-              <strong>{chat.userid}[{chat.time}]: </strong>{chat.chatMessage}
+              <strong>
+                {chat.userid}[{chat.time}]:{" "}
+              </strong>
+              {chat.chatMessage}
             </div>
           ))}
         </div>
 
         <form onSubmit={handleMessageSend}>
-        <input
-          type="text"
-          placeholder="채팅"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
-        <button type="submit">Send</button>
+          <input
+            type="text"
+            placeholder="채팅"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+          <button type="submit">Send</button>
         </form>
       </div>
       {/*채팅 끝 */}
