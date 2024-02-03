@@ -23,7 +23,34 @@ export default function CooperationGameIngamePage() {
         const { admin, gameId, gameName, picture, redTeam, roomSize, started, ...fetchedGameData } =
           JSON.parse(message.body);
 
+        //랜덤 아이템 드랍(사실 배틀에 있어야하는데 여기서 테스트)
+        
+        if (data.randomItem) {
+          // 버튼 생성
+          let button = document.createElement("button");
+          button.textContent = data.randomItem.name;
+
+          // 버튼의 위치 설정
+          button.style.position = "absolute";
+          button.style.left = data.randomItem.position_x + "px";
+          button.style.top = data.randomItem.position_y + "px";
+
+
+          button.onclick = function() {
+              // 부모 요소로부터 버튼 제거
+              button.parentNode.removeChild(button);
+          };
+
+          // 버튼을 body에 추가
+          document.body.appendChild(button);
+
+          // alert 대신 메시지를 콘솔에 출력
+          console.log(data.randomItem.name + " 을 " + data.randomItem.position_x + " " + data.randomItem.position_y + " 에 생성한다!");
+        }
+        
+
         // 1. 게임이 끝나면 대기실 화면으로 보낸다.
+        //여기 수정함
         if (data.finished === true) {
           alert("게임 끝남!!")
           window.location.href = `/game/cooperation/waiting/${gameId}`;
