@@ -22,8 +22,10 @@ export default function CooperationGameIngamePage() {
         const data = JSON.parse(message.body);
         const { admin, gameId, gameName, picture, redTeam, roomSize, started, ...fetchedGameData } =
           JSON.parse(message.body);
+
         // 1. 게임이 끝나면 대기실 화면으로 보낸다.
-        if (data.started && data.started === false) {
+        if (data.finished === true) {
+          alert("게임 끝남!!")
           window.location.href = `/game/cooperation/waiting/${gameId}`;
           return;
         }
