@@ -8,42 +8,61 @@ import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
 import CardActionArea from "@mui/material/CardActionArea";
+import { setRoomId, setSender } from "@/socket-utils/storage";
 
-export default function GameCard({
-  blueTeam,
-  gameId,
-  gameName,
-  gameType,
-  isStarted,
-  redTeam,
-  sessionToUser,
-  startTime,
-  ...room
-}) {
+export default function GameCard({ room, category }) {
   const navigate = useNavigate();
-  // const { roomId, img, title, isPlaying, totalPieceCount, curPlayerCount, maxPlayerCount } =
-  //   props.data;
 
-  const chipMessage = `${parseInt(maxPlayerCount / 2)} : ${parseInt(maxPlayerCount / 2)}`;
+  const {
+    admin,
+    blueTeam,
+    gameId,
+    gameName,
+    gameType,
+    isStarted,
+    picture,
+    redTeam,
+    roomSize,
+    sessionToUser,
+    startTime,
+  } = room;
+
+  const chipMessage = `${parseInt(roomSize / 2)} : ${parseInt(roomSize / 2)}`;
   const chipColorArray = ["error", "warning", "success", "info"];
-  const chipColor = chipColorArray[parseInt(maxPlayerCount / 2) - 1];
+  const chipColor = chipColorArray[parseInt(roomSize / 2) - 1];
+
+  const enterRoom = async (roomId) => {
+    const sender = window.prompt("닉네임을 입력해주세요");
+    if (!sender) {
+      return;
+    }
+    setSender(sender);
+    setRoomId(roomId);
+    navigate(`/game/${category}/waiting/${roomId}`);
+  };
 
   const handleClick = (event) => {
-    navigate(`/game/${props.category}/${event.currentTarget.id}`);
+    enterRoom(event.currentTarget.id);
   };
+
   return (
-    <MyCard onClick={handleClick} id={roomId}>
+    <MyCard onClick={handleClick} id={gameId}>
       <MyCardActionArea>
-        <CardMedia component="img" sx={{ width: 151, height: 151 }} image={img} alt={title} />
+        <CardMedia
+          component="img"
+          sx={{ width: 151, height: 151 }}
+          image={picture.encodedString}
+          alt={picture.encodedString}
+        />
         <CardContent sx={{ display: "flex", flexDirection: "column", marginRight: "3%" }}>
-          {props.category === "battle" && <MyChip label={chipMessage} color={chipColor} />}
+          {category === "battle" && <MyChip label={chipMessage} color={chipColor} />}
           <Box sx={{ width: "250px", paddingY: "15%" }}>
             <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
               <Typography component="div" variant="h5">
-                {title}
+                {gameName}
               </Typography>
               <Typography sx={{ alignSelf: "end" }} component="div" variant="subtitle2">
-                {totalPieceCount}pcs
+                {picture.lengthPieceCnt * picture.widthPieceCnt}pcs
               </Typography>
             </Box>
 
@@ -51,10 +70,10 @@ export default function GameCard({
 
             <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
               <RoomState component="div" variant="h5">
-                {isPlaying ? "Playing" : "Waiting"}
+                {isStarted ? "Playing" : "Waiting"}
               </RoomState>
               <Typography variant="h6" color="text.secondary" component="div">
-                {curPlayerCount} / {maxPlayerCount}
+                {redTeam.players.length + blueTeam.players.length} / {roomSize}
               </Typography>
             </Box>
           </Box>

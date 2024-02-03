@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Modal, Typography, Box } from "@mui/material";
-import GamePageNavigation from "../../components/GamePageNavigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { request } from "../../apis/requestBuilder";
-import { getSender, setRoomId, setSender } from "../../socket-utils/storage";
+import GameRoomListBoard from "@/components/GameRoomList/GameRoomListBoard";
+import { request } from "@/apis/requestBuilder";
+import { getSender, setRoomId, setSender } from "@/socket-utils/storage";
 
 export default function CooperationGameListPage() {
   const navigate = useNavigate();
@@ -83,7 +83,7 @@ export default function CooperationGameListPage() {
           </div>
         ))}
       </ul>
-      {/* <GameRoomListBoard category="cooperation" /> */}
+      <GameRoomListBoard category="cooperation" roomList={roomList} />
       <Modal
         open={isOpenedModal}
         onClose={() => setIsOpenedModal(false)}
