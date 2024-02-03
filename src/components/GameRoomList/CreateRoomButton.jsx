@@ -7,8 +7,14 @@ import {
   Grid,
   Typography,
   TextField,
+  FormControl,
+  FormLabel,
+  FormControlLabel,
+  RadioGroup,
+  Radio,
   createTheme,
   ThemeProvider,
+  deprecatedPropType,
 } from "@mui/material";
 import { deepPurple } from "@mui/material/colors";
 import { request } from "@/apis/requestBuilder";
@@ -28,7 +34,7 @@ export default function CreateRoomButton({ category }) {
 
   const handleRoomSize = (e) => {
     const count = Number(e.target.value);
-    if (2 <= count && count <= 6) {
+    if (2 <= count && count <= 8) {
       setRoomSize(count);
     }
   };
@@ -105,6 +111,25 @@ export default function CreateRoomButton({ category }) {
           },
         },
       },
+      MuiFormLabel: {
+        styleOverrides: {
+          root: {
+            color: deepPurple[200],
+            "&.Mui-focused": {
+              color: deepPurple[400],
+            },
+          },
+        },
+      },
+      MuiRadio: {
+        styleOverrides: {
+          root: {
+            "&.Mui-checked": {
+              color: deepPurple[400],
+            },
+          },
+        },
+      },
     },
   });
 
@@ -138,7 +163,7 @@ export default function CreateRoomButton({ category }) {
           <Typography id="modal-modal-title" variant="h5">
             {category === "cooperation" ? "협동" : "배틀"}방 만들기
           </Typography>
-          <Grid container id="modal-modal-description" spacing={2} sx={{ mt: 2 }}>
+          <Grid container id="modal-modal-description" spacing={2} sx={{ mt: 0.5 }}>
             <Grid item xs={12}>
               <TextField
                 label="방 제목"
@@ -148,20 +173,32 @@ export default function CreateRoomButton({ category }) {
               />
             </Grid>
             <Grid item xs={9}>
-              <TextField
-                label="최대 인원수"
-                type="number"
-                value={roomSize}
-                onChange={handleRoomSize}
-                sx={{ width: "100%" }}
-                helperText="최소 2인 최대 6인 플레이 가능합니다."
-              />
+              {category === "cooperation" ? (
+                <TextField
+                  label="최대 인원수"
+                  type="number"
+                  value={roomSize}
+                  onChange={handleRoomSize}
+                  sx={{ width: "100%" }}
+                  helperText="최소 2인 최대 8인 플레이 가능합니다."
+                />
+              ) : (
+                <FormControl>
+                  <FormLabel id="demo-controlled-radio-buttons-group">최대 인원수</FormLabel>
+                  <RadioGroup row value={roomSize} onChange={handleRoomSize}>
+                    <FormControlLabel value={2} control={<Radio />} label="1:1" />
+                    <FormControlLabel value={4} control={<Radio />} label="2:2" />
+                    <FormControlLabel value={6} control={<Radio />} label="3:3" />
+                    <FormControlLabel value={8} control={<Radio />} label="4:4" />
+                  </RadioGroup>
+                </FormControl>
+              )}
             </Grid>
             <Grid item xs={3}>
               <Button
                 disabled={!roomTitle}
                 onClick={createRoom}
-                sx={{ width: "100%", height: "50%", padding: "2%", margin: "15% auto" }}
+                sx={{ width: "100%", height: "50px", padding: "2%", margin: "15% auto" }}
               >
                 방 만들기
               </Button>
