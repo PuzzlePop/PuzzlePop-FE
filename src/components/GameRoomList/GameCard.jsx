@@ -88,6 +88,7 @@ const MyCard = styled(Card)`
   height: 150px;
   display: flex;
   position: relative;
+  background-color: rgba(255, 255, 255, 0.7);
   &:hover {
     box-shadow: 5px 5px 10px lightgray;
   }

@@ -11,7 +11,7 @@ export default function BattleGameListPage() {
       <div style={{ width: "950px", margin: "5% auto" }}>
         <h1>배틀 플레이</h1>
       </div>
-      <GameRoomListBoard category="battle" />
+      {/* <GameRoomListBoard category="battle" /> */}
       <Footer />
     </>
   );
