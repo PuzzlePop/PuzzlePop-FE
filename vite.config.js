@@ -8,6 +8,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
+      find: /^jss-plugin-(.*)$/,
+      replacement: path.resolve(__dirname, "./node_modules/jss-plugin-$1/src/index.js"),
     },
   },
 });
