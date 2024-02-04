@@ -1,60 +1,17 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Modal, Typography, Box } from "@mui/material";
-import GamePageNavigation from "../../components/GamePageNavigation";
+import styled from "styled-components";
+import { IconButton } from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { request } from "../../apis/requestBuilder";
-import { getSender, setRoomId, setSender } from "../../socket-utils/storage";
+import CreateRoomButton from "@/components/GameRoomList/CreateRoomButton";
+import GameRoomListBoard from "@/components/GameRoomList/GameRoomListBoard";
+import { request } from "@/apis/requestBuilder";
+import { getSender } from "@/socket-utils/storage";
+import backgroundPath from "@/assets/background.gif";
 
 export default function CooperationGameListPage() {
-  const navigate = useNavigate();
   const [roomList, setRoomList] = useState([]);
-  const [roomTitle, setRoomTitle] = useState("");
-  const [roomSize, setRoomSize] = useState(2);
-  const [isOpenedModal, setIsOpenedModal] = useState(false);
-
-  const handleRoomSize = (e) => {
-    const count = Number(e.target.value);
-    if (2 <= count && count <= 6) {
-      setRoomSize(count);
-    }
-  };
-
-  const enterRoom = async (roomId) => {
-    const sender = window.prompt("닉네임을 입력해주세요");
-    if (!sender) {
-      return;
-    }
-    setSender(sender);
-    setRoomId(roomId);
-    navigate(`/game/cooperation/waiting/${roomId}`);
-  };
-
-  const createRoom = async () => {
-    if (!roomTitle) {
-      return;
-    }
-
-    const sender = window.prompt("닉네임을 입력해주세요");
-    if (!sender) {
-      return;
-    }
-    setSender(sender);
-
-    const { data } = await request.post("/game/room", {
-      name: roomTitle,
-      userid: sender,
-      type: "TEAM",
-      roomSize,
-      gameType: "COOPERATION",
-    });
-    // 방 속성 정보
-    const { blueTeam, gameId, gameName, gameType, isStarted, redTeam, sessionToUser, startTime } =
-      data;
-    setRoomId(gameId);
-    navigate(`/game/cooperation/waiting/${gameId}`);
-  };
 
   const refetchAllRoom = () => {
     fetchAllRoom();
@@ -71,57 +28,27 @@ export default function CooperationGameListPage() {
   }, []);
 
   return (
-    <>
+    <Wrapper>
       <Header />
-      {/* <GamePageNavigation /> */}
-      <button onClick={() => setIsOpenedModal(true)}>방 만들기</button>
-      <button onClick={refetchAllRoom}>새로고침</button>
-      <ul>
-        {roomList.map((room) => (
-          <div key={room.gameId} onClick={() => enterRoom(room.gameId)}>
-            {room.gameName}
-          </div>
-        ))}
-      </ul>
-      {/* <GameRoomListBoard category="cooperation" /> */}
-      <Modal
-        open={isOpenedModal}
-        onClose={() => setIsOpenedModal(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+
+      <div
+        style={{ display: "flex", alignItems: "center", width: "950px", margin: "5% auto 0 auto" }}
       >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            border: "1px solid #ccc",
-            borderRadius: "10px",
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <Typography id="modal-modal-title" variant="h4" component="h2">
-            협동방 만들기
-          </Typography>
-          <Box id="modal-modal-description" sx={{ mt: 2 }}>
-            <input
-              placeholder="방 제목"
-              value={roomTitle}
-              onChange={(e) => setRoomTitle(e.target.value)}
-            />
-            <input type="number" value={roomSize} onChange={handleRoomSize} />
-            <button disabled={!roomTitle} onClick={createRoom}>
-              방 만들기
-            </button>
-          </Box>
-        </Box>
-      </Modal>
+        <h1>협동 플레이</h1>
+        <IconButton aria-label="refresh" onClick={refetchAllRoom} sx={{ marginRight: "auto" }}>
+          <RefreshIcon />
+        </IconButton>
+        <CreateRoomButton category="cooperation" />
+      </div>
+
+      <GameRoomListBoard category="cooperation" roomList={roomList} />
 
       <Footer />
-    </>
+    </Wrapper>
   );
 }
+
+const Wrapper = styled.div`
+  height: 1000px;
+  background-image: url(${backgroundPath});
+`;
