@@ -58,10 +58,6 @@ export default function CooperationGameWaitingPage() {
     }
 
     connectSocket();
-    // 비동기 문제로 임의로 0.5 뒤에 로딩 풀리게
-    setTimeout(() => {
-      setLoading(false);
-    }, 500);
 
     return () => {
       disconnect();
@@ -70,6 +66,12 @@ export default function CooperationGameWaitingPage() {
 
     // eslint-disable-next-line
   }, []);
+
+  useEffect(() => {
+    if (gameData) {
+      setLoading(false);
+    }
+  }, [gameData]);
 
   const handleGameStart = () => {
     if (getSender()) {

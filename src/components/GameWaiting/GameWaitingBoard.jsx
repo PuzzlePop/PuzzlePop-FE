@@ -79,12 +79,12 @@ export default function GameWaitingBoard({ data, allowedPiece, category }) {
   });
 
   return (
-    <Wrapper container spacing={4}>
-      <ColGrid item xs={8}>
+    <Wrapper container="true" spacing={4}>
+      <ColGrid item="true" xs={8}>
         {/* 방 번호, 방 제목, 인원수 header */}
         <InnerBox sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           {/* <Typography component="div" variant="subtitle2">
-            {data.roomId}번방
+            {gameId}번방
           </Typography> */}
           <Typography component="div" variant="h6">
             {gameName}
@@ -98,16 +98,16 @@ export default function GameWaitingBoard({ data, allowedPiece, category }) {
         <InnerBox>
           {category === "battle" ? (
             // 왜 여기서 unique key warning이 뜨는지 모르겠음...
-            <Grid container item spacing={2}>
+            <Grid container="true" spacing={2}>
               {redTeam.players.map((player) => (
-                <Grid key={player.id} item xs={3}>
+                <Grid key={player.id} item="true" xs={3}>
                   <PlayerCard player={player} color="red" />
                 </Grid>
               ))}
               {makeEmptyPlayer(emptyPlayerCount[0])}
               {makeXPlayer()}
               {blueTeam.players.map((player) => (
-                <Grid key={player.id} item xs={3}>
+                <Grid key={player.id} item="true" xs={3}>
                   <PlayerCard player={player} color="blue" />
                 </Grid>
               ))}
@@ -116,11 +116,11 @@ export default function GameWaitingBoard({ data, allowedPiece, category }) {
             </Grid>
           ) : (
             // 왜 여기서 unique key warning이 뜨는지 모르겠음...22
-            <Grid container item spacing={2}>
+            <Grid container="true" spacing={2}>
               {redTeam.players.map((player) => {
                 // console.log(player.nickname);
                 return (
-                  <Grid key={player.id} item xs={3}>
+                  <Grid key={player.id} item="true" xs={3}>
                     <PlayerCard player={player} />
                   </Grid>
                 );
@@ -133,7 +133,7 @@ export default function GameWaitingBoard({ data, allowedPiece, category }) {
       </ColGrid>
 
       {/* 퍼즐 이미지 선택, 피스 수 선택 */}
-      <ColGrid item xs={4}>
+      <ColGrid item="true" xs={4}>
         <SelectImgAndPiece src={picture.encodedString} allowedPiece={allowedPiece} />
 
         {category === "battle" && (
