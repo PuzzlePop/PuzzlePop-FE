@@ -7,6 +7,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue } from "@mui/material/colors";
 import { PlayerCard, EmptyPlayerCard, XPlayerCard } from "@/components/GameWaiting/PlayerCard";
 import SelectImgAndPiece from "@/components/GameWaiting/SelectImgAndPiece";
+import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
 
 export default function GameWaitingBoard({ data, allowedPiece, category }) {
   // const redTeam = data.player.filter((player) => player.isRedTeam);
@@ -80,6 +81,8 @@ export default function GameWaitingBoard({ data, allowedPiece, category }) {
 
   return (
     <Wrapper container="true" spacing={4}>
+      {/* 현재 접속중인 플레이어 (나)가 누군지 알아야함 !! */}
+      {/* <GameOpenVidu gameId={gameId} playerName={player.nickname} /> */}
       <ColGrid item="true" xs={8}>
         {/* 방 번호, 방 제목, 인원수 header */}
         <InnerBox sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -101,14 +104,14 @@ export default function GameWaitingBoard({ data, allowedPiece, category }) {
             <Grid container="true" spacing={2}>
               {redTeam.players.map((player) => (
                 <Grid key={player.id} item="true" xs={3}>
-                  <PlayerCard player={player} color="red" />
+                  <PlayerCard player={player} gameId={gameId} color="red" />
                 </Grid>
               ))}
               {makeEmptyPlayer(emptyPlayerCount[0])}
               {makeXPlayer()}
               {blueTeam.players.map((player) => (
                 <Grid key={player.id} item="true" xs={3}>
-                  <PlayerCard player={player} color="blue" />
+                  <PlayerCard player={player} gameId={gameId} color="blue" />
                 </Grid>
               ))}
               {makeEmptyPlayer(emptyPlayerCount[1])}
@@ -121,7 +124,7 @@ export default function GameWaitingBoard({ data, allowedPiece, category }) {
                 // console.log(player.nickname);
                 return (
                   <Grid key={player.id} item="true" xs={3}>
-                    <PlayerCard player={player} />
+                    <PlayerCard player={player} gameId={gameId} />
                   </Grid>
                 );
               })}

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import OpenViduVideoComponent from "./OvVideo";
+import OpenViduAudiocomponent from "./OvAudio";
 
-export default class UserVideoComponent extends Component {
+export default class UserAudioComponent extends Component {
   getNicknameTag() {
     // Gets the nickName of the user
     return JSON.parse(this.props.streamManager.stream.connection.data).clientData;
@@ -12,7 +12,7 @@ export default class UserVideoComponent extends Component {
       <div>
         {this.props.streamManager !== undefined ? (
           <div className="streamcomponent">
-            <OpenViduVideoComponent streamManager={this.props.streamManager} />
+            <OpenViduAudiocomponent streamManager={this.props.streamManager} />
             <div>
               <p>{this.getNicknameTag()}</p>
             </div>

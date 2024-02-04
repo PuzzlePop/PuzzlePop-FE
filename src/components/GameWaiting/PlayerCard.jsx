@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import styled from "styled-components";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -5,9 +6,11 @@ import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import { red, blue } from "@mui/material/colors";
+import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
+// import OpenViduAudiocomponent from "@/components/GameIngame/openvidu/OvAudio";
 
 function PlayerCard(props) {
-  let { player, color } = props;
+  let { player, gameId, color } = props;
   // 필드 없는 값 임시로 채움
   player = {
     nickname: player.id,
@@ -35,6 +38,7 @@ function PlayerCard(props) {
           {state}
         </State>
       </Content>
+      <GameOpenVidu gameId={gameId} playerName={player.nickname} />
     </WrapperCard>
   );
 }

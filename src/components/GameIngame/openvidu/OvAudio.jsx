@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-export default class OpenViduVideoComponent extends Component {
+export default class OpenViduAudiocomponent extends Component {
   constructor(props) {
     super(props);
     this.videoRef = React.createRef();
@@ -19,6 +19,6 @@ export default class OpenViduVideoComponent extends Component {
   }
 
   render() {
-    return <video autoPlay={true} ref={this.videoRef} />;
+    return <audio autoPlay={true} ref={this.videoRef} width="30px" />;
   }
 }
