@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import GamePageNavigation from "@/components/GamePageNavigation";
-import { getSender, getRoomId } from "../../socket-utils/storage";
-import { socket } from "../../socket-utils/socket";
-import Header from "../../components/Header";
-import Footer from "../../components/Footer";
+// import GamePageNavigation from "@/components/GamePageNavigation";
+import { getSender, getRoomId } from "@/socket-utils/storage";
+import { socket } from "@/socket-utils/socket";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import GameWaitingBoard from "@/components/GameWaiting/GameWaitingBoard";
+import Loading from "@/components/Loading";
 
 const { connect, send, subscribe, disconnect } = socket;
 
@@ -20,8 +22,11 @@ export default function CooperationGameWaitingPage() {
       // console.log("WebSocket 연결 성공");
 
       subscribe(`/topic/game/room/${roomId}`, (message) => {
-        const { admin, gameId, gameName, picture, redTeam, roomSize, started, ...fetchedGameData } =
-          JSON.parse(message.body);
+        // const { admin, gameId, gameName, picture, redTeam, roomSize, started, ...fetchedGameData } =
+        //   JSON.parse(message.body);
+        const { ...fetchedGameData } = JSON.parse(message.body);
+        const gameId = fetchedGameData.gameId;
+        const started = fetchedGameData.started;
         // 1. 게임이 시작되면 인게임 화면으로 보낸다.
         if (started === true) {
           window.location.href = `/game/cooperation/ingame/${gameId}`;
@@ -53,7 +58,10 @@ export default function CooperationGameWaitingPage() {
     }
 
     connectSocket();
-    setLoading(false);
+    // 비동기 문제로 임의로 0.5 뒤에 로딩 풀리게
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
 
     return () => {
       disconnect();
@@ -78,68 +86,28 @@ export default function CooperationGameWaitingPage() {
     }
   };
 
-  if (loading) {
-    return <h1>대기실에 입장 중...</h1>;
-  }
-
-  console.log(gameData);
-
   return (
     <>
       <Header />
-      {/* <GamePageNavigation /> */}
-      <SocketMessageTestComponent />
-      <h1>CooperationGameWaitingPage</h1>
-      <div>roomId : {roomId}</div>
-      <div>
-        <button onClick={handleGameStart}>GAME START</button>
-      </div>
-      {/* <GameWaitingBoard data={dummyData} allowedPiece={allowedPiece} category="cooperation" />{" "} */}
+      {loading ? (
+        <Loading />
+      ) : (
+        <>
+          <SocketMessageTestComponent />
+          <h1>CooperationGameWaitingPage</h1>
+          <div>roomId : {roomId}</div>
+          <div>
+            <button onClick={handleGameStart}>GAME START</button>
+          </div>
+          {/* 필요한 정보 : 각 플레이어의 상태 (방장, 준비완료, 준비x) */}
+          <GameWaitingBoard data={gameData} allowedPiece={allowedPiece} category="cooperation" />
+        </>
+      )}
       <Footer />
     </>
   );
 }
 
-// 더미 데이터
-const dummyData = {
-  roomId: 1,
-  img: "https://img1.daumcdn.net/thumb/R1280x0.fjpg/?fname=http://t1.daumcdn.net/brunch/service/user/cnoC/image/R7FVHsxQscWuMqj6TtNhHLSH8do",
-  title: "방 제목입니다.",
-  isPlaying: false,
-  totalPieceCount: 300,
-  curPlayerCount: 4,
-  maxPlayerCount: 6,
-  player: [
-    {
-      nickname: "용상윤",
-      img: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
-      isCaptain: true,
-      isReady: true,
-      isRedTeam: true,
-    },
-    {
-      nickname: "김다인",
-      img: "https://ynoblesse.com/wp-content/uploads/2023/07/358520758_1425769678257003_8801872512201663407_n.jpg",
-      isCaptain: false,
-      isReady: false,
-      isRedTeam: true,
-    },
-    {
-      nickname: "김한중",
-      img: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
-      isCaptain: false,
-      isReady: false,
-      isRedTeam: false,
-    },
-    {
-      nickname: "나해란",
-      img: "https://mblogthumb-phinf.pstatic.net/MjAxODEwMjdfMjU0/MDAxNTQwNjQyMDcyMTA2.SLn2XYr5LVkefNG7EPLp56ce2WOnuy3UCCusjOyk-RUg.bs6Ir-_Dc1vfZTriBlJInV4St1UT-r2ssP0rfX3g_bYg.JPEG.dltnwjd49/444.jpg?type=w800",
-      isCaptain: false,
-      isReady: true,
-      isRedTeam: false,
-    },
-  ],
-};
 const allowedPiece = [100, 200, 300, 400, 500];
 
 const SocketMessageTestComponent = () => {

@@ -21,7 +21,6 @@ export default function BattleGameListPage() {
     const res = await request.get("/game/rooms/battle", { id: getSender() });
     const { data: fetchedRoomList } = res;
     setRoomList(fetchedRoomList);
-    console.log(roomList);
   };
 
   useEffect(() => {

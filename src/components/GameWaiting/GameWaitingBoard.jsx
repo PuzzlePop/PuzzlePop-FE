@@ -9,25 +9,26 @@ import { PlayerCard, EmptyPlayerCard, XPlayerCard } from "@/components/GameWaiti
 import SelectImgAndPiece from "@/components/GameWaiting/SelectImgAndPiece";
 
 export default function GameWaitingBoard({ data, allowedPiece, category }) {
-  const redTeams = data.player.filter((player) => player.isRedTeam);
-  const blueTeams = data.player.filter((player) => !player.isRedTeam);
+  // const redTeam = data.player.filter((player) => player.isRedTeam);
+  // const blueTeam = data.player.filter((player) => !player.isRedTeam);
+  const { redTeam, blueTeam, gameId, gameName, picture, roomSize } = data;
 
   // 배틀의 경우 [red팀 빈칸 수, blue팀 빈칸 수]
   // 협동의 경우 방 빈칸 수
   let emptyPlayerCount = 0;
   if (category === "battle") {
     emptyPlayerCount = [0, 0];
-    emptyPlayerCount[0] = parseInt(data.maxPlayerCount / 2) - redTeams.length;
-    emptyPlayerCount[1] = parseInt(data.maxPlayerCount / 2) - blueTeams.length;
+    emptyPlayerCount[0] = parseInt(roomSize / 2) - redTeam.players.length;
+    emptyPlayerCount[1] = parseInt(roomSize / 2) - blueTeam.players.length;
   } else if (category === "cooperation") {
-    emptyPlayerCount = data.maxPlayerCount - data.curPlayerCount;
+    emptyPlayerCount = roomSize - redTeam.players.length - blueTeam.players.length;
   }
 
   let xPlayerCount = 0;
   if (category === "battle") {
-    xPlayerCount = 4 - parseInt(data.maxPlayerCount / 2);
+    xPlayerCount = 4 - parseInt(roomSize / 2);
   } else if (category === "cooperation") {
-    xPlayerCount = 8 - data.maxPlayerCount;
+    xPlayerCount = 8 - roomSize;
   }
 
   const makeEmptyPlayer = (count) => {
@@ -82,14 +83,14 @@ export default function GameWaitingBoard({ data, allowedPiece, category }) {
       <ColGrid item xs={8}>
         {/* 방 번호, 방 제목, 인원수 header */}
         <InnerBox sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Typography component="div" variant="subtitle2">
+          {/* <Typography component="div" variant="subtitle2">
             {data.roomId}번방
-          </Typography>
+          </Typography> */}
           <Typography component="div" variant="h6">
-            {data.title}
+            {gameName}
           </Typography>
           <Typography component="div" variant="subtitle1" sx={{ marginLeft: "auto" }}>
-            {data.curPlayerCount} / {data.maxPlayerCount}
+            {redTeam.players.length + blueTeam.players.length} / {roomSize}
           </Typography>
         </InnerBox>
 
@@ -98,15 +99,15 @@ export default function GameWaitingBoard({ data, allowedPiece, category }) {
           {category === "battle" ? (
             // 왜 여기서 unique key warning이 뜨는지 모르겠음...
             <Grid container item spacing={2}>
-              {redTeams.map((player) => (
-                <Grid key={player.nickname} item xs={3}>
+              {redTeam.players.map((player) => (
+                <Grid key={player.id} item xs={3}>
                   <PlayerCard player={player} color="red" />
                 </Grid>
               ))}
               {makeEmptyPlayer(emptyPlayerCount[0])}
               {makeXPlayer()}
-              {blueTeams.map((player) => (
-                <Grid key={player.nickname} item xs={3}>
+              {blueTeam.players.map((player) => (
+                <Grid key={player.id} item xs={3}>
                   <PlayerCard player={player} color="blue" />
                 </Grid>
               ))}
@@ -116,10 +117,10 @@ export default function GameWaitingBoard({ data, allowedPiece, category }) {
           ) : (
             // 왜 여기서 unique key warning이 뜨는지 모르겠음...22
             <Grid container item spacing={2}>
-              {data.player.map((player) => {
+              {redTeam.players.map((player) => {
                 // console.log(player.nickname);
                 return (
-                  <Grid key={player.nickname} item xs={3}>
+                  <Grid key={player.id} item xs={3}>
                     <PlayerCard player={player} />
                   </Grid>
                 );
@@ -133,24 +134,26 @@ export default function GameWaitingBoard({ data, allowedPiece, category }) {
 
       {/* 퍼즐 이미지 선택, 피스 수 선택 */}
       <ColGrid item xs={4}>
-        <SelectImgAndPiece src={data.img} allowedPiece={allowedPiece} />
+        <SelectImgAndPiece src={picture.encodedString} allowedPiece={allowedPiece} />
 
-        <InnerBox>
-          <Typography variant="subtitle1" sx={{ textAlign: "center" }}>
-            팀 선택
-          </Typography>
-          <ThemeProvider theme={theme}>
-            <Box sx={{ display: "flex" }}>
-              {/* 팀 선택 버튼들, 추후 socket 연결하여 플레이어의 팀 정보 수정해야 함 */}
-              <TeamButton variant="contained" color="redTeam" disableElevation>
-                Red
-              </TeamButton>
-              <TeamButton variant="contained" color="blueTeam" disableElevation>
-                Blue
-              </TeamButton>
-            </Box>
-          </ThemeProvider>
-        </InnerBox>
+        {category === "battle" && (
+          <InnerBox>
+            <Typography variant="subtitle1" sx={{ textAlign: "center" }}>
+              팀 선택
+            </Typography>
+            <ThemeProvider theme={theme}>
+              <Box sx={{ display: "flex" }}>
+                {/* 팀 선택 버튼들, 추후 socket 연결하여 플레이어의 팀 정보 수정해야 함 */}
+                <TeamButton variant="contained" color="redTeam" disableElevation>
+                  Red
+                </TeamButton>
+                <TeamButton variant="contained" color="blueTeam" disableElevation>
+                  Blue
+                </TeamButton>
+              </Box>
+            </ThemeProvider>
+          </InnerBox>
+        )}
       </ColGrid>
     </Wrapper>
   );

@@ -7,7 +7,15 @@ import Divider from "@mui/material/Divider";
 import { red, blue } from "@mui/material/colors";
 
 function PlayerCard(props) {
-  const { player, color } = props;
+  let { player, color } = props;
+  // 필드 없는 값 임시로 채움
+  player = {
+    nickname: player.id,
+    img: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
+    isCaptain: true,
+    isReady: true,
+    isRedTeam: true,
+  };
   const state = player.isCaptain ? "방 장" : player.isReady ? "준 비 완 료" : "준 비 중";
 
   return (
