@@ -38,7 +38,23 @@ export default function CooperationGameIngamePage() {
 
           button.onclick = function() {
               // 부모 요소로부터 버튼 제거
+              //근데 이거 다른 클라이언트들도 이 아이템 먹었다고 버튼 사라지는 이벤트 처리하든가 해야함.
               button.parentNode.removeChild(button);
+              
+
+              
+              // 서버로 메시지 전송
+              send(
+                "/app/game/message",
+                {},
+                JSON.stringify({
+                  type: "GAME",
+                  roomId: getRoomId(),
+                  sender: getSender(),
+                  message: "USE_RANDOM_ITEM",
+                  targets: data.randomItem.name
+                }),
+              );
           };
 
           // 버튼을 body에 추가
