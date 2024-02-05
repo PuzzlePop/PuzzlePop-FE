@@ -4,7 +4,7 @@ import PlayPuzzle from "../../components/PlayPuzzle";
 import { getRoomId, getSender } from "../../socket-utils/storage";
 import { socket } from "../../socket-utils/socket";
 import { parsePuzzleShapes } from "../../socket-utils/parsePuzzleShapes";
-import { config } from "../../components/PlayPuzzle/PuzzleCanvas/Puzzle/MovePuzzle";
+import { config, uniteTiles } from "../../components/PlayPuzzle/PuzzleCanvas/Puzzle/MovePuzzle";
 import { Point } from "paper/dist/paper-core";
 
 const { connect, send, subscribe, disconnect } = socket;
@@ -33,6 +33,7 @@ export default function CooperationGameIngamePage() {
 
   const addPeice = (fromIndex, toIndex) => {
     console.log(fromIndex, toIndex);
+    uniteTiles(fromIndex, toIndex);
   };
 
   const connectSocket = async () => {
@@ -61,22 +62,22 @@ export default function CooperationGameIngamePage() {
 
           if (data.message && data.message === "LOCKED") {
             const { targets } = data;
-            const { x, y, index } = JSON.parse(targets.slice(1, -1));
-            lockPuzzle(x, y, index);
+            const targetList = JSON.parse(targets);
+            targetList.forEach(({ x, y, index }) => lockPuzzle(x, y, index));
             return;
           }
 
           if (data.message && data.message === "MOVE") {
             const { targets } = data;
-            const { x, y, index } = JSON.parse(targets.slice(1, -1));
-            movePuzzle(x, y, index);
+            const targetList = JSON.parse(targets);
+            targetList.forEach(({ x, y, index }) => movePuzzle(x, y, index));
             return;
           }
 
           if (data.message && data.message === "UNLOCKED") {
             const { targets } = data;
-            const { x, y, index } = JSON.parse(targets.slice(1, -1));
-            unLockPuzzle(x, y, index);
+            const targetList = JSON.parse(targets);
+            targetList.forEach(({ x, y, index }) => unLockPuzzle(x, y, index));
             return;
           }
 
