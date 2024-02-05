@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { OpenVidu } from "openvidu-browser";
 import axios from "axios";
 import UserAudioComponent from "./UserAudioComponent";
@@ -28,26 +28,11 @@ const GameOpenVidu = ({ gameId, playerName }) => {
     };
   }, []);
 
-  const handleChangeSessionId = (e) => {
-    setMySessionId(e.target.value);
-  };
-
-  const handleChangeUserName = (e) => {
-    setMyUserName(e.target.value);
-  };
-
-  const handleMainVideoStream = (stream) => {
-    if (mainStreamManager !== stream) {
-      setMainStreamManager(stream);
-    }
-  };
-
   const deleteSubscriber = (streamManager) => {
     setSubscribers((prevSubscribers) => prevSubscribers.filter((sub) => sub !== streamManager));
   };
 
   const joinSession = async () => {
-    // e.preventDefault();
     const OV = new OpenVidu();
     const mySession = OV.initSession();
 
@@ -111,43 +96,6 @@ const GameOpenVidu = ({ gameId, playerName }) => {
     setCurrentVideoDevice(null);
   };
 
-  const renderJoinSessionForm = () => {
-    return (
-      <div id="join">
-        <div id="join-dialog" className="jumbotron vertical-center">
-          <h1> Join a video session </h1>
-          <form className="form-group" onSubmit={joinSession}>
-            <p>
-              <label>Participant: </label>
-              <input
-                className="form-control"
-                type="text"
-                id="userName"
-                value={myUserName}
-                onChange={handleChangeUserName}
-                required
-              />
-            </p>
-            <p>
-              <label> Session: </label>
-              <input
-                className="form-control"
-                type="text"
-                id="sessionId"
-                value={mySessionId}
-                onChange={handleChangeSessionId}
-                required
-              />
-            </p>
-            <p className="text-center">
-              <input className="btn btn-lg btn-success" name="commit" type="submit" value="JOIN" />
-            </p>
-          </form>
-        </div>
-      </div>
-    );
-  };
-
   const renderSession = () => {
     return (
       <div id="session">
@@ -170,20 +118,13 @@ const GameOpenVidu = ({ gameId, playerName }) => {
 
         <div id="video-container" className="col-md-6">
           {publisher && (
-            <div
-              className="stream-container col-md-6 col-xs-6"
-              onClick={() => handleMainVideoStream(publisher)}
-            >
+            <div className="stream-container col-md-6 col-xs-6">
               <UserAudioComponent streamManager={publisher} />
             </div>
           )}
 
           {subscribers.map((sub, i) => (
-            <div
-              key={sub.id}
-              className="stream-container col-md-6 col-xs-6"
-              onClick={() => handleMainVideoStream(sub)}
-            >
+            <div key={sub.id} className="stream-container col-md-6 col-xs-6">
               <span>{sub.id}</span>
               <UserAudioComponent streamManager={sub} />
             </div>
@@ -193,7 +134,7 @@ const GameOpenVidu = ({ gameId, playerName }) => {
     );
   };
 
-  return <div style={{ width: "100%" }}>{session ? renderSession() : renderJoinSessionForm()}</div>;
+  return <div style={{ width: "100%" }}>{session && renderSession()}</div>;
 };
 
 async function createSession(sessionId) {
