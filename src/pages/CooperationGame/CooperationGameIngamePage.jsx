@@ -57,6 +57,7 @@ export default function CooperationGameIngamePage() {
           // 2. 게임정보 받기
           if (data.gameType && data.gameType === "COOPERATION") {
             setGameData(data);
+            console.log("gamedata is here!", gameData, data);
             return;
           }
 
@@ -179,7 +180,13 @@ export default function CooperationGameIngamePage() {
     <>
       <h1>CooperationGameIngamePage : {roomId}</h1>
       {gameData && gameData.redPuzzle && gameData.redPuzzle.board && (
-        <PlayPuzzle shapes={parsePuzzleShapes(gameData.redPuzzle.board[0])} />
+        <PlayPuzzle
+          shapes={parsePuzzleShapes(
+            gameData.redPuzzle.board[0],
+            gameData.picture.widthPieceCnt,
+            gameData.picture.lengthPieceCnt,
+          )}
+        />
       )}
     </>
   );
