@@ -8,8 +8,6 @@ import ShopPage from "./ShopPage";
 import OptionsPage from "./OptionsPage";
 import ProfilePage from "./ProfilePage";
 
-import LoginPage from "./LoginPage";
-
 export function Routes() {
   return (
     <ReactRouterRoutes>
