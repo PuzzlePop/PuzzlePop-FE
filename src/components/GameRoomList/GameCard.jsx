@@ -13,6 +13,7 @@ import {
   ThemeProvider,
 } from "@mui/material";
 import { setRoomId, setSender } from "@/socket-utils/storage";
+import { request } from "../../apis/requestBuilder";
 
 export default function GameCard({ room, category }) {
   const navigate = useNavigate();
@@ -42,7 +43,16 @@ export default function GameCard({ room, category }) {
     }
     setSender(sender);
     setRoomId(roomId);
-    navigate(`/game/${category}/waiting/${roomId}`);
+
+    const res = await request.post(`/game/room/${roomId}`, {id:sender});
+    console.log(res);
+
+    if (res.status === 400) {
+      alert(res)
+    } else {
+      navigate(`/game/${category}/waiting/${roomId}`);
+    }
+    
   };
 
   const handleClick = (event) => {
