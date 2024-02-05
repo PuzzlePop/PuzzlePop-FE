@@ -4,6 +4,8 @@ import { SingleGame } from "./SingleGame";
 import { CooperationGame } from "./CooperationGame";
 import { BattleGame } from "./BattleGame";
 
+import LoginPage from "./LoginPage";
+
 export function Routes() {
   return (
     <ReactRouterRoutes>
@@ -17,6 +19,8 @@ export function Routes() {
       <Route path="/game/battle" element={<BattleGame.ListPage />} />
       {/* TODO: socket room의 상태에 따라 WaitingPage 또는 IngamePage 를 보여줘야한다. */}
       <Route path="/game/battle/:roomId" element={<BattleGame.WaitingPage />} />
+
+      <Route path="/login" element={<LoginPage />} />
     </ReactRouterRoutes>
   );
 }
