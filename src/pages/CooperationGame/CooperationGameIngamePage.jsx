@@ -31,7 +31,7 @@ export default function CooperationGameIngamePage() {
     // TODO: 여기서 Lock에 대한 UI처리를 해제한다.
   };
 
-  const addPeice = (fromIndex, toIndex) => {
+  const addPiece = (fromIndex, toIndex) => {
     console.log(fromIndex, toIndex);
     uniteTiles(fromIndex, toIndex);
   };
@@ -84,7 +84,7 @@ export default function CooperationGameIngamePage() {
           if (data.message && data.message === "ADD_PIECE") {
             const { targets } = data;
             const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
-            addPeice(fromIndex, toIndex);
+            addPiece(fromIndex, toIndex);
             return;
           }
 
