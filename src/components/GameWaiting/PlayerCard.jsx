@@ -6,7 +6,7 @@ import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import { red, blue } from "@mui/material/colors";
-import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
+// import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
 // import OpenViduAudiocomponent from "@/components/GameIngame/openvidu/OvAudio";
 
 function PlayerCard(props) {
@@ -38,7 +38,7 @@ function PlayerCard(props) {
           {state}
         </State>
       </Content>
-      <GameOpenVidu gameId={gameId} playerName={player.nickname} />
+      {/* <GameOpenVidu gameId={gameId} playerName={player.nickname} /> */}
     </WrapperCard>
   );
 }

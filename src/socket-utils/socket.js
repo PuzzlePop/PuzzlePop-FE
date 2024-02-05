@@ -1,8 +1,8 @@
 import SockJS from "sockjs-client";
 import StompJS from "stompjs";
 
-// const SOCKET_END_POINT = "http://localhost:8080/game";
-const SOCKET_END_POINT = "http://localhost:8082/game";
+const SOCKET_END_POINT = "http://localhost:8080/game";
+// const SOCKET_END_POINT = "https://i10a304.p.ssafy.io/api/game";
 
 const createSocket = () => {
   let sock;
