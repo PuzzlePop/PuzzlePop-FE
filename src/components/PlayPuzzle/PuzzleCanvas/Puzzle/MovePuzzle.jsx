@@ -1,9 +1,35 @@
 import { Point } from "paper/dist/paper-core";
 import Puzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/index";
 import FindChange from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/FindChange";
+import { getRoomId, getSender } from "../../../../socket-utils/storage";
+import { socket } from "../../../../socket-utils/socket";
 
-let first = true;
-let config;
+// let first = true;
+
+const { send } = socket;
+
+export let config;
+
+const getPuzzleGroup = (paperEvent) => {
+  const puzzleUniqueId = paperEvent.target.id;
+  const puzzle = config.groupTiles.find((tile) => tile[0].id === puzzleUniqueId);
+
+  if (puzzle[1] === undefined) {
+    const { x, y } = puzzle[0].position;
+    return [{ x, y, index: puzzle[2] }];
+  }
+
+  const groupId = puzzle[1];
+  const group = [];
+  for (let index = 0; index < config.groupTiles.length; index += 1) {
+    const tile = config.groupTiles[index];
+    if (tile[1] === groupId) {
+      const { x, y } = tile[0].position;
+      group.push({ x, y, index });
+    }
+  }
+  return group;
+};
 
 const moveTile = () => {
   config = Puzzle.exportConfig();
@@ -28,6 +54,23 @@ const moveTile = () => {
         // 그룹이 아닐땐 클릭된 타일만 앞으로 이동
         event.target.bringToFront();
       }
+
+      const puzzleGroup = getPuzzleGroup(event);
+
+      // socket 전송
+      send(
+        "/app/game/message",
+        {},
+        JSON.stringify({
+          type: "GAME",
+          roomId: getRoomId(),
+          sender: getSender(),
+          message: "MOUSE_DOWN",
+          targets: JSON.stringify(puzzleGroup),
+          position_x: gtile[0].position.x,
+          position_y: gtile[0].position.y,
+        }),
+      );
     };
 
     gtile[0].onMouseDrag = (event) => {
@@ -60,6 +103,31 @@ const moveTile = () => {
           }
         });
       }
+
+      const puzzleGroup = getPuzzleGroup(event);
+
+      // socket 전송
+      send(
+        "/app/game/message",
+        {},
+        JSON.stringify({
+          type: "GAME",
+          roomId: getRoomId(),
+          sender: getSender(),
+          message: "MOUSE_DRAG",
+          targets: JSON.stringify(puzzleGroup),
+          position_x: gtile[0].position.x,
+          position_y: gtile[0].position.y,
+        }),
+      );
+    };
+
+    gtile[0].onMouseEnter = (event) => {
+      //console.log("Enter", event);
+    };
+
+    gtile[0].onMouseLeave = (event) => {
+      //console.log("Leave");
     };
   });
 };
@@ -83,6 +151,22 @@ const findNearTileGroup = () => {
 
   config.groupTiles.forEach((tile, tileIndex) => {
     tile[0].onMouseUp = (event) => {
+      const puzzleGroup = getPuzzleGroup(event);
+      // socket 전송
+      send(
+        "/app/game/message",
+        {},
+        JSON.stringify({
+          type: "GAME",
+          roomId: getRoomId(),
+          sender: getSender(),
+          message: "MOUSE_UP",
+          targets: JSON.stringify(puzzleGroup),
+          position_x: tile[0].position.x,
+          position_y: tile[0].position.y,
+        }),
+      );
+
       const group = tile[1];
       if (group !== undefined) {
         config.groupTiles.forEach((gtile) => {
@@ -257,11 +341,26 @@ const fitTiles = (nowIndex, preIndex, nowTile, preTile, nowShape, preShape, dir,
 
   // console.log("flag && uniteFlag: ", flag && uniteFlag);
   if (flag && uniteFlag) {
-    uniteTiles(nowIndex, preIndex, nowTile, preTile);
+    uniteTiles(nowIndex, preIndex, true);
   }
 };
 
-const uniteTiles = (nowIndex, preIndex) => {
+//ADD_PIECE
+export const uniteTiles = (nowIndex, preIndex, isSender = false) => {
+  if (isSender) {
+    send(
+      "/app/game/message",
+      {},
+      JSON.stringify({
+        type: "GAME",
+        roomId: getRoomId(),
+        sender: getSender(),
+        message: "ADD_PIECE",
+        targets: nowIndex.toString() + "," + preIndex.toString(),
+      }),
+    );
+  }
+
   const nowGroup = config.groupTiles[nowIndex][1];
   const preGroup = config.groupTiles[preIndex][1];
 

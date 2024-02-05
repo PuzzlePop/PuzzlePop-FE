@@ -1,4 +1,5 @@
 import GamePageNavigation from "../../components/GamePageNavigation";
+import Header from "../../components/Header";
 import PlayPuzzle from "../../components/PlayPuzzle";
 
 // TODO: 임시로 <PlayPuzzle /> 컴포넌트를 위치시켜놓았음.
@@ -6,8 +7,9 @@ import PlayPuzzle from "../../components/PlayPuzzle";
 export default function SingleGameListPage() {
   return (
     <>
-      <GamePageNavigation />
-      <PlayPuzzle />
+      <Header />
+      {/* <GamePageNavigation /> */}
+      <PlayPuzzle category="single" />
     </>
   );
 }

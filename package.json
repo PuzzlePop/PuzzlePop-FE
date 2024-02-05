@@ -8,19 +8,26 @@
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0 .",
     "format": "npm run prettier && npm run lint",
     "dev": "vite",
+    "test": "vitest",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
-    "@mui/material": "^5.15.6",
+    "@mui/icons-material": "^5.15.7",
+    "@mui/material": "^5.15.7",
     "@mui/styled-engine-sc": "^6.0.0-alpha.13",
     "axios": "^1.6.7",
+    "openvidu-browser": "^2.29.1",
     "paper": "^0.12.17",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.3",
+    "react-uid": "^2.3.3",
+    "recoil": "^0.7.7",
+    "sockjs-client": "^1.6.1",
+    "stompjs": "^2.3.3",
     "styled-components": "^6.1.8"
   },
   "devDependencies": {
@@ -35,6 +42,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "prettier": "^3.0.3",
-    "vite": "^5.0.8"
+    "vite": "^5.0.8",
+    "vitest": "^1.2.2"
   }
 }

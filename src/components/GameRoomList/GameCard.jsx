@@ -1,55 +1,107 @@
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import Divider from "@mui/material/Divider";
-import Chip from "@mui/material/Chip";
-import CardActionArea from "@mui/material/CardActionArea";
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  Box,
+  Divider,
+  Chip,
+  CardActionArea,
+  createTheme,
+  ThemeProvider,
+} from "@mui/material";
+import { setRoomId, setSender } from "@/socket-utils/storage";
+import { request } from "../../apis/requestBuilder";
+import { isAxiosError } from "axios";
 
-export default function GameCard(props) {
+export default function GameCard({ room, category }) {
   const navigate = useNavigate();
-  const { roomId, img, title, isPlaying, totalPieceCount, curPlayerCount, maxPlayerCount } =
-    props.data;
 
-  const chipMessage = `${parseInt(maxPlayerCount / 2)} : ${parseInt(maxPlayerCount / 2)}`;
+  const {
+    admin,
+    blueTeam,
+    gameId,
+    gameName,
+    gameType,
+    isStarted,
+    picture,
+    redTeam,
+    roomSize,
+    sessionToUser,
+    startTime,
+  } = room;
+
+  const chipMessage = `${parseInt(roomSize / 2)} : ${parseInt(roomSize / 2)}`;
   const chipColorArray = ["error", "warning", "success", "info"];
-  const chipColor = chipColorArray[parseInt(maxPlayerCount / 2) - 1];
+  const chipColor = chipColorArray[parseInt(roomSize / 2) - 1];
+
+  const enterRoom = async (roomId) => {
+    const sender = window.prompt("닉네임을 입력해주세요");
+    if (!sender) {
+      return;
+    }
+    setSender(sender);
+    setRoomId(roomId);
+
+    try {
+      const res = await request.post(`/game/room/${roomId}`, { id: sender });
+      console.log(res);
+      navigate(`/game/${category}/waiting/${roomId}`);
+    } catch (e) {
+      if (isAxiosError(e) && e.response.status === 400) {
+        window.alert("다른 닉네임을 사용해주세요.");
+      }
+    }
+  };
 
   const handleClick = (event) => {
-    navigate(`/game/${props.category}/${event.currentTarget.id}`);
+    enterRoom(event.currentTarget.id);
   };
+
+  const theme = createTheme({
+    typography: {
+      fontFamily: "'Galmuri11', sans-serif",
+    },
+  });
+
   return (
-    <MyCard onClick={handleClick} id={roomId}>
-      <MyCardActionArea>
-        <CardMedia component="img" sx={{ width: 151, height: 151 }} image={img} alt={title} />
-        <CardContent sx={{ display: "flex", flexDirection: "column", marginRight: "3%" }}>
-          {props.category === "battle" && <MyChip label={chipMessage} color={chipColor} />}
-          <Box sx={{ width: "250px", paddingY: "15%" }}>
-            <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
-              <Typography component="div" variant="h5">
-                {title}
-              </Typography>
-              <Typography sx={{ alignSelf: "end" }} component="div" variant="subtitle2">
-                {totalPieceCount}pcs
-              </Typography>
-            </Box>
+    <MyCard onClick={handleClick} id={gameId}>
+      <ThemeProvider theme={theme}>
+        <MyCardActionArea>
+          <CardMedia
+            component="img"
+            sx={{ width: 151, height: 151 }}
+            image={picture.encodedString}
+            alt={picture.encodedString}
+          />
+          <CardContent sx={{ display: "flex", flexDirection: "column", marginRight: "3%" }}>
+            {category === "battle" && <MyChip label={chipMessage} color={chipColor} />}
+            <Box sx={{ width: "250px", paddingY: "15%" }}>
+              <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+                <Typography component="div" variant="h5">
+                  {gameName}
+                </Typography>
+                <Typography sx={{ alignSelf: "end" }} component="div" variant="subtitle2">
+                  {picture.lengthPieceCnt * picture.widthPieceCnt}pcs
+                </Typography>
+              </Box>
 
-            <Divider sx={{ marginY: "3%" }} />
+              <Divider sx={{ marginY: "3%" }} />
 
-            <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
-              <RoomState component="div" variant="h5">
-                {isPlaying ? "Playing" : "Waiting"}
-              </RoomState>
-              <Typography variant="h6" color="text.secondary" component="div">
-                {curPlayerCount} / {maxPlayerCount}
-              </Typography>
+              <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+                <RoomState component="div" variant="h5">
+                  {isStarted ? "Playing" : "Waiting"}
+                </RoomState>
+                <Typography variant="h6" color="text.secondary" component="div">
+                  {redTeam.players.length + blueTeam.players.length} / {roomSize}
+                </Typography>
+              </Box>
             </Box>
-          </Box>
-        </CardContent>
-      </MyCardActionArea>
+          </CardContent>
+        </MyCardActionArea>
+      </ThemeProvider>
     </MyCard>
   );
 }
@@ -59,6 +111,7 @@ const MyCard = styled(Card)`
   height: 150px;
   display: flex;
   position: relative;
+  background-color: rgba(255, 255, 255, 0.7);
   &:hover {
     box-shadow: 5px 5px 10px lightgray;
   }
@@ -90,3 +143,6 @@ const RoomState = styled(Typography)`
     }
   }};
 `;
+
+const SAMPLE_IMAGE =
+  "https://img1.daumcdn.net/thumb/R1280x0.fjpg/?fname=http://t1.daumcdn.net/brunch/service/user/cnoC/image/R7FVHsxQscWuMqj6TtNhHLSH8do";

@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import styled from "styled-components";
 import Paper from "paper";
 import Puzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/index";
@@ -49,34 +49,28 @@ const setConfig = (img, level, Paper) => {
   Puzzle.setting(config);
 };
 
-const PuzzleCanvas = (props) => {
+const PuzzleCanvas = ({ puzzleImg, level, shapes }) => {
   const canvasRef = useRef(null);
-  const { puzzleImg, level } = props;
-  // eslint-disable-next-line
-  const [showCanvas, setShowCanvas] = useState(true);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (canvas === null) {
+    if (!canvasRef.current) {
       return;
     }
-    Paper.setup(canvas);
 
+    Paper.setup(canvasRef.current);
     setConfig(puzzleImg, level, Paper);
     // console.log(Puzzle.exportConfig());
-    createTiles();
 
+    createTiles(shapes);
     Puzzle.move();
-  }, [level, puzzleImg]);
+  }, [level, puzzleImg, shapes]);
 
   return (
-    <div style={{ width: "100vw", display: "flex", justifyContent: "center" }}>
-      {showCanvas ? (
+    <>
+      <div style={{ width: "100vw", display: "flex", justifyContent: "center" }}>
         <Canvas ref={canvasRef} id="canvas" />
-      ) : (
-        <img src={puzzleImg.current.src} alt="puzzleImage" />
-      )}
-    </div>
+      </div>
+    </>
   );
 };
 

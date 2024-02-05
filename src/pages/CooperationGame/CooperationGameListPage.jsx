@@ -1,82 +1,54 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
-import GamePageNavigation from "../../components/GamePageNavigation";
+import styled from "styled-components";
+import { IconButton } from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import CreateRoomButton from "@/components/GameRoomList/CreateRoomButton";
 import GameRoomListBoard from "@/components/GameRoomList/GameRoomListBoard";
-
-const request = axios.create({
-  baseURL: "http://localhost:8080",
-  timeout: 3000,
-  headers: { "Content-Type": "application/json" },
-  withCredentials: true,
-});
+import { request } from "@/apis/requestBuilder";
+import { getSender } from "@/socket-utils/storage";
+import backgroundPath from "@/assets/background.gif";
 
 export default function CooperationGameListPage() {
   const [roomList, setRoomList] = useState([]);
 
-  return (
-    <>
-      <GamePageNavigation />
-      <h1>CooperationGameListPage</h1>
-      <SocketTestComponent />
-      {roomList.map((room, index) => (
-        <div key={index}>{room.name}</div>
-      ))}
-    </>
-  );
-}
-
-const SocketTestComponent = () => {
-  const [roomTitle, setRoomTitle] = useState("");
-  const [userId, setUserId] = useState("");
-  const [roomList, setRoomList] = useState([]);
-
-  const createRoom = async () => {
-    if (!roomTitle || !userId) {
-      return;
-    }
-
-    // TODO: CORS 에러 해결하기
-    const response = await request.post(`/game/room`, {
-      name: roomTitle,
-      userid: userId,
-    });
-
-    console.log(response);
+  const refetchAllRoom = () => {
+    fetchAllRoom();
   };
 
-  const findAllRoom = async () => {
-    axios.get("/game/rooms").then((response) => {
-      if (response.status === 200 && response.data) {
-        setRoomList(response.data);
-      }
-    });
+  const fetchAllRoom = async () => {
+    const res = await request.get("/game/rooms/cooperation", { id: getSender() });
+    const { data: fetchedRoomList } = res;
+    setRoomList(fetchedRoomList);
   };
 
   useEffect(() => {
-    findAllRoom();
+    fetchAllRoom();
   }, []);
 
   return (
-    <>
-      <div>
-        <input
-          placeholder="방 제목"
-          value={roomTitle}
-          onChange={(e) => {
-            setRoomTitle(e.target.value);
-          }}
-        />
-        <input
-          type="number"
-          placeholder="유저 아이디"
-          value={userId}
-          onChange={(e) => {
-            setUserId(e.target.value);
-          }}
-        />
-        <button onClick={createRoom}>방 생성하기</button>
+    <Wrapper>
+      <Header />
+
+      <div
+        style={{ display: "flex", alignItems: "center", width: "950px", margin: "5% auto 0 auto" }}
+      >
+        <h1>협동 플레이</h1>
+        <IconButton aria-label="refresh" onClick={refetchAllRoom} sx={{ marginRight: "auto" }}>
+          <RefreshIcon />
+        </IconButton>
+        <CreateRoomButton category="cooperation" />
       </div>
-      <GameRoomListBoard category="cooperation" />
-    </>
+
+      <GameRoomListBoard category="cooperation" roomList={roomList} />
+
+      <Footer />
+    </Wrapper>
   );
-};
+}
+
+const Wrapper = styled.div`
+  height: 1000px;
+  background-image: url(${backgroundPath});
+`;

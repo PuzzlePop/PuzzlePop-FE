@@ -1,5 +1,7 @@
 import GamePageNavigation from "@/components/GamePageNavigation";
 import GameWaitingBoard from "@/components/GameWaiting/GameWaitingBoard";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 // 더미 데이터
 const dummyData = {
@@ -46,8 +48,10 @@ const allowedPiece = [100, 200, 300, 400, 500];
 export default function BattleGameWaitingPage() {
   return (
     <>
-      <GamePageNavigation />
-      <GameWaitingBoard data={dummyData} allowedPiece={allowedPiece} category="battle" />
+      <Header />
+      {/* <GamePageNavigation /> */}
+      {/* <GameWaitingBoard data={dummyData} allowedPiece={allowedPiece} category="battle" /> */}
+      <Footer />
     </>
   );
 }
