@@ -31,6 +31,10 @@ export default function CooperationGameIngamePage() {
     // TODO: 여기서 Lock에 대한 UI처리를 해제한다.
   };
 
+  const addPeice = (fromIndex, toIndex) => {
+    console.log(fromIndex, toIndex);
+  };
+
   const connectSocket = async () => {
     // websocket 연결 시도
     connect(
@@ -73,6 +77,13 @@ export default function CooperationGameIngamePage() {
             const { targets } = data;
             const { x, y, index } = JSON.parse(targets.slice(1, -1));
             unLockPuzzle(x, y, index);
+            return;
+          }
+
+          if (data.message && data.message === "ADD_PIECE") {
+            const { targets } = data;
+            const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
+            addPeice(fromIndex, toIndex);
             return;
           }
 
