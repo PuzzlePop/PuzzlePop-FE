@@ -112,7 +112,7 @@ export default function CooperationGameIngamePage() {
                   roomId: getRoomId(),
                   sender: getSender(),
                   message: "USE_RANDOM_ITEM",
-                  targets: data.randomItem.name,
+                  targets: data.randomItem.uuid,
                 }),
               );
             };
