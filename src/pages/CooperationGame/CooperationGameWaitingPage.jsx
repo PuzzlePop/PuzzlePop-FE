@@ -103,7 +103,12 @@ export default function CooperationGameWaitingPage() {
             <button onClick={handleGameStart}>GAME START</button>
           </div>
           {/* 필요한 정보 : 각 플레이어의 상태 (방장, 준비완료, 준비x) */}
-          <GameWaitingBoard data={gameData} allowedPiece={allowedPiece} category="cooperation" />
+          <GameWaitingBoard
+            player={getSender()}
+            data={gameData}
+            allowedPiece={allowedPiece}
+            category="cooperation"
+          />
         </>
       )}
       <Footer />

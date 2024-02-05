@@ -9,7 +9,7 @@ import { PlayerCard, EmptyPlayerCard, XPlayerCard } from "@/components/GameWaiti
 import SelectImgAndPiece from "@/components/GameWaiting/SelectImgAndPiece";
 import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
 
-export default function GameWaitingBoard({ data, allowedPiece, category }) {
+export default function GameWaitingBoard({ player, data, allowedPiece, category }) {
   // const redTeam = data.player.filter((player) => player.isRedTeam);
   // const blueTeam = data.player.filter((player) => !player.isRedTeam);
   const { redTeam, blueTeam, gameId, gameName, picture, roomSize } = data;
@@ -82,7 +82,7 @@ export default function GameWaitingBoard({ data, allowedPiece, category }) {
   return (
     <Wrapper container="true" spacing={4}>
       {/* 현재 접속중인 플레이어 (나)가 누군지 알아야함 !! */}
-      {/* <GameOpenVidu gameId={gameId} playerName={player.nickname} /> */}
+      <GameOpenVidu gameId={gameId} playerName={player} />
       <ColGrid item="true" xs={8}>
         {/* 방 번호, 방 제목, 인원수 header */}
         <InnerBox sx={{ display: "flex", alignItems: "center", gap: 2 }}>
