@@ -346,7 +346,13 @@ const fitTiles = (nowIndex, preIndex, nowTile, preTile, nowShape, preShape, dir,
 };
 
 //ADD_PIECE
-export const uniteTiles = (nowIndex, preIndex, isSender = false) => {
+export const uniteTiles = (
+  nowIndex,
+  preIndex,
+  isSender = false,
+  isCombo = false,
+  direction = -1,
+) => {
   if (isSender) {
     send(
       "/app/game/message",
@@ -388,7 +394,11 @@ export const uniteTiles = (nowIndex, preIndex, isSender = false) => {
   // console.log(dismantling(config.groupTiles[preIndex][1]));
   if (!dismantling(config.groupTiles[preIndex][1])) {
     // console.log(config.groupTiles[preIndex][1]);
-    groupFit(config.groupTiles[preIndex][1], nowIndex);
+    if (isCombo) {
+      comboFit(nowIndex, preIndex, direction);
+    } else {
+      groupFit(config.groupTiles[preIndex][1], nowIndex);
+    }
   }
 };
 
@@ -410,7 +420,28 @@ const dismantling = (groupIndexNow) => {
   return false;
 };
 
+const comboFit = (nowIndex, preIndex, direction) => {
+  const nowTile = config.groupTiles[nowIndex][0];
+  const preTile = config.groupTiles[preIndex][0];
+
+  fitTiles(
+    preIndex,
+    nowIndex,
+    preTile,
+    nowTile,
+    config.shapes[preIndex],
+    config.shapes[nowIndex],
+    direction,
+    false,
+    nowTile.bounds.width,
+  );
+};
+
 const groupFit = (nowGroup, nowIdx) => {
+  // if (isCombo) {
+  //   console.log('groupFit!!', isCombo, direction)
+  // }
+
   const xTileCount = config.tilesPerRow;
   const yTileCount = config.tilesPerColumn;
   const groupArr = [];
