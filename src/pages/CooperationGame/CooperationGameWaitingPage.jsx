@@ -95,7 +95,7 @@ export default function CooperationGameWaitingPage() {
     <>
       <Header />
       {loading ? (
-        <Loading />
+        <Loading message="방 정보 불러오는 중..." />
       ) : (
         <>
           <ChattingTest chatHistory={chatHistory} />

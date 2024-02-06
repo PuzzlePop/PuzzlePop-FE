@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import PlayPuzzle from "../../components/PlayPuzzle";
-import { getRoomId, getSender, getTeam } from "../../socket-utils/storage";
-import { socket } from "../../socket-utils/socket";
-import { parsePuzzleShapes } from "../../socket-utils/parsePuzzleShapes";
-import { config, uniteTiles } from "../../components/PlayPuzzle/PuzzleCanvas/Puzzle/MovePuzzle";
+import PlayPuzzle from "@/components/PlayPuzzle";
+import Loading from "@/components/Loading";
+import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
+import { socket } from "@/socket-utils/socket";
+import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
+import { config, uniteTiles } from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/MovePuzzle";
 import { Point } from "paper/dist/paper-core";
 
 const { connect, send, subscribe, disconnect } = socket;
@@ -195,7 +196,7 @@ export default function CooperationGameIngamePage() {
     <>
       <h1>CooperationGameIngamePage : {roomId}</h1>
       {loading ? (
-        <h1>게임 정보를 받아오는 중...</h1>
+        <Loading message="게임 정보 받아오는 중..." />
       ) : (
         gameData &&
         gameData[`${getTeam()}Puzzle`] &&
