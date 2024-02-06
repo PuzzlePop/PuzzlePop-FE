@@ -7,6 +7,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import GameWaitingBoard from "@/components/GameWaiting/GameWaitingBoard";
 import Loading from "@/components/Loading";
+import { request } from "../../apis/requestBuilder";
+import { isAxiosError } from "axios";
 
 const { connect, send, subscribe, disconnect } = socket;
 
@@ -24,6 +26,7 @@ export default function CooperationGameWaitingPage() {
 
       subscribe(`/topic/game/room/${roomId}`, (message) => {
         const data = JSON.parse(message.body);
+
         // 1. 게임이 시작되면 인게임 화면으로 보낸다.
         if (data.gameId && data.started && data.started === true) {
           window.location.href = `/game/cooperation/ingame/${data.gameId}`;
@@ -52,6 +55,19 @@ export default function CooperationGameWaitingPage() {
     });
   };
 
+  const initialize = async () => {
+    try {
+      await request.post(`/game/room/${roomId}`, { id: getSender() });
+      await connectSocket();
+    } catch (e) {
+      if (isAxiosError(e) && e.response.status >= 400) {
+        navigate("/game/cooperation", {
+          replace: true,
+        });
+      }
+    }
+  };
+
   useEffect(() => {
     if (roomId !== getRoomId() || !getSender()) {
       navigate("/game/cooperation", {
@@ -60,7 +76,7 @@ export default function CooperationGameWaitingPage() {
       return;
     }
 
-    connectSocket();
+    initialize();
 
     return () => {
       disconnect();
