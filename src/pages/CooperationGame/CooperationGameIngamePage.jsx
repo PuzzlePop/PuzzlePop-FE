@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import PlayPuzzle from "../../components/PlayPuzzle";
-import { getRoomId, getSender } from "../../socket-utils/storage";
+import { getRoomId, getSender, getTeam } from "../../socket-utils/storage";
 import { socket } from "../../socket-utils/socket";
 import { parsePuzzleShapes } from "../../socket-utils/parsePuzzleShapes";
 import { config, uniteTiles } from "../../components/PlayPuzzle/PuzzleCanvas/Puzzle/MovePuzzle";
@@ -62,6 +62,7 @@ export default function CooperationGameIngamePage() {
           // 2. 게임정보 받기
           if (data.gameType && data.gameType === "COOPERATION") {
             setGameData(data);
+            console.log("i'm", getTeam(), "team", getSender());
             console.log("gamedata is here!", gameData, data);
             return;
           }
@@ -94,7 +95,6 @@ export default function CooperationGameIngamePage() {
 
             if (combo) {
               console.log("콤보 효과 발동 !! : ", combo);
-              console.log(typeof combo);
               combo.forEach(([toIndex, fromIndex]) => addPiece(fromIndex, toIndex));
             }
 

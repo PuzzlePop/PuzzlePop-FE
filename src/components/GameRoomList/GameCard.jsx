@@ -12,7 +12,7 @@ import {
   createTheme,
   ThemeProvider,
 } from "@mui/material";
-import { setRoomId, setSender } from "@/socket-utils/storage";
+import { setRoomId, setSender, setTeam } from "@/socket-utils/storage";
 import { request } from "../../apis/requestBuilder";
 import { isAxiosError } from "axios";
 
@@ -44,6 +44,7 @@ export default function GameCard({ room, category }) {
     }
     setSender(sender);
     setRoomId(roomId);
+    setTeam("red");
 
     try {
       const res = await request.post(`/game/room/${roomId}`, { id: sender });

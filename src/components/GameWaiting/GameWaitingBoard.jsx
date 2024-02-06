@@ -8,6 +8,7 @@ import { red, blue } from "@mui/material/colors";
 import { PlayerCard, EmptyPlayerCard, XPlayerCard } from "@/components/GameWaiting/PlayerCard";
 import SelectImgAndPiece from "@/components/GameWaiting/SelectImgAndPiece";
 import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
+import { setTeam } from "@/socket-utils/storage";
 
 export default function GameWaitingBoard({ player, data, allowedPiece, category }) {
   // const redTeam = data.player.filter((player) => player.isRedTeam);
@@ -147,10 +148,20 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category 
             <ThemeProvider theme={theme}>
               <Box sx={{ display: "flex" }}>
                 {/* 팀 선택 버튼들, 추후 socket 연결하여 플레이어의 팀 정보 수정해야 함 */}
-                <TeamButton variant="contained" color="redTeam" disableElevation>
+                <TeamButton
+                  variant="contained"
+                  color="redTeam"
+                  disableElevation
+                  onClick={() => setTeam("red")}
+                >
                   Red
                 </TeamButton>
-                <TeamButton variant="contained" color="blueTeam" disableElevation>
+                <TeamButton
+                  variant="contained"
+                  color="blueTeam"
+                  disableElevation
+                  onClick={() => setTeam("blue")}
+                >
                   Blue
                 </TeamButton>
               </Box>
