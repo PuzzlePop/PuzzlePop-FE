@@ -361,10 +361,10 @@ export const SAMPLE = [
   ],
 ];
 
-export const parsePuzzleShapes = (data) => {
+export const parsePuzzleShapes = (data, widthPieceCnt, lengthPieceCnt) => {
   const shapes = [];
-  for (let i = 0; i < 4; i += 1) {
-    for (let j = 0; j < 8; j += 1) {
+  for (let i = 0; i < lengthPieceCnt; i += 1) {
+    for (let j = 0; j < widthPieceCnt; j += 1) {
       const { type } = data[i][j];
       const [topTab, rightTab, bottomTab, leftTab] = type;
       shapes.push({

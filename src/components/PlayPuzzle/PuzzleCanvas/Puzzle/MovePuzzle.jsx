@@ -341,23 +341,25 @@ const fitTiles = (nowIndex, preIndex, nowTile, preTile, nowShape, preShape, dir,
 
   // console.log("flag && uniteFlag: ", flag && uniteFlag);
   if (flag && uniteFlag) {
-    uniteTiles(nowIndex, preIndex, nowTile, preTile);
+    uniteTiles(nowIndex, preIndex, true);
   }
 };
 
 //ADD_PIECE
-const uniteTiles = (nowIndex, preIndex) => {
-  send(
-    "/app/game/message",
-    {},
-    JSON.stringify({
-      type: "GAME",
-      roomId: getRoomId(),
-      sender: getSender(),
-      message: "ADD_PIECE",
-      targets: nowIndex.toString() + "," + preIndex.toString(),
-    }),
-  );
+export const uniteTiles = (nowIndex, preIndex, isSender = false) => {
+  if (isSender) {
+    send(
+      "/app/game/message",
+      {},
+      JSON.stringify({
+        type: "GAME",
+        roomId: getRoomId(),
+        sender: getSender(),
+        message: "ADD_PIECE",
+        targets: nowIndex.toString() + "," + preIndex.toString(),
+      }),
+    );
+  }
 
   const nowGroup = config.groupTiles[nowIndex][1];
   const preGroup = config.groupTiles[preIndex][1];
