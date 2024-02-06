@@ -7,6 +7,7 @@ import { socket } from "@/socket-utils/socket";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import { config, uniteTiles } from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/MovePuzzle";
 import { Point } from "paper/dist/paper-core";
+import comboAudioPath from "@/assets/audio/combo.mp3";
 
 const { connect, send, subscribe, disconnect } = socket;
 
@@ -114,6 +115,17 @@ export default function CooperationGameIngamePage() {
               combo.forEach(([toIndex, fromIndex, direction]) =>
                 addCombo(fromIndex, toIndex, direction),
               );
+
+              const audio = new Audio(comboAudioPath);
+              audio.loop = false;
+              audio.crossOrigin = "anonymous";
+              audio.volume = 0.5;
+              audio.load();
+              try {
+                audio.play();
+              } catch (err) {
+                console.log(err);
+              }
             }
 
             finishGame(data);

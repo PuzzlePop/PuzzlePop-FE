@@ -3,6 +3,7 @@ import Puzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/index";
 import FindChange from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/FindChange";
 import { getRoomId, getSender } from "../../../../socket-utils/storage";
 import { socket } from "../../../../socket-utils/socket";
+import comboEffectPath from "@/assets/comboEffect.gif";
 
 // let first = true;
 
@@ -260,7 +261,18 @@ const checkUndefined = (nowIndex, nextIndex, direction) => {
   return flag;
 };
 
-const fitTiles = (nowIndex, preIndex, nowTile, preTile, nowShape, preShape, dir, flag, width) => {
+const fitTiles = (
+  nowIndex,
+  preIndex,
+  nowTile,
+  preTile,
+  nowShape,
+  preShape,
+  dir,
+  flag,
+  width,
+  isCombo = false,
+) => {
   const xChange = FindChange.findXChange(nowShape, preShape, width);
   const yChange = FindChange.findYChange(nowShape, preShape, width);
   const xUp = FindChange.findXUp(nowShape, preShape, width);
@@ -337,6 +349,29 @@ const fitTiles = (nowIndex, preIndex, nowTile, preTile, nowShape, preShape, dir,
         uniteFlag = true;
       }
       break;
+  }
+
+  if (isCombo) {
+    console.log(`${nowTile.position._x}, ${nowTile.position._y}에 img 생성!`);
+    const comboEffect = document.createElement("img");
+    const canvasContainer = document.getElementById("canvasContainer");
+    comboEffect.src = comboEffectPath;
+
+    comboEffect.style.zIndex = 100;
+    comboEffect.style.position = "absolute";
+    comboEffect.style.left = `${nowTile.position._x}px`;
+    comboEffect.style.top = `${nowTile.position._y}px`;
+
+    canvasContainer.appendChild(comboEffect);
+
+    console.log(comboEffect);
+    setTimeout(() => {
+      console.log("effect 삭제");
+      console.log(comboEffect);
+      console.log(comboEffect.parentNode);
+      console.log(comboEffect.parentElement);
+      comboEffect.parentNode.removeChild(comboEffect);
+    }, 500);
   }
 
   // console.log("flag && uniteFlag: ", flag && uniteFlag);
@@ -434,6 +469,7 @@ const comboFit = (nowIndex, preIndex, direction) => {
     direction,
     false,
     nowTile.bounds.width,
+    true,
   );
 };
 
