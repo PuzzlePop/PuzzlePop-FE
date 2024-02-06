@@ -36,6 +36,19 @@ export default function CooperationGameIngamePage() {
     uniteTiles(fromIndex, toIndex);
   };
 
+  // const addCombo = (fromIndex, toIndex) => {
+  //   console.log("addCombo 함수 실행 :", fromIndex, toIndex);
+  //   console.log(config);
+  // };
+
+  const finishGame = (data) => {
+    if (data.finished === true) {
+      window.alert("게임이 종료되었습니다.");
+      window.location.href = `/game/cooperation/waiting/${roomId}`;
+      return;
+    }
+  };
+
   const connectSocket = async () => {
     // websocket 연결 시도
     connect(
@@ -45,16 +58,6 @@ export default function CooperationGameIngamePage() {
         subscribe(`/topic/game/room/${roomId}`, (message) => {
           const data = JSON.parse(message.body);
           console.log(data);
-
-          // 1. 게임이 끝나면 대기실 화면으로 보낸다.
-          //여기 수정함
-          if (data.finished === true) {
-            window.alert("게임이 종료되었습니다.");
-            navigate(`/game/cooperation/waiting/${roomId}`, {
-              replace: true,
-            });
-            return;
-          }
 
           // 2. 게임정보 받기
           if (data.gameType && data.gameType === "COOPERATION") {
@@ -85,9 +88,17 @@ export default function CooperationGameIngamePage() {
           }
 
           if (data.message && data.message === "ADD_PIECE") {
-            const { targets } = data;
+            const { targets, combo } = data;
             const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
             addPiece(fromIndex, toIndex);
+
+            if (combo) {
+              console.log("콤보 효과 발동 !! : ", combo);
+              console.log(typeof combo);
+              combo.forEach(([toIndex, fromIndex]) => addPiece(fromIndex, toIndex));
+            }
+
+            finishGame(data);
             return;
           }
 
