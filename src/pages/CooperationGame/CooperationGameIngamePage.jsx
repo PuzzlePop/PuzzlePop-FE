@@ -178,7 +178,7 @@ export default function CooperationGameIngamePage() {
     <>
       <h1>CooperationGameIngamePage : {roomId}</h1>
       {gameData && gameData.redPuzzle && gameData.redPuzzle.board && (
-        <PlayPuzzle shapes={parsePuzzleShapes(gameData.redPuzzle.board[0])} />
+        <PlayPuzzle shapes={parsePuzzleShapes(gameData.redPuzzle.board)} />
       )}
     </>
   );
