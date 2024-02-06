@@ -5,12 +5,15 @@ import Loading from "@/components/Loading";
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
-import { config, uniteTiles } from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/MovePuzzle";
 import { Point } from "paper/dist/paper-core";
+import { uniteTiles } from "../../puzzle-core/uniteTiles";
+import { usePuzzleConfig } from "../../hooks/usePuzzleConfig";
 
 const { connect, send, subscribe, disconnect } = socket;
 
 export default function CooperationGameIngamePage() {
+  const { config } = usePuzzleConfig();
+
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [loading, setLoading] = useState(true);
@@ -34,7 +37,7 @@ export default function CooperationGameIngamePage() {
 
   const addPiece = (fromIndex, toIndex) => {
     console.log(fromIndex, toIndex);
-    uniteTiles(fromIndex, toIndex);
+    uniteTiles({ config: {}, preIndex: fromIndex, nowIndex: toIndex });
   };
 
   // const addCombo = (fromIndex, toIndex) => {
@@ -185,12 +188,14 @@ export default function CooperationGameIngamePage() {
     // eslint-disable-next-line
   }, []);
 
-  useEffect(() => {
-    if (gameData) {
-      console.log(gameData);
-      setLoading(false);
-    }
-  }, [gameData]);
+  // useEffect(() => {
+  //   if (gameData) {
+  //     console.log(gameData);
+  //     setLoading(false);
+  //   }
+  // }, [gameData]);
+
+  console.log(config);
 
   return (
     <>

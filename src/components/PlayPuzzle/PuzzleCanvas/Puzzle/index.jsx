@@ -19,10 +19,10 @@ const settingValue = (key, value) => {
 // puzzle 객체 config export
 const exportConfig = () => config;
 
-const move = () => {
-  MovePuzzle.moveTile();
-  MovePuzzle.findNearTileGroup();
-};
+// const move = () => {
+//   MovePuzzle.moveTile();
+//   MovePuzzle.findNearTileGroup();
+// };
 
 const Puzzle = {
   setting,
