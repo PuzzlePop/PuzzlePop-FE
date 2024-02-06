@@ -5,40 +5,17 @@ import Loading from "@/components/Loading";
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
-import { Point } from "paper/dist/paper-core";
-import { uniteTiles } from "../../puzzle-core/uniteTiles";
 import { usePuzzleConfig } from "../../hooks/usePuzzleConfig";
 
 const { connect, send, subscribe, disconnect } = socket;
 
 export default function CooperationGameIngamePage() {
-  const { config } = usePuzzleConfig();
+  const { lockPuzzle, movePuzzle, unLockPuzzle, addPiece } = usePuzzleConfig();
 
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [loading, setLoading] = useState(true);
   const [gameData, setGameData] = useState(null);
-
-  const lockPuzzle = (x, y, index) => {
-    console.log(x, y, index);
-    // TODO: "Lock"이 걸려있다는 처리해야함
-    // 피그마처럼 유저별로 "색깔"을 지정해두고 border 색깔을 변경하는 것도 좋을듯?
-  };
-
-  const movePuzzle = (x, y, index) => {
-    const { tiles } = config;
-    tiles[index].position = new Point(x, y);
-  };
-
-  const unLockPuzzle = (x, y, index) => {
-    console.log(x, y, index);
-    // TODO: 여기서 Lock에 대한 UI처리를 해제한다.
-  };
-
-  const addPiece = (fromIndex, toIndex) => {
-    console.log(fromIndex, toIndex);
-    uniteTiles({ config: {}, preIndex: fromIndex, nowIndex: toIndex });
-  };
 
   // const addCombo = (fromIndex, toIndex) => {
   //   console.log("addCombo 함수 실행 :", fromIndex, toIndex);
@@ -188,14 +165,12 @@ export default function CooperationGameIngamePage() {
     // eslint-disable-next-line
   }, []);
 
-  // useEffect(() => {
-  //   if (gameData) {
-  //     console.log(gameData);
-  //     setLoading(false);
-  //   }
-  // }, [gameData]);
-
-  console.log(config);
+  useEffect(() => {
+    if (gameData) {
+      console.log(gameData);
+      setLoading(false);
+    }
+  }, [gameData]);
 
   return (
     <>

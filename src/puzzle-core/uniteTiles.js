@@ -1,4 +1,5 @@
 import { socket } from "../socket-utils/socket";
+import { getRoomId, getSender } from "../socket-utils/storage";
 import { fitTiles } from "./findNearTileGroup";
 
 const { send } = socket;
@@ -49,7 +50,7 @@ export const uniteTiles = ({ config, nowIndex, preIndex, isSender = false }) => 
     groupFit({ config, nowGroup: config.groupTiles[preIndex][1], nowIdx: nowIndex });
   }
 
-  return config;
+  return { ...config };
 };
 
 const dismantling = ({ config, groupIndexNow }) => {

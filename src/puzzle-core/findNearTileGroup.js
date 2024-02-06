@@ -10,7 +10,7 @@ const { send } = socket;
 export const findNearTileGroup = ({ config }) => {
   config.groupTiles.forEach((tile, tileIndex) => {
     tile[0].onMouseUp = (event) => {
-      const puzzleGroup = getPuzzleGroup(event);
+      const puzzleGroup = getPuzzleGroup({ config, paperEvent: event });
       // socket 전송
       send(
         "/app/game/message",
