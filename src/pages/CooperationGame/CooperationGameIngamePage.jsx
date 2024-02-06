@@ -62,7 +62,6 @@ export default function CooperationGameIngamePage() {
           // 2. 게임정보 받기
           if (data.gameType && data.gameType === "COOPERATION") {
             setGameData(data);
-            console.log("i'm", getTeam(), "team", getSender());
             console.log("gamedata is here!", gameData, data);
             return;
           }
@@ -185,21 +184,31 @@ export default function CooperationGameIngamePage() {
     // eslint-disable-next-line
   }, []);
 
-  if (loading) {
-    return <h1>게임 정보를 받아오는 중...</h1>;
-  }
+  useEffect(() => {
+    if (gameData) {
+      console.log(gameData);
+      setLoading(false);
+    }
+  }, [gameData]);
 
   return (
     <>
       <h1>CooperationGameIngamePage : {roomId}</h1>
-      {gameData && gameData.redPuzzle && gameData.redPuzzle.board && (
-        <PlayPuzzle
-          shapes={parsePuzzleShapes(
-            gameData.redPuzzle.board,
-            gameData.picture.widthPieceCnt,
-            gameData.picture.lengthPieceCnt,
-          )}
-        />
+      {loading ? (
+        <h1>게임 정보를 받아오는 중...</h1>
+      ) : (
+        gameData &&
+        gameData[`${getTeam()}Puzzle`] &&
+        gameData[`${getTeam()}Puzzle`].board && (
+          <PlayPuzzle
+            shapes={parsePuzzleShapes(
+              gameData[`${getTeam()}Puzzle`].board,
+              gameData.picture.widthPieceCnt,
+              gameData.picture.lengthPieceCnt,
+            )}
+            board={gameData[`${getTeam()}Puzzle`].board}
+          />
+        )
       )}
     </>
   );

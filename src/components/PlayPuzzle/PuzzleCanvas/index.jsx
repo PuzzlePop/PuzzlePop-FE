@@ -49,7 +49,7 @@ const setConfig = (img, level, Paper) => {
   Puzzle.setting(config);
 };
 
-const PuzzleCanvas = ({ puzzleImg, level, shapes }) => {
+const PuzzleCanvas = ({ puzzleImg, level, shapes, board }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -61,9 +61,9 @@ const PuzzleCanvas = ({ puzzleImg, level, shapes }) => {
     setConfig(puzzleImg, level, Paper);
     // console.log(Puzzle.exportConfig());
 
-    createTiles(shapes);
+    createTiles(shapes, board);
     Puzzle.move();
-  }, [level, puzzleImg, shapes]);
+  }, [level, puzzleImg, shapes, board]);
 
   return (
     <>
