@@ -181,16 +181,27 @@ export default function CooperationGameIngamePage() {
         gameData &&
         gameData[`${getTeam()}Puzzle`] &&
         gameData[`${getTeam()}Puzzle`].board && (
-          <PlayPuzzle
-            shapes={parsePuzzleShapes(
-              gameData[`${getTeam()}Puzzle`].board,
-              gameData.picture.widthPieceCnt,
-              gameData.picture.lengthPieceCnt,
-            )}
-            board={gameData[`${getTeam()}Puzzle`].board}
-          />
+          <>
+            <PlayPuzzle
+              shapes={parsePuzzleShapes(
+                gameData[`${getTeam()}Puzzle`].board,
+                gameData.picture.widthPieceCnt,
+                gameData.picture.lengthPieceCnt,
+              )}
+              board={gameData[`${getTeam()}Puzzle`].board}
+            />
+            <ItemRenderer />
+          </>
         )
       )}
     </>
   );
+}
+
+function ItemRenderer() {
+  const { config } = usePuzzleConfig();
+
+  console.log(config);
+
+  return <h1></h1>;
 }
