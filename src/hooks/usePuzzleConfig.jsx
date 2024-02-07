@@ -63,40 +63,38 @@ export const PuzzleConfigProvider = ({ children }) => {
     });
   }, []);
 
-  const addCombo = useCallback(
-    (fromIndex, toIndex, direction) => {
-      let dir = -1;
-      switch (direction) {
-        case 0:
-          dir = 3;
-          break;
-        case 1:
-          dir = 0;
-          break;
-        case 2:
-          dir = 2;
-          break;
-        case 3:
-          dir = 1;
-          break;
-      }
-      console.log("addCombo 함수 실행 :", fromIndex, toIndex, direction, dir);
-      console.log(config);
+  const addCombo = useCallback((fromIndex, toIndex, direction) => {
+    let dir = -1;
+    switch (direction) {
+      case 0:
+        dir = 3;
+        break;
+      case 1:
+        dir = 0;
+        break;
+      case 2:
+        dir = 2;
+        break;
+      case 3:
+        dir = 1;
+        break;
+    }
 
-      setConfig((prevConfig) => {
-        const nextConfig = uniteTiles({
-          config: prevConfig,
-          nowIndex: fromIndex,
-          preIndex: toIndex,
-          isSender: false,
-          isCombo: true,
-          direction: dir,
-        });
-        return { ...nextConfig };
+    setConfig((prevConfig) => {
+      console.log("addCombo 함수 실행 :", fromIndex, toIndex, direction, dir);
+      console.log(prevConfig);
+
+      const nextConfig = uniteTiles({
+        config: prevConfig,
+        nowIndex: fromIndex,
+        preIndex: toIndex,
+        isSender: false,
+        isCombo: true,
+        direction: dir,
       });
-    },
-    [config],
-  );
+      return { ...nextConfig };
+    });
+  }, []);
 
   const contextValue = useMemo(
     () => ({

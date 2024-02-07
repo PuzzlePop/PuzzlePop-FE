@@ -16,7 +16,9 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board }) {
   return (
     <>
       <div style={{ width: "100vw", display: "flex", justifyContent: "center" }}>
-        <Canvas ref={canvasRef} id="canvas" />
+        <div id="canvasContainer" style={{ position: "relative" }}>
+          <Canvas ref={canvasRef} id="canvas" />
+        </div>
       </div>
     </>
   );
