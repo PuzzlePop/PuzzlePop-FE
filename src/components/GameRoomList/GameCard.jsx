@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import {
@@ -18,6 +19,7 @@ import { isAxiosError } from "axios";
 
 export default function GameCard({ room, category }) {
   const navigate = useNavigate();
+  const [imgSrc, setImgSrc] = useState("");
 
   const {
     admin,
@@ -61,6 +63,15 @@ export default function GameCard({ room, category }) {
     enterRoom(event.currentTarget.id);
   };
 
+  const fetchImage = async () => {
+    const imgRes = await request.get(`/image/${picture.id}`);
+    setImgSrc(`data:image/jpeg;base64,${imgRes.data}`);
+  };
+
+  useEffect(() => {
+    fetchImage();
+  }, []);
+
   const theme = createTheme({
     typography: {
       fontFamily: "'Galmuri11', sans-serif",
@@ -74,7 +85,7 @@ export default function GameCard({ room, category }) {
           <CardMedia
             component="img"
             sx={{ width: 151, height: 151 }}
-            image={picture.encodedString}
+            image={imgSrc}
             alt={picture.encodedString}
           />
           <CardContent sx={{ display: "flex", flexDirection: "column", marginRight: "3%" }}>
