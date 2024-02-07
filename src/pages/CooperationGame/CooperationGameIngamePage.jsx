@@ -7,6 +7,7 @@ import { socket } from "@/socket-utils/socket";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import comboAudioPath from "@/assets/audio/combo.mp3";
 import { usePuzzleConfig } from "../../hooks/usePuzzleConfig";
+import ItemController from "../../components/ItemController";
 
 const { connect, send, subscribe, disconnect } = socket;
 
@@ -71,7 +72,7 @@ export default function CooperationGameIngamePage() {
           if (data.message && data.message === "ADD_PIECE") {
             const { targets, combo } = data;
             const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
-            addPiece(fromIndex, toIndex);
+            addPiece({ fromIndex, toIndex });
 
             if (combo) {
               console.log("콤보 효과 발동 !! : ", combo);
@@ -205,6 +206,7 @@ export default function CooperationGameIngamePage() {
               )}
               board={gameData[`${getTeam()}Puzzle`].board}
             />
+            <ItemController />
           </>
         )
       )}

@@ -4,11 +4,11 @@ import { Point } from "paper/dist/paper-core";
 import { initializeConfig } from "../puzzle-core/initializeConfig";
 import { setMoveEvent } from "../puzzle-core/setMoveEvent";
 import { uniteTiles } from "../puzzle-core/uniteTiles";
-import { searchItemList, setItemStyleToAllPiece } from "../puzzle-core/item";
+import { removeItemStyleToPiece, setItemStyleToAllPiece } from "../puzzle-core/item";
 
 const PuzzleConfigState = {
   config: null,
-  puzzlePieceItemList: [],
+  itemInventory: [],
   initializePuzzle: () => {},
   lockPuzzle: () => {},
   movePuzzle: () => {},
@@ -23,18 +23,15 @@ export const usePuzzleConfig = () => useContext(PuzzleConfigContext);
 
 export const PuzzleConfigProvider = ({ children }) => {
   const canvasRef = useRef(null);
-  const [puzzlePieceItemList, setPuzzlePieceItemList] = useState([]);
+  const [itemInventory, setItemInventory] = useState([]);
   const [config, setConfig] = useState(null);
 
   const initializePuzzle = useCallback(
-    ({ puzzleImg, level, shapes, board }) => {
+    ({ puzzleImg, level, shapes, board = [], itemList = [] }) => {
       if (!canvasRef.current || config !== null) {
         return;
       }
-      // 1. 퍼즐 피스에 붙어있는 아이템 정보 배열
-      const itemList = searchItemList(board);
-
-      // 2. 단계별 config 설정 시작
+      // 단계별 config 설정
       Paper.setup(canvasRef.current);
       const initializedConfig = initializeConfig({ img: puzzleImg, level, board, shapes });
       const attachedMoveEventConfig = setMoveEvent({ config: initializedConfig });
@@ -44,8 +41,7 @@ export const PuzzleConfigProvider = ({ children }) => {
       });
 
       // 3. 상태 업데이트
-      setPuzzlePieceItemList(itemList);
-      setConfig(attachedItemToAllPieceConfig);
+      setConfig(() => ({ ...attachedItemToAllPieceConfig }));
     },
     [config],
   );
@@ -69,52 +65,55 @@ export const PuzzleConfigProvider = ({ children }) => {
     // TODO: 여기서 Lock에 대한 UI처리를 해제한다.
   }, []);
 
-  const addPiece = useCallback((fromIndex, toIndex) => {
-    console.log(fromIndex, toIndex);
+  const addPiece = useCallback(({ fromIndex, toIndex, itemList = [] }) => {
+    setItemInventory(itemList);
+
     setConfig((prevConfig) => {
-      const nextConfig = uniteTiles({ config: prevConfig, preIndex: fromIndex, nowIndex: toIndex });
-      return { ...nextConfig };
+      const afterUnitedConfig = uniteTiles({
+        config: prevConfig,
+        preIndex: fromIndex,
+        nowIndex: toIndex,
+      });
+      const afterCheckItemConfig = removeItemStyleToPiece({
+        config: afterUnitedConfig,
+        fromIndex,
+        toIndex,
+      });
+      return { ...afterCheckItemConfig };
     });
   }, []);
 
-  const addCombo = useCallback(
-    (fromIndex, toIndex, direction) => {
-      let dir = -1;
-      switch (direction) {
-        case 0:
-          dir = 3;
-          break;
-        case 1:
-          dir = 0;
-          break;
-        case 2:
-          dir = 2;
-          break;
-        case 3:
-          dir = 1;
-          break;
-      }
+  const addCombo = useCallback((fromIndex, toIndex, direction) => {
+    let dir = -1;
+    switch (direction) {
+      case 0:
+        dir = 3;
+        break;
+      case 1:
+        dir = 0;
+        break;
+      case 2:
+        dir = 2;
+        break;
+      case 3:
+        dir = 1;
+        break;
+    }
+
+    setConfig((prevConfig) => {
       console.log("addCombo 함수 실행 :", fromIndex, toIndex, direction, dir);
-      console.log(config);
+      console.log(prevConfig);
 
-      setConfig((prevConfig) => {
-        const nextConfig = uniteTiles({
-          config: prevConfig,
-          nowIndex: fromIndex,
-          preIndex: toIndex,
-          isSender: false,
-          isCombo: true,
-          direction: dir,
-        });
-        return { ...nextConfig };
+      const nextConfig = uniteTiles({
+        config: prevConfig,
+        nowIndex: fromIndex,
+        preIndex: toIndex,
+        isSender: false,
+        isCombo: true,
+        direction: dir,
       });
-    },
-    [config],
-  );
-
-  const addItem = useCallback(() => {
-    // 퍼즐을 맞췄을 때
-    // 1. 아이템을 가지고 있는 퍼즐을 맞췄다면, 아이템 인벤토리에 추가해야한다.
+      return { ...nextConfig };
+    });
   }, []);
 
   const useItem = useCallback(() => {
@@ -127,6 +126,7 @@ export const PuzzleConfigProvider = ({ children }) => {
     () => ({
       config,
       canvasRef,
+      itemInventory,
       initializePuzzle,
       lockPuzzle,
       movePuzzle,
@@ -134,7 +134,16 @@ export const PuzzleConfigProvider = ({ children }) => {
       addPiece,
       addCombo,
     }),
-    [config, initializePuzzle, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo],
+    [
+      config,
+      itemInventory,
+      initializePuzzle,
+      lockPuzzle,
+      movePuzzle,
+      unLockPuzzle,
+      addPiece,
+      addCombo,
+    ],
   );
 
   return (

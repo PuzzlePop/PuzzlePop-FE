@@ -25,6 +25,18 @@ export const uniteTiles = ({
         targets: nowIndex.toString() + "," + preIndex.toString(),
       }),
     );
+
+    send(
+      "/app/game/message",
+      {},
+      JSON.stringify({
+        type: "GAME",
+        roomId: getRoomId(),
+        sender: getSender(),
+        message: "GAME_INFO",
+        targets: nowIndex.toString() + "," + preIndex.toString(),
+      }),
+    );
   }
 
   const nowGroup = config.groupTiles[nowIndex][1];
@@ -86,18 +98,6 @@ const dismantling = ({ config, groupIndexNow }) => {
 const comboFit = ({ config, nowIndex, preIndex, direction }) => {
   const nowTile = config.groupTiles[nowIndex][0];
   const preTile = config.groupTiles[preIndex][0];
-
-  // config,
-  // nowIndex,
-  // preIndex,
-  // nowTile,
-  // preTile,
-  // nowShape,
-  // preShape,
-  // dir,
-  // flag,
-  // width,
-  // isCombo = false,
 
   fitTiles({
     config,

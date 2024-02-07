@@ -33,3 +33,13 @@ export const setItemStyleToAllPiece = ({ config, itemList }) => {
   });
   return { ...nextConfig };
 };
+
+export const removeItemStyleToPiece = ({ config, fromIndex, toIndex }) => {
+  const nextConfig = { ...config };
+  nextConfig.tiles.forEach((tile, tileIndex) => {
+    if (fromIndex === tileIndex || toIndex === tileIndex) {
+      tile.strokeColor = undefined;
+    }
+  });
+  return { ...nextConfig };
+};
