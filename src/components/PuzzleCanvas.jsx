@@ -2,12 +2,12 @@ import { useEffect } from "react";
 import styled from "styled-components";
 import { usePuzzleConfig } from "../hooks/usePuzzleConfig";
 
-export default function PuzzleCanvas({ puzzleImg, level, shapes, board }) {
+export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture }) {
   const { canvasRef, initializePuzzle } = usePuzzleConfig();
 
   useEffect(() => {
     if (canvasRef.current) {
-      initializePuzzle({ puzzleImg, level, shapes, board });
+      initializePuzzle({ puzzleImg, level, shapes, board, picture });
     }
 
     // eslint-disable-next-line

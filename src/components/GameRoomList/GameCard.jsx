@@ -27,7 +27,7 @@ export default function GameCard({ room, category }) {
     gameId,
     gameName,
     gameType,
-    isStarted,
+    started,
     picture,
     redTeam,
     roomSize,
@@ -104,7 +104,7 @@ export default function GameCard({ room, category }) {
 
               <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
                 <RoomState component="div" variant="h5">
-                  {isStarted ? "Playing" : "Waiting"}
+                  {started ? "Playing" : "Waiting"}
                 </RoomState>
                 <Typography variant="h6" color="text.secondary" component="div">
                   {redTeam.players.length + blueTeam.players.length} / {roomSize}

@@ -199,12 +199,14 @@ export default function CooperationGameIngamePage() {
         gameData[`${getTeam()}Puzzle`].board && (
           <>
             <PlayPuzzle
+              category="cooperation"
               shapes={parsePuzzleShapes(
                 gameData[`${getTeam()}Puzzle`].board,
                 gameData.picture.widthPieceCnt,
                 gameData.picture.lengthPieceCnt,
               )}
               board={gameData[`${getTeam()}Puzzle`].board}
+              picture={gameData.picture}
             />
             <ItemController />
           </>

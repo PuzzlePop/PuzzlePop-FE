@@ -2,8 +2,8 @@ import Paper from "paper";
 import { Size, Point } from "paper/dist/paper-core";
 import { getRandomShapes } from "./getRandomShapes";
 
-export const initializeConfig = ({ img, level, shapes, board }) => {
-  const config1 = setConfig(img, level);
+export const initializeConfig = ({ img, level, shapes, board, picture }) => {
+  const config1 = setConfig(img, level, picture);
   const config2 = createTiles({ config: config1, shapes, board });
   const config3 = initConfig({ config: config2, board });
   return config3;
@@ -12,9 +12,9 @@ export const initializeConfig = ({ img, level, shapes, board }) => {
 // level 임의로 3단계로
 const levelSize = { 1: 500, 2: 600, 3: 800 };
 
-const setConfig = (img, level) => {
-  const originHeight = img.current.height;
-  const originWidth = img.current.width;
+const setConfig = (img, level, picture) => {
+  const originHeight = picture.length;
+  const originWidth = picture.width;
   const imgWidth =
     originHeight >= originWidth
       ? Math.round((levelSize[level] * originWidth) / originHeight / 100) * 100
@@ -30,8 +30,8 @@ const setConfig = (img, level) => {
     originWidth: originWidth, // 실제 사진의 너비
     imgWidth: imgWidth, // canvas에 나타날 이미지의 너비
     imgHeight: imgHeight, // canvas에 나타날 이미지의 높이
-    tilesPerRow: Math.floor(imgWidth / tileWidth), // 한 행당 피스 개수
-    tilesPerColumn: Math.floor(imgHeight / tileWidth), // 한 열당 피스 개수
+    tilesPerRow: picture.widthPieceCnt, // 한 행당 피스 개수
+    tilesPerColumn: picture.lengthPieceCnt, // 한 열당 피스 개수
     tileWidth: tileWidth, // 한 피스의 길이 (피스는 정사각형)
     tileMarginWidth: tileWidth * 0.203125, // 피스가 딱 맞기 위한 margin 값
     level: level, // 난이도
