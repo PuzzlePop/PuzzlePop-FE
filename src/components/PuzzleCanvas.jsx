@@ -1,34 +1,29 @@
 import { useEffect } from "react";
 import styled from "styled-components";
-import { usePuzzleConfig } from "../../../hooks/usePuzzleConfig";
+import { usePuzzleConfig } from "../hooks/usePuzzleConfig";
 
-const PuzzleCanvas = ({ puzzleImg, level, shapes, board }) => {
+export default function PuzzleCanvas({ puzzleImg, level, shapes, board }) {
   const { canvasRef, initializePuzzle } = usePuzzleConfig();
 
   useEffect(() => {
     if (canvasRef.current) {
       initializePuzzle({ puzzleImg, level, shapes, board });
     }
+
     // eslint-disable-next-line
   }, [canvasRef]);
 
   return (
     <>
       <div style={{ width: "100vw", display: "flex", justifyContent: "center" }}>
-        <div id="canvasContainer" style={{ position: "relative" }}>
-          <Canvas ref={canvasRef} id="canvas" />
-        </div>
+        <Canvas ref={canvasRef} id="canvas" />
       </div>
     </>
   );
-};
+}
 
 const Canvas = styled.canvas`
-  // width: 2580px;
-  // height: 1440px;
-  width: 100vw;
-  height: 80vh;
+  width: 2580px;
+  height: 1440px;
   border: 1px solid #ccc;
 `;
-
-export default PuzzleCanvas;
