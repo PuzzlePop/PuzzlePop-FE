@@ -11,7 +11,7 @@ import { usePuzzleConfig } from "../../hooks/usePuzzleConfig";
 const { connect, send, subscribe, disconnect } = socket;
 
 export default function CooperationGameIngamePage() {
-  const { lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = usePuzzleConfig();
+  const { config, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = usePuzzleConfig();
 
   const navigate = useNavigate();
   const { roomId } = useParams();
@@ -26,6 +26,11 @@ export default function CooperationGameIngamePage() {
     }
   };
 
+  const initializeGame = (data) => {
+    setGameData(data);
+    console.log("gamedata is here!", gameData, data);
+  };
+
   const connectSocket = async () => {
     // websocket 연결 시도
     connect(
@@ -38,8 +43,7 @@ export default function CooperationGameIngamePage() {
 
           // 2. 게임정보 받기
           if (data.gameType && data.gameType === "COOPERATION") {
-            setGameData(data);
-            console.log("gamedata is here!", gameData, data);
+            initializeGame(data);
             return;
           }
 
@@ -181,6 +185,8 @@ export default function CooperationGameIngamePage() {
     }
   }, [gameData]);
 
+  console.log(config);
+
   return (
     <>
       <h1>CooperationGameIngamePage : {roomId}</h1>
@@ -199,18 +205,9 @@ export default function CooperationGameIngamePage() {
               )}
               board={gameData[`${getTeam()}Puzzle`].board}
             />
-            <ItemRenderer />
           </>
         )
       )}
     </>
   );
-}
-
-function ItemRenderer() {
-  const { config } = usePuzzleConfig();
-
-  console.log(config);
-
-  return <h1></h1>;
 }

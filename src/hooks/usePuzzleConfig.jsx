@@ -4,9 +4,11 @@ import { Point } from "paper/dist/paper-core";
 import { initializeConfig } from "../puzzle-core/initializeConfig";
 import { setMoveEvent } from "../puzzle-core/setMoveEvent";
 import { uniteTiles } from "../puzzle-core/uniteTiles";
+import { searchItemList, setItemStyleToAllPiece } from "../puzzle-core/item";
 
 const PuzzleConfigState = {
   config: null,
+  puzzlePieceItemList: [],
   initializePuzzle: () => {},
   lockPuzzle: () => {},
   movePuzzle: () => {},
@@ -21,6 +23,7 @@ export const usePuzzleConfig = () => useContext(PuzzleConfigContext);
 
 export const PuzzleConfigProvider = ({ children }) => {
   const canvasRef = useRef(null);
+  const [puzzlePieceItemList, setPuzzlePieceItemList] = useState([]);
   const [config, setConfig] = useState(null);
 
   const initializePuzzle = useCallback(
@@ -28,10 +31,21 @@ export const PuzzleConfigProvider = ({ children }) => {
       if (!canvasRef.current || config !== null) {
         return;
       }
+      // 1. 퍼즐 피스에 붙어있는 아이템 정보 배열
+      const itemList = searchItemList(board);
+
+      // 2. 단계별 config 설정 시작
       Paper.setup(canvasRef.current);
-      const config1 = initializeConfig({ img: puzzleImg, level, board, shapes });
-      const config2 = setMoveEvent({ config: config1 });
-      setConfig(config2);
+      const initializedConfig = initializeConfig({ img: puzzleImg, level, board, shapes });
+      const attachedMoveEventConfig = setMoveEvent({ config: initializedConfig });
+      const attachedItemToAllPieceConfig = setItemStyleToAllPiece({
+        config: attachedMoveEventConfig,
+        itemList,
+      });
+
+      // 3. 상태 업데이트
+      setPuzzlePieceItemList(itemList);
+      setConfig(attachedItemToAllPieceConfig);
     },
     [config],
   );
@@ -97,6 +111,17 @@ export const PuzzleConfigProvider = ({ children }) => {
     },
     [config],
   );
+
+  const addItem = useCallback(() => {
+    // 퍼즐을 맞췄을 때
+    // 1. 아이템을 가지고 있는 퍼즐을 맞췄다면, 아이템 인벤토리에 추가해야한다.
+  }, []);
+
+  const useItem = useCallback(() => {
+    // 아이템을 사용하면..
+    // 아이템 효과를 부여하고
+    // 인벤토리에서 제거
+  }, []);
 
   const contextValue = useMemo(
     () => ({
