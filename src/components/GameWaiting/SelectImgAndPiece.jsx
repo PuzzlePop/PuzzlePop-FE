@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import Box from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
@@ -8,7 +8,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Dialog from "@mui/material/Dialog";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
-import { request } from "../../apis/requestBuilder";
+import { request, requestFile } from "../../apis/requestBuilder";
 import { getSender, getRoomId } from "@/socket-utils/storage";
 
 let idx = 9;
@@ -104,6 +104,26 @@ export default function SelectImgAndPiece({ src, allowedPiece }) {
 }
 
 function ImgDialog({ onClose, selectedImg, open }) {
+  const [imageList, setImageList] = useState([])
+  const [file, setFile] = useState(null)
+
+  useEffect(() => {
+    async function fetchImage() {
+      try {
+        const res = await request.get("/image/list/puzzle");
+        // const decodedImageList = res.data.map(imageData => ({
+        //   ...imageData,
+        //   base64_image: atob(imageData.base64_image)
+        // }));
+        setImageList(res.data);
+      } catch(error) {
+        console.error("Error fetching image data:", error);
+      }
+    }
+
+    fetchImage();
+  }, [])
+
   const handleClose = () => {
     onClose(selectedImg);
   };
@@ -127,20 +147,46 @@ function ImgDialog({ onClose, selectedImg, open }) {
     }
   };
 
+  const handleFileChange = async (event) => {
+    setFile(event.target.files[0]);
+    // const reader = new FileReader();
+    // reader.onload = async (e) => {
+    //   const base64Image = e.target.result.split(",")[1];
+    //   // Handle base64Image, for example, upload to server
+    //   console.log("Base64 Image:", base64Image);
+    // };
+    // reader.readAsDataURL(file);
+    
+
+  };
+
+  const postFile = async () => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', 'sPuzzle');
+    const res = await requestFile.post("/image", 
+      formData
+    );
+
+    console.log(res);
+  }
+
   return (
     <Dialog onClose={handleClose} open={open} maxWidth="md">
       <Typography variant="h4" sx={{ margin: "5% 10% 2% 10%" }}>
         퍼즐 그림 선택하기
       </Typography>
       <Grid container sx={{ width: "80%", margin: "0 10% 5% 10%" }}>
-        {dummyData.map((data) => {
+        {imageList.map((data) => {
           return (
-            <Grid key={data.idx} item xs={3}>
-              <ImgButton src={data.src} value={data.src} onClick={() => handleImgClick(data.idx)} />
+            <Grid key={data.id} item xs={3}>
+              <ImgButton src={`data:image/jpeg;base64,${data.base64_image}`} value={data.base64_image} onClick={() => handleImgClick(data.id)}  />
             </Grid>
           );
         })}
       </Grid>
+      <input type="file" accept="image/*" onChange={handleFileChange} />
+      <button onClick={postFile}>등록</button>
     </Dialog>
   );
 }
