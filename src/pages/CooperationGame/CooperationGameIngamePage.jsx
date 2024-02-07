@@ -5,59 +5,19 @@ import Loading from "@/components/Loading";
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
-import { config, uniteTiles } from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/MovePuzzle";
-import { Point } from "paper/dist/paper-core";
 import comboAudioPath from "@/assets/audio/combo.mp3";
+import { usePuzzleConfig } from "../../hooks/usePuzzleConfig";
+import ItemController from "../../components/ItemController";
 
 const { connect, send, subscribe, disconnect } = socket;
 
 export default function CooperationGameIngamePage() {
+  const { config, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = usePuzzleConfig();
+
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [loading, setLoading] = useState(true);
   const [gameData, setGameData] = useState(null);
-
-  const lockPuzzle = (x, y, index) => {
-    console.log(x, y, index);
-    // TODO: "Lock"이 걸려있다는 처리해야함
-    // 피그마처럼 유저별로 "색깔"을 지정해두고 border 색깔을 변경하는 것도 좋을듯?
-  };
-
-  const movePuzzle = (x, y, index) => {
-    const { tiles } = config;
-    tiles[index].position = new Point(x, y);
-  };
-
-  const unLockPuzzle = (x, y, index) => {
-    console.log(x, y, index);
-    // TODO: 여기서 Lock에 대한 UI처리를 해제한다.
-  };
-
-  const addPiece = (fromIndex, toIndex) => {
-    console.log(fromIndex, toIndex);
-    uniteTiles(fromIndex, toIndex);
-  };
-
-  const addCombo = (fromIndex, toIndex, direction) => {
-    let dir = -1;
-    switch (direction) {
-      case 0:
-        dir = 3;
-        break;
-      case 1:
-        dir = 0;
-        break;
-      case 2:
-        dir = 2;
-        break;
-      case 3:
-        dir = 1;
-        break;
-    }
-    console.log("addCombo 함수 실행 :", fromIndex, toIndex, direction, dir);
-    console.log(config);
-    uniteTiles(fromIndex, toIndex, false, true, dir);
-  };
 
   const finishGame = (data) => {
     if (data.finished === true) {
@@ -65,6 +25,11 @@ export default function CooperationGameIngamePage() {
       window.location.href = `/game/cooperation/waiting/${roomId}`;
       return;
     }
+  };
+
+  const initializeGame = (data) => {
+    setGameData(data);
+    console.log("gamedata is here!", gameData, data);
   };
 
   const connectSocket = async () => {
@@ -79,8 +44,7 @@ export default function CooperationGameIngamePage() {
 
           // 2. 게임정보 받기
           if (data.gameType && data.gameType === "COOPERATION") {
-            setGameData(data);
-            console.log("gamedata is here!", gameData, data);
+            initializeGame(data);
             return;
           }
 
@@ -108,7 +72,7 @@ export default function CooperationGameIngamePage() {
           if (data.message && data.message === "ADD_PIECE") {
             const { targets, combo } = data;
             const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
-            addPiece(fromIndex, toIndex);
+            addPiece({ fromIndex, toIndex });
 
             if (combo) {
               console.log("콤보 효과 발동 !! : ", combo);
@@ -222,6 +186,8 @@ export default function CooperationGameIngamePage() {
     }
   }, [gameData]);
 
+  console.log(config);
+
   return (
     <>
       <h1>CooperationGameIngamePage : {roomId}</h1>
@@ -231,14 +197,17 @@ export default function CooperationGameIngamePage() {
         gameData &&
         gameData[`${getTeam()}Puzzle`] &&
         gameData[`${getTeam()}Puzzle`].board && (
-          <PlayPuzzle
-            shapes={parsePuzzleShapes(
-              gameData[`${getTeam()}Puzzle`].board,
-              gameData.picture.widthPieceCnt,
-              gameData.picture.lengthPieceCnt,
-            )}
-            board={gameData[`${getTeam()}Puzzle`].board}
-          />
+          <>
+            <PlayPuzzle
+              shapes={parsePuzzleShapes(
+                gameData[`${getTeam()}Puzzle`].board,
+                gameData.picture.widthPieceCnt,
+                gameData.picture.lengthPieceCnt,
+              )}
+              board={gameData[`${getTeam()}Puzzle`].board}
+            />
+            <ItemController />
+          </>
         )
       )}
     </>
