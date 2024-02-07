@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import { deepPurple } from "@mui/material/colors";
 import { request } from "@/apis/requestBuilder";
-import { setRoomId, setSender } from "@/socket-utils/storage";
+import { setRoomId, setSender, setTeam } from "@/socket-utils/storage";
 
 export default function CreateRoomButton({ category }) {
   const navigate = useNavigate();
@@ -49,6 +49,7 @@ export default function CreateRoomButton({ category }) {
       return;
     }
     setSender(sender);
+    setTeam("red");
 
     const { data } = await request.post("/game/room", {
       name: roomTitle,

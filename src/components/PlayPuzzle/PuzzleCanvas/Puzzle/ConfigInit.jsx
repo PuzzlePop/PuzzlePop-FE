@@ -13,7 +13,7 @@ const constant = {
 
 let config;
 
-const initConfig = () => {
+const initConfig = (board) => {
   config = Puzzle.exportConfig();
   const tileRatio = config.tileWidth / constant.percentageTotal;
   for (let y = 0; y < config.tilesPerColumn; y++) {
@@ -63,32 +63,9 @@ const initConfig = () => {
 
   for (let y = 0; y < config.tilesPerColumn; y++) {
     for (let x = 0; x < config.tilesPerRow; x++) {
-      // const index1 = Math.floor(Math.random() * config.tileIndexes.length);
-      const index1 = Math.floor(0.5 * config.tileIndexes.length); // 멀티 플레이를 위해 그냥 0.5로 고정
-      const index2 = config.tileIndexes[index1];
-      const tile = config.tiles[index2];
-      config.tileIndexes.splice(index1, 1);
-      const position = new Point(
-        config.project.view.center.x -
-          config.tileWidth / 2 +
-          config.tileWidth * (x * 2 + (y % 2)) -
-          config.imgWidth,
-        config.project.view.center.y -
-          config.tileWidth / 2 +
-          config.tileWidth * y -
-          config.imgHeight / 2,
-      );
-
-      const cellPosition = new Point(
-        Math.round(position.x / config.tileWidth) + 1,
-        Math.round(position.y / config.tileWidth) + 1,
-      );
-
-      tile.position = new Point(
-        cellPosition.x * config.tileWidth + constant.tileMarginX,
-        cellPosition.y * config.tileWidth +
-          (config.tilesPerColumn % 2 === 1 ? -constant.tileMarginY : constant.tileMarginY),
-      );
+      const tileIndex = board[y][x].index;
+      const tile = config.tiles[tileIndex];
+      tile.position = new Point(board[y][x].position_x, board[y][x].position_y);
     }
   }
   Puzzle.setting({

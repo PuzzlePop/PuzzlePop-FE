@@ -1,11 +1,26 @@
 import styled from "styled-components";
+import { Typography, createTheme, ThemeProvider } from "@mui/material";
 import loadingPath from "@/assets/loading.gif";
 
-export default function Loading() {
+export default function Loading({ message }) {
+  const theme = createTheme({
+    typography: {
+      fontFamily: "'Galmuri11', sans-serif",
+    },
+  });
+
   return (
-    <Wrapper>
-      <LoadingImg src={loadingPath} />
-    </Wrapper>
+    <ThemeProvider theme={theme}>
+      <Wrapper>
+        <LoadingImg src={loadingPath} />
+        <Typography
+          variant="h5"
+          sx={{ marginLeft: "20px", marginTop: "20px", color: "#777", fontWeight: "bold" }}
+        >
+          {message}
+        </Typography>
+      </Wrapper>
+    </ThemeProvider>
   );
 }
 
@@ -14,6 +29,7 @@ const Wrapper = styled.div`
   height: 90vh;
   position: fixed;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 `;

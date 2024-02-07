@@ -3,7 +3,7 @@ import initPuzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/ConfigInit";
 
 let config;
 
-export const createTiles = (shapes) => {
+export const createTiles = (shapes, board) => {
   config = Puzzle.exportConfig();
   if (shapes && Array.isArray(shapes)) {
     // getRandomShapes();
@@ -11,7 +11,7 @@ export const createTiles = (shapes) => {
   } else {
     getRandomShapes();
   }
-  initPuzzle.initConfig();
+  initPuzzle.initConfig(board);
 };
 
 // 모든 피스에 대해 랜덤 모양 결정

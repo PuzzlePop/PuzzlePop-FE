@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import PlayPuzzle from "../../components/PlayPuzzle";
-import { getRoomId, getSender } from "../../socket-utils/storage";
-import { socket } from "../../socket-utils/socket";
-import { parsePuzzleShapes } from "../../socket-utils/parsePuzzleShapes";
-import { config, uniteTiles } from "../../components/PlayPuzzle/PuzzleCanvas/Puzzle/MovePuzzle";
+import PlayPuzzle from "@/components/PlayPuzzle";
+import Loading from "@/components/Loading";
+import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
+import { socket } from "@/socket-utils/socket";
+import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
+import { config, uniteTiles } from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/MovePuzzle";
 import { Point } from "paper/dist/paper-core";
+import comboAudioPath from "@/assets/audio/combo.mp3";
 
 const { connect, send, subscribe, disconnect } = socket;
 
@@ -36,6 +38,35 @@ export default function CooperationGameIngamePage() {
     uniteTiles(fromIndex, toIndex);
   };
 
+  const addCombo = (fromIndex, toIndex, direction) => {
+    let dir = -1;
+    switch (direction) {
+      case 0:
+        dir = 3;
+        break;
+      case 1:
+        dir = 0;
+        break;
+      case 2:
+        dir = 2;
+        break;
+      case 3:
+        dir = 1;
+        break;
+    }
+    console.log("addCombo 함수 실행 :", fromIndex, toIndex, direction, dir);
+    console.log(config);
+    uniteTiles(fromIndex, toIndex, false, true, dir);
+  };
+
+  const finishGame = (data) => {
+    if (data.finished === true) {
+      window.alert("게임이 종료되었습니다.");
+      window.location.href = `/game/cooperation/waiting/${roomId}`;
+      return;
+    }
+  };
+
   const connectSocket = async () => {
     // websocket 연결 시도
     connect(
@@ -46,17 +77,10 @@ export default function CooperationGameIngamePage() {
           const data = JSON.parse(message.body);
           console.log(data);
 
-          // 1. 게임이 끝나면 대기실 화면으로 보낸다.
-          //여기 수정함
-          if (data.finished === true && data.gameId) {
-            window.alert("게임이 종료되었습니다.");
-            window.location.href = `/game/cooperation/waiting/${data.gameId}`;
-            return;
-          }
-
           // 2. 게임정보 받기
           if (data.gameType && data.gameType === "COOPERATION") {
             setGameData(data);
+            console.log("gamedata is here!", gameData, data);
             return;
           }
 
@@ -82,9 +106,29 @@ export default function CooperationGameIngamePage() {
           }
 
           if (data.message && data.message === "ADD_PIECE") {
-            const { targets } = data;
+            const { targets, combo } = data;
             const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
             addPiece(fromIndex, toIndex);
+
+            if (combo) {
+              console.log("콤보 효과 발동 !! : ", combo);
+              combo.forEach(([toIndex, fromIndex, direction]) =>
+                addCombo(fromIndex, toIndex, direction),
+              );
+
+              const audio = new Audio(comboAudioPath);
+              audio.loop = false;
+              audio.crossOrigin = "anonymous";
+              audio.volume = 0.5;
+              audio.load();
+              try {
+                audio.play();
+              } catch (err) {
+                console.log(err);
+              }
+            }
+
+            finishGame(data);
             return;
           }
 
@@ -171,15 +215,31 @@ export default function CooperationGameIngamePage() {
     // eslint-disable-next-line
   }, []);
 
-  if (loading) {
-    return <h1>게임 정보를 받아오는 중...</h1>;
-  }
+  useEffect(() => {
+    if (gameData) {
+      console.log(gameData);
+      setLoading(false);
+    }
+  }, [gameData]);
 
   return (
     <>
       <h1>CooperationGameIngamePage : {roomId}</h1>
-      {gameData && gameData.redPuzzle && gameData.redPuzzle.board && (
-        <PlayPuzzle shapes={parsePuzzleShapes(gameData.redPuzzle.board[0])} />
+      {loading ? (
+        <Loading message="게임 정보 받아오는 중..." />
+      ) : (
+        gameData &&
+        gameData[`${getTeam()}Puzzle`] &&
+        gameData[`${getTeam()}Puzzle`].board && (
+          <PlayPuzzle
+            shapes={parsePuzzleShapes(
+              gameData[`${getTeam()}Puzzle`].board,
+              gameData.picture.widthPieceCnt,
+              gameData.picture.lengthPieceCnt,
+            )}
+            board={gameData[`${getTeam()}Puzzle`].board}
+          />
+        )
       )}
     </>
   );

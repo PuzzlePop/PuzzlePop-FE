@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import Box from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
@@ -8,8 +8,10 @@ import MenuItem from "@mui/material/MenuItem";
 import Dialog from "@mui/material/Dialog";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
+import { request, requestFile } from "../../apis/requestBuilder";
+import { getSender, getRoomId } from "@/socket-utils/storage";
 
-let idx = 1;
+let idx = 9;
 const dummyData = [
   {
     idx: idx++,
@@ -23,10 +25,10 @@ const dummyData = [
     idx: idx++,
     src: "https://img.sbs.co.kr/newsnet/etv/upload/2023/12/11/30000894114_700.jpg",
   },
-  {
-    idx: idx++,
-    src: "https://image.tving.com/ntgs/contents/CTC/caip/CAIP1500/ko/20220925/P001647858.jpg/dims/resize/1280",
-  },
+  // {
+  //   idx: idx++,
+  //   src: "https://image.tving.com/ntgs/contents/CTC/caip/CAIP1500/ko/20220925/P001647858.jpg/dims/resize/1280",
+  // },
   {
     idx: idx++,
     src: "https://i.pinimg.com/originals/fd/26/a1/fd26a15bf2032a616e820da21e6f9752.jpg",
@@ -39,10 +41,10 @@ const dummyData = [
     idx: idx++,
     src: "https://mblogthumb-phinf.pstatic.net/MjAyMDA4MjdfOTkg/MDAxNTk4NTIwNjg1MTcy.rF-rPPZHcu7_Z-_9a4mJOHegxM72AI7o5G4xu2LWR2Eg.QuItX-TXQievex-_o-Ru-qTwH3NYHPBBL3v-QqLxOrcg.JPEG.sonss1997/IMG_3245.JPG?type=w800",
   },
-  {
-    idx: idx++,
-    src: "https://i.pinimg.com/originals/75/9e/75/759e75e01a6e3a05ceee8026f7c8d2d3.gif",
-  },
+  // {
+  //   idx: idx++,
+  //   src: "https://i.pinimg.com/originals/75/9e/75/759e75e01a6e3a05ceee8026f7c8d2d3.gif",
+  // },
   {
     idx: idx++,
     src: "https://i.pinimg.com/736x/14/ab/10/14ab10a5ed90e5dec2b7541a33b28d2b.jpg",
@@ -102,13 +104,72 @@ export default function SelectImgAndPiece({ src, allowedPiece }) {
 }
 
 function ImgDialog({ onClose, selectedImg, open }) {
+  const [imageList, setImageList] = useState([])
+  const [file, setFile] = useState(null)
+
+  useEffect(() => {
+    async function fetchImage() {
+      try {
+        const res = await request.get("/image/list/puzzle");
+        // const decodedImageList = res.data.map(imageData => ({
+        //   ...imageData,
+        //   base64_image: atob(imageData.base64_image)
+        // }));
+        setImageList(res.data);
+      } catch(error) {
+        console.error("Error fetching image data:", error);
+      }
+    }
+
+    fetchImage();
+  }, [])
+
   const handleClose = () => {
     onClose(selectedImg);
   };
 
-  const handleImgClick = (value) => {
-    onClose(value);
+  const handleImgClick = async (value) => {
+
+    try {
+      const res = await request.post(`/game/room/picture`, {
+        picture : {
+          id : value
+        },
+        user : {
+          id : getSender()
+        },
+        uuid : getRoomId()
+      })
+          
+      onClose(value);
+    } catch(e) {
+      console.log(e)
+    }
   };
+
+  const handleFileChange = async (event) => {
+    setFile(event.target.files[0]);
+    // const reader = new FileReader();
+    // reader.onload = async (e) => {
+    //   const base64Image = e.target.result.split(",")[1];
+    //   // Handle base64Image, for example, upload to server
+    //   console.log("Base64 Image:", base64Image);
+    // };
+    // reader.readAsDataURL(file);
+    
+
+  };
+
+  const postFile = async () => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', 'sPuzzle');
+    const res = await requestFile.post("/image", 
+      formData
+    );
+
+    console.log(res);
+  }
 
   return (
     <Dialog onClose={handleClose} open={open} maxWidth="md">
@@ -116,14 +177,16 @@ function ImgDialog({ onClose, selectedImg, open }) {
         퍼즐 그림 선택하기
       </Typography>
       <Grid container sx={{ width: "80%", margin: "0 10% 5% 10%" }}>
-        {dummyData.map((data) => {
+        {imageList.map((data) => {
           return (
-            <Grid key={data.idx} item xs={3}>
-              <ImgButton src={data.src} value={data.src} onClick={() => handleImgClick(data.src)} />
+            <Grid key={data.id} item xs={3}>
+              <ImgButton src={`data:image/jpeg;base64,${data.base64_image}`} value={data.base64_image} onClick={() => handleImgClick(data.id)}  />
             </Grid>
           );
         })}
       </Grid>
+      <input type="file" accept="image/*" onChange={handleFileChange} />
+      <button onClick={postFile}>등록</button>
     </Dialog>
   );
 }

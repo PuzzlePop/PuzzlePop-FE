@@ -9,7 +9,7 @@ export default function SingleGameListPage() {
     <>
       <Header />
       {/* <GamePageNavigation /> */}
-      <PlayPuzzle category="single" />
+      {/* <PlayPuzzle category="single" /> */}
     </>
   );
 }

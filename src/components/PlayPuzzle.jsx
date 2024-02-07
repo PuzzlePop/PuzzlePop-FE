@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import PuzzleCanvas from "@/components/PlayPuzzle/PuzzleCanvas/index";
 
-const PlayPuzzle = ({ category, shapes }) => {
+const PlayPuzzle = ({ category, shapes, board }) => {
   const [loaded, setLoaded] = useState(false);
   const [puzzleInfo, setPuzzleInfo] = useState({
     crossOrigin: "anonymous",
@@ -46,6 +46,7 @@ const PlayPuzzle = ({ category, shapes }) => {
             puzzleImg={imgRef}
             level={puzzleInfo.level}
             shapes={shapes}
+            board={board}
           />
         )}
       </div>
