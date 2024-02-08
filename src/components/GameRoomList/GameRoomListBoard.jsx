@@ -31,7 +31,7 @@ export default function GameRoomListBoard({ category, roomList }) {
   };
 
   useEffect(() => {
-    setTotalPage(parseInt(roomList.length / 6) + 1);
+    setTotalPage(Math.ceil(roomList.length / 6));
   }, [roomList]);
 
   useEffect(() => {
