@@ -82,6 +82,14 @@ export default function SelectImgAndPiece({ src, allowedPiece }) {
     setSelectedPieceNum(event.target.value);
   };
 
+  useEffect(() => {
+    if (src === "짱구.jpg") {
+      setSelectedImg(
+        "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+      );
+    }
+  }, []);
+
   const theme = createTheme({
     typography: {
       fontFamily: "'Galmuri11', sans-serif",
@@ -143,6 +151,7 @@ function ImgDialog({ onClose, selectedImg, open }) {
   };
 
   const handleImgClick = async (value, src) => {
+    console.log("handleImgClick", value);
     try {
       const res = await request.post(`/game/room/picture`, {
         picture: {
@@ -153,7 +162,7 @@ function ImgDialog({ onClose, selectedImg, open }) {
         },
         uuid: getRoomId(),
       });
-      console.log("handleImgClick", value);
+
       onClose(src);
     } catch (e) {
       console.log(e);
@@ -162,7 +171,6 @@ function ImgDialog({ onClose, selectedImg, open }) {
 
   const handleFileChange = async (event) => {
     console.log("handleFileChange", event.target.files[0]);
-    // setFile(event.target.files[0]);
     postFile(event.target.files[0]);
   };
 
