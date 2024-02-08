@@ -14,7 +14,7 @@ export const setMoveEvent = ({ config }) => {
 };
 
 let lastExecutionTime = 0;
-const interval = 10; // 실행 간격 (40ms)
+const interval = 30; // 실행 간격 (40ms)
 
 const moveTile = ({ config }) => {
   config.groupTiles.forEach((gtile, index) => {
