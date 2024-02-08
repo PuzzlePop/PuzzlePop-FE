@@ -27,13 +27,13 @@ export const PuzzleConfigProvider = ({ children }) => {
   const [config, setConfig] = useState(null);
 
   const initializePuzzle = useCallback(
-    ({ puzzleImg, level, shapes, board = [], itemList = [] }) => {
+    ({ puzzleImg, level, shapes, board = [], itemList = [], picture }) => {
       if (!canvasRef.current || config !== null) {
         return;
       }
       // 단계별 config 설정
       Paper.setup(canvasRef.current);
-      const initializedConfig = initializeConfig({ img: puzzleImg, level, board, shapes });
+      const initializedConfig = initializeConfig({ img: puzzleImg, level, board, shapes, picture });
       const attachedMoveEventConfig = setMoveEvent({ config: initializedConfig });
       const attachedItemToAllPieceConfig = setItemStyleToAllPiece({
         config: attachedMoveEventConfig,

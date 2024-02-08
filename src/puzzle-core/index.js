@@ -6,7 +6,7 @@ import { setMoveEvent } from "./setMoveEvent";
 import { uniteTiles } from "./uniteTiles";
 
 const createPuzzleConfig = () => {
-  let config = null;
+  let config = {};
 
   const initializePuzzle = ({ canvasRef, puzzleImg, level, shapes, board = [], itemList = [] }) => {
     // 단계별 config 설정
@@ -21,7 +21,7 @@ const createPuzzleConfig = () => {
     config = attachedItemToAllPieceConfig;
   };
 
-  const getConfig = () => config;
+  const getConfig = () => ({ ...config });
 
   const lockPuzzle = (x, y, index) => {
     console.log(x, y, index);
@@ -30,8 +30,7 @@ const createPuzzleConfig = () => {
   };
 
   const movePuzzle = (x, y, index) => {
-    const { tiles } = config;
-    tiles[index].position = new Point(x, y);
+    config.tiles[index].position = new Point(x, y);
   };
 
   const unLockPuzzle = (x, y, index) => {

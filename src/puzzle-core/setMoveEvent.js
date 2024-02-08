@@ -1,4 +1,5 @@
 import { Point } from "paper/dist/paper-core";
+import { debounce } from "lodash";
 import { socket } from "../socket-utils/socket";
 import { getRoomId, getSender } from "../socket-utils/storage";
 import { getPuzzleGroup } from "./getPuzzleGroup";
@@ -11,6 +12,9 @@ export const setMoveEvent = ({ config }) => {
   findNearTileGroup({ config });
   return { ...config };
 };
+
+let lastExecutionTime = 0;
+const interval = 50; // 실행 간격 (40ms)
 
 const moveTile = ({ config }) => {
   config.groupTiles.forEach((gtile, index) => {
@@ -36,7 +40,6 @@ const moveTile = ({ config }) => {
       }
 
       const puzzleGroup = getPuzzleGroup({ config, paperEvent: event });
-
       // socket 전송
       send(
         "/app/game/message",
@@ -86,20 +89,27 @@ const moveTile = ({ config }) => {
 
       const puzzleGroup = getPuzzleGroup({ config, paperEvent: event });
 
-      // socket 전송
-      send(
-        "/app/game/message",
-        {},
-        JSON.stringify({
-          type: "GAME",
-          roomId: getRoomId(),
-          sender: getSender(),
-          message: "MOUSE_DRAG",
-          targets: JSON.stringify(puzzleGroup),
-          position_x: gtile[0].position.x,
-          position_y: gtile[0].position.y,
-        }),
-      );
+      const currentTime = Date.now();
+      if (currentTime - lastExecutionTime >= interval) {
+        // 지정된 간격(interval)으로 함수 실행
+
+        // socket 전송
+        send(
+          "/app/game/message",
+          {},
+          JSON.stringify({
+            type: "GAME",
+            roomId: getRoomId(),
+            sender: getSender(),
+            message: "MOUSE_DRAG",
+            targets: JSON.stringify(puzzleGroup),
+            position_x: gtile[0].position.x,
+            position_y: gtile[0].position.y,
+          }),
+        );
+
+        lastExecutionTime = currentTime;
+      }
     };
 
     gtile[0].onMouseEnter = (event) => {

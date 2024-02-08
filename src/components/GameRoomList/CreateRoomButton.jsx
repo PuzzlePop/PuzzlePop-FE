@@ -12,10 +12,8 @@ import {
   FormControlLabel,
   RadioGroup,
   Radio,
-  createTheme,
-  ThemeProvider,
-  deprecatedPropType,
 } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 import { request } from "@/apis/requestBuilder";
 import { setRoomId, setSender, setTeam } from "@/socket-utils/storage";
