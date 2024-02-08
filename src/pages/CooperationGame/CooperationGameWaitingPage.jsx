@@ -79,7 +79,7 @@ export default function CooperationGameWaitingPage() {
     initialize();
 
     return () => {
-      disconnect();
+      // disconnect();
       // console.log("WebSocket 연결 종료");
     };
 
