@@ -30,6 +30,12 @@ export default function CreateRoomButton({ category }) {
     setIsOpenedModal(false);
   };
 
+  const handleKeyUp = (e) => {
+    if (e.keyCode === 13) {
+      createRoom();
+    }
+  };
+
   const handleRoomSize = (e) => {
     const count = Number(e.target.value);
     if (2 <= count && count <= 8) {
@@ -168,6 +174,7 @@ export default function CreateRoomButton({ category }) {
                 label="방 제목"
                 value={roomTitle}
                 onChange={(e) => setRoomTitle(e.target.value)}
+                onKeyUp={handleKeyUp}
                 sx={{ width: "100%" }}
               />
             </Grid>
