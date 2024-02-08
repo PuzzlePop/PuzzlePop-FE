@@ -1,9 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import styled from "styled-components";
-import { usePuzzleConfig } from "../../../hooks/usePuzzleConfig";
+import { configStore } from "../../../puzzle-core";
+
+const { initializePuzzle } = configStore;
 
 const PuzzleCanvas = ({ puzzleImg, level, shapes, board }) => {
-  const { canvasRef, initializePuzzle } = usePuzzleConfig();
+  const canvasRef = useRef(null);
 
   useEffect(() => {
     if (canvasRef.current) {
