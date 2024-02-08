@@ -8,10 +8,18 @@ import { uniteTiles } from "./uniteTiles";
 const createPuzzleConfig = () => {
   let config = {};
 
-  const initializePuzzle = ({ canvasRef, puzzleImg, level, shapes, board = [], itemList = [] }) => {
+  const initializePuzzle = ({
+    canvasRef,
+    puzzleImg,
+    level,
+    shapes,
+    board = [],
+    itemList = [],
+    picture,
+  }) => {
     // 단계별 config 설정
     Paper.setup(canvasRef.current);
-    const initializedConfig = initializeConfig({ img: puzzleImg, level, board, shapes });
+    const initializedConfig = initializeConfig({ img: puzzleImg, level, board, shapes, picture });
     const attachedMoveEventConfig = setMoveEvent({ config: initializedConfig });
     const attachedItemToAllPieceConfig = setItemStyleToAllPiece({
       config: attachedMoveEventConfig,
