@@ -173,7 +173,8 @@ export default function CooperationGameIngamePage() {
     setLoading(false);
 
     return () => {
-      disconnect();
+      // disconnect();
+      // console.log("disconnect!");
     };
 
     // eslint-disable-next-line
