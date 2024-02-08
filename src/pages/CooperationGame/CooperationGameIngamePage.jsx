@@ -6,13 +6,15 @@ import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import comboAudioPath from "@/assets/audio/combo.mp3";
-import { usePuzzleConfig } from "../../hooks/usePuzzleConfig";
+// import { usePuzzleConfig } from "../../hooks/usePuzzleConfig";
 import ItemController from "../../components/ItemController";
+import { configStore } from "../../puzzle-core";
 
 const { connect, send, subscribe, disconnect } = socket;
+const { getConfig, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = configStore;
 
 export default function CooperationGameIngamePage() {
-  const { config, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = usePuzzleConfig();
+  // const { config, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = usePuzzleConfig();
 
   const navigate = useNavigate();
   const { roomId } = useParams();
@@ -187,8 +189,6 @@ export default function CooperationGameIngamePage() {
     }
   }, [gameData]);
 
-  console.log(config);
-
   return (
     <>
       <h1>CooperationGameIngamePage : {roomId}</h1>
@@ -207,7 +207,7 @@ export default function CooperationGameIngamePage() {
               )}
               board={gameData[`${getTeam()}Puzzle`].board}
             />
-            <ItemController />
+            {/* <ItemController /> */}
           </>
         )
       )}

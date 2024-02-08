@@ -1,12 +1,11 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getRoomId, getSender } from "../socket-utils/storage";
 import { socket } from "../socket-utils/socket";
-import { usePuzzleConfig } from "../hooks/usePuzzleConfig";
 
 const { send } = socket;
 
 export default function ItemController() {
-  const { itemInventory } = usePuzzleConfig();
+  const [itemInventory, setItemInventory] = useState([]);
 
   const _useItem = useCallback((keyNumber) => {
     console.log(keyNumber);
