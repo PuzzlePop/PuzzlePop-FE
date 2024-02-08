@@ -5,7 +5,8 @@ import HeaderPuzzleImage from "@/assets/icons/header_puzzle.png";
 import HeaderRankImage from "@/assets/icons/header_rank.png";
 import HeaderShopImage from "@/assets/icons/header_shop.png";
 import Logo from "@/assets/logo.png";
-import { AppBar, Toolbar, Button, createTheme, ThemeProvider } from "@mui/material";
+import { AppBar, Toolbar, Button } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 import GamePageNavigation from "@/components/GamePageNavigation";
 

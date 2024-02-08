@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { Box, AppBar, Button, Typography, Drawer, createTheme, ThemeProvider } from "@mui/material";
+import { Box, AppBar, Button, Typography, Drawer } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 
 export default function Footer() {

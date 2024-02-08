@@ -10,9 +10,8 @@ import {
   Divider,
   Chip,
   CardActionArea,
-  createTheme,
-  ThemeProvider,
 } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { setRoomId, setSender, setTeam } from "@/socket-utils/storage";
 import { request } from "../../apis/requestBuilder";
 import { isAxiosError } from "axios";

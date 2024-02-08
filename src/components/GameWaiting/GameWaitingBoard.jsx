@@ -1,5 +1,6 @@
 import styled from "styled-components";
-import Grid from "@mui/material/Unstable_Grid2";
+// import Grid from "@mui/material/Unstable_Grid2";
+import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
@@ -38,7 +39,7 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category 
 
     for (let i = 0; i < count; i++) {
       result.push(
-        <Grid xs={3}>
+        <Grid item xs={3}>
           <EmptyPlayerCard></EmptyPlayerCard>
         </Grid>,
       );
@@ -52,7 +53,7 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category 
 
     for (let i = 0; i < xPlayerCount; i++) {
       result.push(
-        <Grid xs={3}>
+        <Grid item xs={3}>
           <XPlayerCard></XPlayerCard>
         </Grid>,
       );
