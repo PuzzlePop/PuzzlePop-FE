@@ -87,19 +87,19 @@ const moveTile = ({ config }) => {
       const puzzleGroup = getPuzzleGroup({ config, paperEvent: event });
 
       // socket 전송
-      send(
-        "/app/game/message",
-        {},
-        JSON.stringify({
-          type: "GAME",
-          roomId: getRoomId(),
-          sender: getSender(),
-          message: "MOUSE_DRAG",
-          targets: JSON.stringify(puzzleGroup),
-          position_x: gtile[0].position.x,
-          position_y: gtile[0].position.y,
-        }),
-      );
+      // send(
+      //   "/app/game/message",
+      //   {},
+      //   JSON.stringify({
+      //     type: "GAME",
+      //     roomId: getRoomId(),
+      //     sender: getSender(),
+      //     message: "MOUSE_DRAG",
+      //     targets: JSON.stringify(puzzleGroup),
+      //     position_x: gtile[0].position.x,
+      //     position_y: gtile[0].position.y,
+      //   }),
+      // );
     };
 
     gtile[0].onMouseEnter = (event) => {
