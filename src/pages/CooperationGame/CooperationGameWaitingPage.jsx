@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-// import GamePageNavigation from "@/components/GamePageNavigation";
 import { getSender, getRoomId } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import GameWaitingBoard from "@/components/GameWaiting/GameWaitingBoard";
 import Loading from "@/components/Loading";
-import { request } from "../../apis/requestBuilder";
+import { request } from "@/apis/requestBuilder";
 import { isAxiosError } from "axios";
 
 const { connect, send, subscribe } = socket;
