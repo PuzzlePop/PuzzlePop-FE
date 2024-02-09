@@ -1,65 +1,31 @@
 import { useEffect, useState } from "react";
 import { request } from "../../apis/requestBuilder";
 
-export default function FetchDataComponent(){
-    const [someData, setSomeData] = useState([])
+export default function FetchDataComponent() {
+  const [friendList, setFriendList] = useState([]);
 
-    const fetchData = async() => {
-        const response = await request.get(`/friend/list`, {
-            id: 1
-        })
-        // const response = await request.get(`/todos/${todoId}`)
-        // const response = await request.post(`todos`, {
-        //     userId: userId
-        // })
+  const fetchFriendList = async () => {
+    const response = await request.post("/friend/list/accepted", { id: 1 }); // TODO: 현재 로그인 중인 사용자 ID로 교체할 것
+    const { data: friendList } = response;
 
-        console.log(response)
-        console.log(response.data)
+    console.log(friendList);
+    setFriendList(friendList);
+  };
 
-        const { data } = response
-        setSomeData(data)
-    }
+  useEffect(() => {
+    fetchFriendList();
+  }, []);
 
-    useEffect(() => {
-        fetchData();
-    }, [])
-
-    return (
-        <>
-            {someData.map(item => <div key={item.id}>{item.name}</div>)}
-        </>
-    )
+  return (
+    <>
+      {friendList.map((item) => (
+        <div key={item.id} style={{ border: '3px solid #010', margin: '10px', padding: '20px' }}>
+            {/* <img src={item.img_path}></img> */}
+            <div>nickname: {item.nickname}</div>
+            <div>status: {item.online_status}</div>
+            <div>playing game id: {item.playing_game_id}</div>
+        </div>
+      ))}
+    </>
+  );
 }
-
-// export default function FriendList(){
-//     const [someData, setSomeData] = useState(null)
-
-//     const fetchData = async() => {
-//         const response = await request.get(`/todos`)
-//         // const response = await request.get(`/todos/${todoId}`)
-//         // const response = await request.post(`todos`, {
-//         //     userId: userId
-//         // })
-
-
-
-//         const { data } = response
-
-//         setSomeData(data)
-//     }
-
-//     useEffect(() => {
-//         fetchData();
-//     }, [])
-
-//     if (!someData) {
-//         return <div></div>
-//     }
-
-//     return (
-//         <>
-//             <span>{someData.username}</span>
-//             <span>{someData.id}</span>
-//         </>
-//     )
-// }
