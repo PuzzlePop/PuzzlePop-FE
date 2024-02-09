@@ -1,5 +1,4 @@
 import styled from "styled-components";
-// import Grid from "@mui/material/Unstable_Grid2";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -9,9 +8,13 @@ import { red, blue } from "@mui/material/colors";
 import { PlayerCard, EmptyPlayerCard, XPlayerCard } from "@/components/GameWaiting/PlayerCard";
 import SelectImgAndPiece from "@/components/GameWaiting/SelectImgAndPiece";
 import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
-import { setTeam } from "@/socket-utils/storage";
+import Chatting from "@/components/GameWaiting/Chatting";
+import { getSender, setTeam } from "@/socket-utils/storage";
+import { socket } from "@/socket-utils/socket";
 
-export default function GameWaitingBoard({ player, data, allowedPiece, category }) {
+const { send } = socket;
+
+export default function GameWaitingBoard({ player, data, allowedPiece, category, chatHistory }) {
   // const redTeam = data.player.filter((player) => player.isRedTeam);
   // const blueTeam = data.player.filter((player) => !player.isRedTeam);
   const { redTeam, blueTeam, gameId, gameName, picture, roomSize } = data;
@@ -60,6 +63,21 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category 
     }
 
     return result;
+  };
+
+  const handleGameStart = () => {
+    if (getSender()) {
+      send(
+        `/app/game/message`,
+        {},
+        JSON.stringify({
+          roomId: gameId,
+          sender: getSender(),
+          message: "GAME_START",
+          type: "GAME",
+        }),
+      );
+    }
   };
 
   const theme = createTheme({
@@ -123,7 +141,6 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category 
             // 왜 여기서 unique key warning이 뜨는지 모르겠음...22
             <Grid container={true} spacing={2}>
               {redTeam.players.map((player) => {
-                // console.log(player.nickname);
                 return (
                   <Grid key={player.id} item={true} xs={3}>
                     <PlayerCard player={player} gameId={gameId} />
@@ -135,12 +152,16 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category 
             </Grid>
           )}
         </InnerBox>
+
+        {/* 텍스트 채팅 */}
+        <InnerBox>
+          <Chatting chatHistory={chatHistory} />
+        </InnerBox>
       </ColGrid>
 
       {/* 퍼즐 이미지 선택, 피스 수 선택 */}
       <ColGrid item={true} xs={4}>
         <SelectImgAndPiece src={picture.encodedString} allowedPiece={allowedPiece} />
-
         {category === "battle" && (
           <InnerBox>
             <Typography variant="subtitle1" sx={{ textAlign: "center" }}>
@@ -169,6 +190,7 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category 
             </ThemeProvider>
           </InnerBox>
         )}
+        <Button onClick={handleGameStart}>GAME START</Button>
       </ColGrid>
     </Wrapper>
   );

@@ -94,9 +94,21 @@ export default function BattleGameIngamePage() {
             return;
           }
 
-          //랜덤 아이템 드랍(사실 배틀에 있어야하는데 여기서 테스트)
+          if (data.message && data.message === "ATTACK") {
+            console.log("공격메세지", data);
+          }
+
+          if (data.message && data.message === "SHIELD") {
+            console.log("공격메세지 : 쉴드", data);
+          }
+
+          if (data.message && data.message === "MIRROR") {
+            console.log("공격메세지 : 거울", data);
+          }
+
           if (data.randomItem) {
             // 버튼 생성
+            const canvasContainer = document.getElementById("canvasContainer");
             const button = document.createElement("button");
             button.textContent = data.randomItem.name;
 
@@ -108,6 +120,8 @@ export default function BattleGameIngamePage() {
             button.onclick = function () {
               // 부모 요소로부터 버튼 제거
               //근데 이거 다른 클라이언트들도 이 아이템 먹었다고 버튼 사라지는 이벤트 처리하든가 해야함.
+              console.log("item button 클릭됨");
+              console.log(button.parentNode);
               button.parentNode.removeChild(button);
 
               // 서버로 메시지 전송
@@ -124,8 +138,8 @@ export default function BattleGameIngamePage() {
               );
             };
 
-            // 버튼을 body에 추가
-            document.body.appendChild(button);
+            // 버튼을 canvasContainer에 추가
+            canvasContainer.appendChild(button);
 
             // alert 대신 메시지를 콘솔에 출력
             console.log(
@@ -136,6 +150,15 @@ export default function BattleGameIngamePage() {
                 data.randomItem.position_y +
                 " 에 생성한다!",
             );
+
+            // 3초 뒤 아이템 삭제
+            setTimeout(() => {
+              if (button.parentNode) {
+                console.log("3초 끝남! item button 삭제");
+                console.log(button.parentNode);
+                button.parentNode.removeChild(button);
+              }
+            }, 3000);
           }
         });
 
