@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getSender, getRoomId } from "@/socket-utils/storage";
+import { getSender, getRoomId, setTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -25,6 +25,13 @@ export default function BattleGameWaitingPage() {
 
       subscribe(`/topic/game/room/${roomId}`, (message) => {
         const data = JSON.parse(message.body);
+
+        data.blueTeam.players.forEach((player) => {
+          console.log(player);
+          if (player.id === getSender()) {
+            setTeam("blue");
+          }
+        });
 
         // 1. 게임이 시작되면 인게임 화면으로 보낸다.
         if (data.gameId && data.started && data.started === true) {
