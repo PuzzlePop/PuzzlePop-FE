@@ -20,6 +20,7 @@ export default function BattleGameListPage() {
   const fetchAllRoom = async () => {
     const res = await request.get("/game/rooms/battle", { id: getSender() });
     const { data: fetchedRoomList } = res;
+    console.log(fetchedRoomList);
     setRoomList(fetchedRoomList);
   };
 
