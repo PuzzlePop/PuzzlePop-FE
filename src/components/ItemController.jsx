@@ -1,10 +1,12 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getRoomId, getSender } from "../socket-utils/storage";
 import { socket } from "../socket-utils/socket";
 
 const { send } = socket;
 
 export default function ItemController() {
+  const [itemInventory, setItemInventory] = useState([]);
+
   const _useItem = useCallback((keyNumber) => {
     console.log(keyNumber);
 
@@ -43,13 +45,15 @@ export default function ItemController() {
     };
   }, [handleKeyDownItem]);
 
+  console.log(itemInventory);
+
   return (
     <>
-      <button onClick={() => _useItem(1)}>1</button>
-      <button onClick={() => _useItem(2)}>2</button>
-      <button onClick={() => _useItem(3)}>3</button>
-      <button onClick={() => _useItem(4)}>4</button>
-      <button onClick={() => _useItem(5)}>5</button>
+      {itemInventory.map(({ name }, index) => (
+        <button key={index} onClick={() => _useItem(index + 1)}>
+          {name}
+        </button>
+      ))}
     </>
   );
 }

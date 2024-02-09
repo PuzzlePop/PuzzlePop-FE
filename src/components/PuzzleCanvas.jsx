@@ -1,16 +1,17 @@
 import { useEffect, useRef } from "react";
 import styled from "styled-components";
-import { configStore } from "../../../puzzle-core";
+import { configStore } from "../puzzle-core";
 
 const { initializePuzzle } = configStore;
 
-const PuzzleCanvas = ({ puzzleImg, level, shapes, board }) => {
+export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
     if (canvasRef.current) {
-      initializePuzzle({ puzzleImg, level, shapes, board });
+      initializePuzzle({ canvasRef, puzzleImg, level, shapes, board, picture });
     }
+
     // eslint-disable-next-line
   }, [canvasRef]);
 
@@ -23,14 +24,10 @@ const PuzzleCanvas = ({ puzzleImg, level, shapes, board }) => {
       </div>
     </>
   );
-};
+}
 
 const Canvas = styled.canvas`
-  // width: 2580px;
-  // height: 1440px;
-  width: 100vw;
-  height: 80vh;
+  width: 2580px;
+  height: 1440px;
   border: 1px solid #ccc;
 `;
-
-export default PuzzleCanvas;

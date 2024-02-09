@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import styled from "styled-components";
-import Grid from "@mui/material/Unstable_Grid2";
+// import Grid from "@mui/material/Unstable_Grid2";
+import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import Pagination from "@mui/material/Pagination";
 import PaginationItem from "@mui/material/PaginationItem";
@@ -20,7 +21,7 @@ export default function GameRoomListBoard({ category, roomList }) {
 
     for (let i = 0; i < 6 - rooms.length; i++) {
       result.push(
-        <Grid xs={6} key={`empty ${i}`}>
+        <Grid item xs={6} key={`empty ${i}`}>
           <EmptyCard></EmptyCard>
         </Grid>,
       );
@@ -30,7 +31,7 @@ export default function GameRoomListBoard({ category, roomList }) {
   };
 
   useEffect(() => {
-    setTotalPage(parseInt(roomList.length / 6) + 1);
+    setTotalPage(Math.ceil(roomList.length / 6));
   }, [roomList]);
 
   useEffect(() => {
@@ -42,7 +43,7 @@ export default function GameRoomListBoard({ category, roomList }) {
       <Grid container spacing={4}>
         {rooms.map((room) => {
           return (
-            <Grid xs={6} key={room.gameId}>
+            <Grid item xs={6} key={room.gameId}>
               <GameCard room={room} category={category} />
             </Grid>
           );

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import styled from "styled-components";
 import { Link, useLocation } from "react-router-dom";
-import { Box, Tabs, Tab, createTheme, ThemeProvider } from "@mui/material";
+import { Box, Tabs, Tab } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 
 export default function GamePageNavigation() {

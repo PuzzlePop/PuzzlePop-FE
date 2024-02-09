@@ -1,5 +1,6 @@
 import styled from "styled-components";
-import Grid from "@mui/material/Unstable_Grid2";
+// import Grid from "@mui/material/Unstable_Grid2";
+import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
@@ -38,7 +39,7 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category 
 
     for (let i = 0; i < count; i++) {
       result.push(
-        <Grid xs={3}>
+        <Grid item xs={3}>
           <EmptyPlayerCard></EmptyPlayerCard>
         </Grid>,
       );
@@ -52,7 +53,7 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category 
 
     for (let i = 0; i < xPlayerCount; i++) {
       result.push(
-        <Grid xs={3}>
+        <Grid item xs={3}>
           <XPlayerCard></XPlayerCard>
         </Grid>,
       );
@@ -81,10 +82,10 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category 
   });
 
   return (
-    <Wrapper container="true" spacing={4}>
+    <Wrapper container={true} spacing={4}>
       {/* 현재 접속중인 플레이어 (나)가 누군지 알아야함 !! */}
       <GameOpenVidu gameId={gameId} playerName={player} />
-      <ColGrid item="true" xs={8}>
+      <ColGrid item={true} xs={8}>
         {/* 방 번호, 방 제목, 인원수 header */}
         <InnerBox sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           {/* <Typography component="div" variant="subtitle2">
@@ -102,16 +103,16 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category 
         <InnerBox>
           {category === "battle" ? (
             // 왜 여기서 unique key warning이 뜨는지 모르겠음...
-            <Grid container="true" spacing={2}>
+            <Grid container={true} spacing={2}>
               {redTeam.players.map((player) => (
-                <Grid key={player.id} item="true" xs={3}>
+                <Grid key={player.id} item={true} xs={3}>
                   <PlayerCard player={player} gameId={gameId} color="red" />
                 </Grid>
               ))}
               {makeEmptyPlayer(emptyPlayerCount[0])}
               {makeXPlayer()}
               {blueTeam.players.map((player) => (
-                <Grid key={player.id} item="true" xs={3}>
+                <Grid key={player.id} item={true} xs={3}>
                   <PlayerCard player={player} gameId={gameId} color="blue" />
                 </Grid>
               ))}
@@ -120,11 +121,11 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category 
             </Grid>
           ) : (
             // 왜 여기서 unique key warning이 뜨는지 모르겠음...22
-            <Grid container="true" spacing={2}>
+            <Grid container={true} spacing={2}>
               {redTeam.players.map((player) => {
                 // console.log(player.nickname);
                 return (
-                  <Grid key={player.id} item="true" xs={3}>
+                  <Grid key={player.id} item={true} xs={3}>
                     <PlayerCard player={player} gameId={gameId} />
                   </Grid>
                 );
@@ -137,7 +138,7 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category 
       </ColGrid>
 
       {/* 퍼즐 이미지 선택, 피스 수 선택 */}
-      <ColGrid item="true" xs={4}>
+      <ColGrid item={true} xs={4}>
         <SelectImgAndPiece src={picture.encodedString} allowedPiece={allowedPiece} />
 
         {category === "battle" && (

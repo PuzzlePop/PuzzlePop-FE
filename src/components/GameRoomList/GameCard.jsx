@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import {
@@ -9,15 +10,15 @@ import {
   Divider,
   Chip,
   CardActionArea,
-  createTheme,
-  ThemeProvider,
 } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { setRoomId, setSender, setTeam } from "@/socket-utils/storage";
 import { request } from "../../apis/requestBuilder";
 import { isAxiosError } from "axios";
 
 export default function GameCard({ room, category }) {
   const navigate = useNavigate();
+  const [imgSrc, setImgSrc] = useState("");
 
   const {
     admin,
@@ -25,7 +26,7 @@ export default function GameCard({ room, category }) {
     gameId,
     gameName,
     gameType,
-    isStarted,
+    started,
     picture,
     redTeam,
     roomSize,
@@ -57,9 +58,26 @@ export default function GameCard({ room, category }) {
     }
   };
 
-  const handleClick = (event) => {
-    enterRoom(event.currentTarget.id);
+  const handleClick = (event, started) => {
+    if (!started) {
+      enterRoom(event.currentTarget.id);
+    }
   };
+
+  const fetchImage = async () => {
+    const imgRes = await request.get(`/image/${picture.id}`);
+    setImgSrc(`data:image/jpeg;base64,${imgRes.data}`);
+  };
+
+  useEffect(() => {
+    if (picture.encodedString === "짱구.jpg") {
+      setImgSrc(
+        "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+      );
+    } else {
+      fetchImage();
+    }
+  }, []);
 
   const theme = createTheme({
     typography: {
@@ -68,13 +86,13 @@ export default function GameCard({ room, category }) {
   });
 
   return (
-    <MyCard onClick={handleClick} id={gameId}>
+    <MyCard onClick={(e) => handleClick(e, started)} id={gameId} started={started.toString()}>
       <ThemeProvider theme={theme}>
         <MyCardActionArea>
           <CardMedia
             component="img"
             sx={{ width: 151, height: 151 }}
-            image={picture.encodedString}
+            image={imgSrc}
             alt={picture.encodedString}
           />
           <CardContent sx={{ display: "flex", flexDirection: "column", marginRight: "3%" }}>
@@ -93,7 +111,7 @@ export default function GameCard({ room, category }) {
 
               <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
                 <RoomState component="div" variant="h5">
-                  {isStarted ? "Playing" : "Waiting"}
+                  {started ? "Playing" : "Waiting"}
                 </RoomState>
                 <Typography variant="h6" color="text.secondary" component="div">
                   {redTeam.players.length + blueTeam.players.length} / {roomSize}
@@ -116,6 +134,12 @@ const MyCard = styled(Card)`
   &:hover {
     box-shadow: 5px 5px 10px lightgray;
   }
+  opacity: ${(props) => {
+    if (props.started === "true") {
+      return 0.6;
+    }
+    return 1;
+  }};
 `;
 
 const MyCardActionArea = styled(CardActionArea)`
@@ -144,6 +168,3 @@ const RoomState = styled(Typography)`
     }
   }};
 `;
-
-const SAMPLE_IMAGE =
-  "https://img1.daumcdn.net/thumb/R1280x0.fjpg/?fname=http://t1.daumcdn.net/brunch/service/user/cnoC/image/R7FVHsxQscWuMqj6TtNhHLSH8do";

@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-// import GamePageNavigation from "@/components/GamePageNavigation";
 import { getSender, getRoomId } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import GameWaitingBoard from "@/components/GameWaiting/GameWaitingBoard";
 import Loading from "@/components/Loading";
-import { request } from "../../apis/requestBuilder";
+import { request } from "@/apis/requestBuilder";
 import { isAxiosError } from "axios";
 
-const { connect, send, subscribe, disconnect } = socket;
+const { connect, send, subscribe } = socket;
 
 export default function CooperationGameWaitingPage() {
   const [loading, setLoading] = useState(true);
@@ -22,7 +21,7 @@ export default function CooperationGameWaitingPage() {
   const connectSocket = async () => {
     // websocket 연결 시도
     connect(() => {
-      // console.log("WebSocket 연결 성공");
+      console.log("@@@@@@@@@@@@@@@@ 대기실 소켓 연결 @@@@@@@@@@@@@@@@@@");
 
       subscribe(`/topic/game/room/${roomId}`, (message) => {
         const data = JSON.parse(message.body);
@@ -79,7 +78,7 @@ export default function CooperationGameWaitingPage() {
     initialize();
 
     return () => {
-      disconnect();
+      // disconnect();
       // console.log("WebSocket 연결 종료");
     };
 

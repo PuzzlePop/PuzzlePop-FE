@@ -1,17 +1,22 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-import Box from "@mui/material/Box";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import Dialog from "@mui/material/Dialog";
-import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid";
+import {
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Dialog,
+  Typography,
+  Grid,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { request, requestFile } from "../../apis/requestBuilder";
 import { getSender, getRoomId } from "@/socket-utils/storage";
 
-let idx = 9;
+let idx = 1;
 const dummyData = [
   {
     idx: idx++,
@@ -77,116 +82,144 @@ export default function SelectImgAndPiece({ src, allowedPiece }) {
     setSelectedPieceNum(event.target.value);
   };
 
-  return (
-    <InnerBox>
-      <ImgButton src={selectedImg} onClick={handleClickOpen} />
-      <FormControl sx={{ m: 1, minWidth: "80%" }}>
-        <InputLabel id="piece-num-label">피스 수</InputLabel>
-        <PieceSelect
-          labelId="piece-num-label"
-          label="피스 수"
-          value={selectedPieceNum}
-          onChange={handleChange}
-        >
-          {allowedPiece.map((piece) => {
-            return (
-              <MenuItem key={piece} value={piece}>
-                {piece}
-              </MenuItem>
-            );
-          })}
-        </PieceSelect>
-      </FormControl>
+  useEffect(() => {
+    if (src === "짱구.jpg") {
+      setSelectedImg(
+        "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+      );
+    }
+  }, []);
 
-      <ImgDialog selectedImg={selectedImg} open={open} onClose={handleClose} />
-    </InnerBox>
+  const theme = createTheme({
+    typography: {
+      fontFamily: "'Galmuri11', sans-serif",
+    },
+  });
+
+  return (
+    <ThemeProvider theme={theme}>
+      <InnerBox>
+        <ImgButton src={selectedImg} onClick={handleClickOpen} />
+        <FormControl sx={{ m: 1, minWidth: "80%" }}>
+          <InputLabel id="piece-num-label">피스 수</InputLabel>
+          <PieceSelect
+            labelId="piece-num-label"
+            label="피스 수"
+            value={selectedPieceNum}
+            onChange={handleChange}
+          >
+            {allowedPiece.map((piece) => {
+              return (
+                <MenuItem key={piece} value={piece}>
+                  {piece}
+                </MenuItem>
+              );
+            })}
+          </PieceSelect>
+        </FormControl>
+
+        <ImgDialog selectedImg={selectedImg} open={open} onClose={handleClose} />
+      </InnerBox>
+    </ThemeProvider>
   );
 }
 
 function ImgDialog({ onClose, selectedImg, open }) {
-  const [imageList, setImageList] = useState([])
-  const [file, setFile] = useState(null)
+  const [imageList, setImageList] = useState([]);
+  // const [file, setFile] = useState(null);
+
+  async function fetchImage() {
+    try {
+      const res = await request.get("/image/list/puzzle");
+      // const decodedImageList = res.data.map(imageData => ({
+      //   ...imageData,
+      //   base64_image: atob(imageData.base64_image)
+      // }));
+      console.log("이미지 데이터들:", res.data);
+      setImageList(res.data);
+    } catch (error) {
+      console.error("Error fetching image data:", error);
+    }
+  }
 
   useEffect(() => {
-    async function fetchImage() {
-      try {
-        const res = await request.get("/image/list/puzzle");
-        // const decodedImageList = res.data.map(imageData => ({
-        //   ...imageData,
-        //   base64_image: atob(imageData.base64_image)
-        // }));
-        setImageList(res.data);
-      } catch(error) {
-        console.error("Error fetching image data:", error);
-      }
-    }
-
     fetchImage();
-  }, [])
+  }, []);
 
   const handleClose = () => {
     onClose(selectedImg);
   };
 
-  const handleImgClick = async (value) => {
-
+  const handleImgClick = async (value, src) => {
+    console.log("handleImgClick", value);
     try {
       const res = await request.post(`/game/room/picture`, {
-        picture : {
-          id : value
+        picture: {
+          id: value,
         },
-        user : {
-          id : getSender()
+        user: {
+          id: getSender(),
         },
-        uuid : getRoomId()
-      })
-          
-      onClose(value);
-    } catch(e) {
-      console.log(e)
+        uuid: getRoomId(),
+      });
+
+      onClose(src);
+    } catch (e) {
+      console.log(e);
     }
   };
 
   const handleFileChange = async (event) => {
-    setFile(event.target.files[0]);
-    // const reader = new FileReader();
-    // reader.onload = async (e) => {
-    //   const base64Image = e.target.result.split(",")[1];
-    //   // Handle base64Image, for example, upload to server
-    //   console.log("Base64 Image:", base64Image);
-    // };
-    // reader.readAsDataURL(file);
-    
-
+    console.log("handleFileChange", event.target.files[0]);
+    postFile(event.target.files[0]);
   };
 
-  const postFile = async () => {
+  const postFile = async (file) => {
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('type', 'sPuzzle');
-    const res = await requestFile.post("/image", 
-      formData
-    );
+    formData.append("file", file);
+    formData.append("type", "sPuzzle");
+    const res = await requestFile.post("/image", formData);
 
-    console.log(res);
-  }
+    console.log("postFile", res.data);
+
+    const imgRes = await request.get(`/image/${res.data}`);
+    onClose(`data:image/jpeg;base64,${imgRes.data}`);
+    fetchImage();
+  };
 
   return (
     <Dialog onClose={handleClose} open={open} maxWidth="md">
-      <Typography variant="h4" sx={{ margin: "5% 10% 2% 10%" }}>
+      <Typography
+        variant="h4"
+        sx={{ margin: "5% 10% 2% 10%", fontWeight: "bold", color: "#9575cd" }}
+      >
         퍼즐 그림 선택하기
       </Typography>
       <Grid container sx={{ width: "80%", margin: "0 10% 5% 10%" }}>
         {imageList.map((data) => {
           return (
             <Grid key={data.id} item xs={3}>
-              <ImgButton src={`data:image/jpeg;base64,${data.base64_image}`} value={data.base64_image} onClick={() => handleImgClick(data.id)}  />
+              <ImgButton
+                src={`data:image/jpeg;base64,${data.base64_image}`}
+                value={data.base64_image}
+                onClick={() =>
+                  handleImgClick(data.id, `data:image/jpeg;base64,${data.base64_image}`)
+                }
+              />
             </Grid>
           );
         })}
+        <Grid item xs={3}>
+          <PlusButton component="label">
+            <AddIcon sx={{ color: "#9575cd", width: "100%" }} />
+            <VisuallyHiddenInput
+              type="file"
+              accept="image/jpeg, image/png"
+              onChange={handleFileChange}
+            />
+          </PlusButton>
+        </Grid>
       </Grid>
-      <input type="file" accept="image/*" onChange={handleFileChange} />
-      <button onClick={postFile}>등록</button>
     </Dialog>
   );
 }
@@ -218,4 +251,35 @@ const ImgButton = styled.img`
 const PieceSelect = styled(Select)`
   margin-bottom: 5%;
   background-color: white;
+`;
+
+const PlusButton = styled(Button)`
+  width: 80%;
+  height: 120px;
+  margin: 10% auto 5% auto;
+  border: 3px solid #d1c4e9;
+  border-radius: 10px;
+  cursor: pointer;
+
+  &:hover {
+    transition: all 0.3s;
+    background-color: #ede7f6;
+    box-shadow: 3px 3px 8px #7e57c2;
+  }
+
+  & .MuiSvgIcon-root {
+    font-size: 35px;
+  }
+`;
+
+const VisuallyHiddenInput = styled.input`
+  clip: rect(0 0 0 0);
+  clippath: inset(50%);
+  height: 1;
+  overflow: hidden;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  whitespace: nowrap;
+  width: 1;
 `;

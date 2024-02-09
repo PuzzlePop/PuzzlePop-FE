@@ -1,5 +1,6 @@
 import styled from "styled-components";
-import { Typography, createTheme, ThemeProvider } from "@mui/material";
+import { Typography } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import loadingPath from "@/assets/loading.gif";
 
 export default function Loading({ message }) {
