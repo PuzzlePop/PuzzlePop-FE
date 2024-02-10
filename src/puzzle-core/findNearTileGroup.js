@@ -243,5 +243,5 @@ export const fitTiles = ({
     uniteTiles({ config, nowIndex, preIndex, isSender: true });
   }
 
-  return { ...config };
+  return config;
 };

@@ -21,9 +21,8 @@ export const searchItemList = (board) => {
 };
 
 export const setItemStyleToAllPiece = ({ config, itemList }) => {
-  const nextConfig = { ...config };
   itemList.forEach(({ targetPuzzleIndex }) => {
-    nextConfig.tiles.forEach((tile, tileIndex) => {
+    config.tiles.forEach((tile, tileIndex) => {
       if (targetPuzzleIndex === tileIndex) {
         // 여기서 퍼즐에 스타일을 부여한다... 그런데 좀 반짝반짝 빛나는 효과는 못 주려나?
         // 참고: http://paperjs.org/reference/style/#strokecolor
@@ -31,15 +30,14 @@ export const setItemStyleToAllPiece = ({ config, itemList }) => {
       }
     });
   });
-  return { ...nextConfig };
+  return config;
 };
 
 export const removeItemStyleToPiece = ({ config, fromIndex, toIndex }) => {
-  const nextConfig = { ...config };
-  nextConfig.tiles.forEach((tile, tileIndex) => {
+  config.tiles.forEach((tile, tileIndex) => {
     if (fromIndex === tileIndex || toIndex === tileIndex) {
       tile.strokeColor = undefined;
     }
   });
-  return { ...nextConfig };
+  return config;
 };

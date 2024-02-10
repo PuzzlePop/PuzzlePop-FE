@@ -19,7 +19,6 @@
     "@mui/material": "^5.15.7",
     "@mui/styled-engine-sc": "^6.0.0-alpha.13",
     "axios": "^1.6.7",
-    "lodash": "^4.17.21",
     "openvidu-browser": "^2.29.1",
     "paper": "^0.12.17",
     "react": "^18.2.0",
