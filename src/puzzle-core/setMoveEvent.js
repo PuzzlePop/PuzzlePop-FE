@@ -1,5 +1,4 @@
 import { Point } from "paper/dist/paper-core";
-import { debounce } from "lodash";
 import { socket } from "../socket-utils/socket";
 import { getRoomId, getSender } from "../socket-utils/storage";
 import { getPuzzleGroup } from "./getPuzzleGroup";
@@ -10,7 +9,7 @@ const { send } = socket;
 export const setMoveEvent = ({ config }) => {
   moveTile({ config });
   findNearTileGroup({ config });
-  return { ...config };
+  return config;
 };
 
 let lastExecutionTime = 0;

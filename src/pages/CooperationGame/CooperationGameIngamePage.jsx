@@ -11,7 +11,7 @@ import ItemController from "../../components/ItemController";
 import { configStore } from "../../puzzle-core";
 
 const { connect, send, subscribe } = socket;
-const { getConfig, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = configStore;
+const { lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = configStore;
 
 export default function CooperationGameIngamePage() {
   // const { config, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = usePuzzleConfig();
@@ -20,6 +20,7 @@ export default function CooperationGameIngamePage() {
   const { roomId } = useParams();
   const [loading, setLoading] = useState(true);
   const [gameData, setGameData] = useState(null);
+  const [itemInventory, setItemInventory] = useState([null, null, null, null, null]);
 
   const finishGame = (data) => {
     if (data.finished === true) {
@@ -41,6 +42,10 @@ export default function CooperationGameIngamePage() {
         subscribe(`/topic/game/room/${roomId}`, (message) => {
           const data = JSON.parse(message.body);
           console.log(data);
+
+          if (data.redItemList) {
+            setItemInventory(data.redItemList);
+          }
 
           // 2. 게임정보 받기
           if (data.gameType && data.gameType === "COOPERATION") {
@@ -233,7 +238,7 @@ export default function CooperationGameIngamePage() {
               board={gameData[`${getTeam()}Puzzle`].board}
               picture={gameData.picture}
             />
-            {/* <ItemController /> */}
+            <ItemController itemInventory={itemInventory} />
           </>
         )
       )}

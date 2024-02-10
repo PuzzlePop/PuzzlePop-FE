@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { getRoomId, getSender } from "../socket-utils/storage";
 import { socket } from "../socket-utils/socket";
+import { configStore } from "../puzzle-core";
 
+const { getConfig } = configStore;
 const { send } = socket;
 
-export default function ItemController() {
-  const [itemInventory, setItemInventory] = useState([]);
-
+export default function ItemController({ itemInventory }) {
   const _useItem = useCallback((keyNumber) => {
     console.log(keyNumber);
 
@@ -45,13 +45,13 @@ export default function ItemController() {
     };
   }, [handleKeyDownItem]);
 
-  console.log(itemInventory);
+  console.log(getConfig());
 
   return (
     <>
-      {itemInventory.map(({ name }, index) => (
+      {itemInventory.map((item, index) => (
         <button key={index} onClick={() => _useItem(index + 1)}>
-          {name}
+          {item ? item.name : "X"}
         </button>
       ))}
     </>

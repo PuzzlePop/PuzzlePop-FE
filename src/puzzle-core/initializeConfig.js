@@ -4,7 +4,7 @@ import { getRandomShapes } from "./getRandomShapes";
 
 export const initializeConfig = ({ img, level, shapes, board, picture }) => {
   const config1 = setConfig(img, level, picture);
-  const config2 = createTiles({ config: config1, shapes, board });
+  const config2 = createTiles({ config: config1, shapes });
   const config3 = initConfig({ config: config2, board });
   return config3;
 };
@@ -52,10 +52,10 @@ const setConfig = (img, level, picture) => {
     selectIndex: -1,
   };
 
-  return { ...config };
+  return config;
 };
 
-const createTiles = ({ config, shapes, board }) => {
+const createTiles = ({ config, shapes }) => {
   if (shapes && Array.isArray(shapes)) {
     // getRandomShapes();
     config.shapes = shapes;
@@ -63,7 +63,7 @@ const createTiles = ({ config, shapes, board }) => {
     getRandomShapes();
   }
 
-  return { ...config };
+  return config;
 };
 
 const constant = {
@@ -134,7 +134,7 @@ const initConfig = ({ config, board }) => {
     }
   }
 
-  return { ...config };
+  return config;
 };
 
 // 들어갔는지 (-1) 나왔는지 (1)에 따라 curvy mask 계산

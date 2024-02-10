@@ -74,7 +74,7 @@ export const uniteTiles = ({
     }
   }
 
-  return { ...config };
+  return config;
 };
 
 const dismantling = ({ config, groupIndexNow }) => {
