@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import PlayPuzzle from "@/components/PlayPuzzle";
 import Loading from "@/components/Loading";
+import Timer from "@/components/GameIngame/Timer";
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
@@ -18,6 +19,7 @@ export default function BattleGameIngamePage() {
   const { roomId } = useParams();
   const [loading, setLoading] = useState(true);
   const [gameData, setGameData] = useState(null);
+  const [time, setTime] = useState(0);
 
   const finishGame = (data) => {
     if (data.finished === true) {
@@ -40,58 +42,65 @@ export default function BattleGameIngamePage() {
           const data = JSON.parse(message.body);
           console.log(data);
 
+          // 1. timer 설정
+          if (!data.gameType && data.time) {
+            setTime(data.time);
+          }
+
           // 2. 게임정보 받기
           if (data.gameType && data.gameType === "BATTLE") {
             initializeGame(data);
             return;
           }
 
-          if (data.message && data.message === "LOCKED") {
-            const { targets } = data;
-            const targetList = JSON.parse(targets);
-            targetList.forEach(({ x, y, index }) => lockPuzzle(x, y, index));
-            return;
-          }
-
-          if (data.message && data.message === "MOVE") {
-            const { targets } = data;
-            const targetList = JSON.parse(targets);
-            targetList.forEach(({ x, y, index }) => movePuzzle(x, y, index));
-            return;
-          }
-
-          if (data.message && data.message === "UNLOCKED") {
-            const { targets } = data;
-            const targetList = JSON.parse(targets);
-            targetList.forEach(({ x, y, index }) => unLockPuzzle(x, y, index));
-            return;
-          }
-
-          if (data.message && data.message === "ADD_PIECE") {
-            const { targets, combo } = data;
-            const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
-            addPiece({ fromIndex, toIndex });
-
-            if (combo) {
-              console.log("콤보 효과 발동 !! : ", combo);
-              combo.forEach(([toIndex, fromIndex, direction]) =>
-                addCombo(fromIndex, toIndex, direction),
-              );
-
-              const audio = new Audio(comboAudioPath);
-              audio.loop = false;
-              audio.crossOrigin = "anonymous";
-              audio.volume = 0.5;
-              audio.load();
-              try {
-                audio.play();
-              } catch (err) {
-                console.log(err);
-              }
+          if (data.message && data.team === getTeam().toUpperCase()) {
+            if (data.message && data.message === "LOCKED") {
+              const { targets } = data;
+              const targetList = JSON.parse(targets);
+              targetList.forEach(({ x, y, index }) => lockPuzzle(x, y, index));
+              return;
             }
 
-            finishGame(data);
-            return;
+            if (data.message && data.message === "MOVE") {
+              const { targets } = data;
+              const targetList = JSON.parse(targets);
+              targetList.forEach(({ x, y, index }) => movePuzzle(x, y, index));
+              return;
+            }
+
+            if (data.message && data.message === "UNLOCKED") {
+              const { targets } = data;
+              const targetList = JSON.parse(targets);
+              targetList.forEach(({ x, y, index }) => unLockPuzzle(x, y, index));
+              return;
+            }
+
+            if (data.message && data.message === "ADD_PIECE") {
+              const { targets, combo } = data;
+              const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
+              addPiece({ fromIndex, toIndex });
+
+              if (combo) {
+                console.log("콤보 효과 발동 !! : ", combo);
+                combo.forEach(([toIndex, fromIndex, direction]) =>
+                  addCombo(fromIndex, toIndex, direction),
+                );
+
+                const audio = new Audio(comboAudioPath);
+                audio.loop = false;
+                audio.crossOrigin = "anonymous";
+                audio.volume = 0.5;
+                audio.load();
+                try {
+                  audio.play();
+                } catch (err) {
+                  console.log(err);
+                }
+              }
+
+              finishGame(data);
+              return;
+            }
           }
 
           if (data.message && data.message === "ATTACK") {
@@ -216,6 +225,7 @@ export default function BattleGameIngamePage() {
         gameData[`${getTeam()}Puzzle`] &&
         gameData[`${getTeam()}Puzzle`].board && (
           <>
+            <Timer num={time} />
             <PlayPuzzle
               category="battle"
               shapes={parsePuzzleShapes(
