@@ -19,7 +19,7 @@ const setConfig = (img, level, picture) => {
     originHeight >= originWidth
       ? levelSize[level]
       : Math.round((levelSize[level] * originHeight) / originWidth / 100) * 100;
-  const tileWidth = 100;
+  const tileWidth = 70;
 
   const config = {
     originHeight: originHeight, // 실제 사진의 높이
