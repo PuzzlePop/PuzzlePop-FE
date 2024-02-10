@@ -9,8 +9,11 @@ import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import comboAudioPath from "@/assets/audio/combo.mp3";
+import redTeamBackgroundPath from "@/assets/redTeamBackground.gif";
+import blueTeamBackgroundPath from "@/assets/blueTeamBackground.gif";
 import { configStore } from "@/puzzle-core";
 import { Grid, Box } from "@mui/material";
+import { red, blue } from "@mui/material/colors";
 
 const { connect, send, subscribe } = socket;
 const { getConfig, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = configStore;
@@ -232,49 +235,68 @@ export default function BattleGameIngamePage() {
   }, [gameData]);
 
   return (
-    <>
-      <h1>BattleGameIngamePage : {roomId}</h1>
+    <Wrapper>
+      {/* <h1>BattleGameIngamePage : {roomId}</h1> */}
       {loading ? (
         <Loading message="게임 정보 받아오는 중..." />
       ) : (
         gameData &&
         gameData[`${getTeam()}Puzzle`] &&
         gameData[`${getTeam()}Puzzle`].board && (
-          <Grid container spacing={2}>
-            <ColGrid item xs={10}>
+          <div>
+            <>
               <Timer num={time} />
-              <PlayPuzzle
-                category="battle"
-                shapes={parsePuzzleShapes(
-                  gameData[`${getTeam()}Puzzle`].board,
-                  gameData.picture.widthPieceCnt,
-                  gameData.picture.lengthPieceCnt,
-                )}
-                board={gameData[`${getTeam()}Puzzle`].board}
-                picture={gameData.picture}
-              />
-            </ColGrid>
 
-            <Grid item xs={2}>
-              <ProgressWrapper>
-                <PrograssBar percent={ourPercent} isEnemy={false} />
-              </ProgressWrapper>
-              <ProgressWrapper>
-                <PrograssBar percent={enemyPercent} isEnemy={true} />
-              </ProgressWrapper>
-            </Grid>
+              <Board>
+                <PlayPuzzle
+                  category="battle"
+                  shapes={parsePuzzleShapes(
+                    gameData[`${getTeam()}Puzzle`].board,
+                    gameData.picture.widthPieceCnt,
+                    gameData.picture.lengthPieceCnt,
+                  )}
+                  board={gameData[`${getTeam()}Puzzle`].board}
+                  picture={gameData.picture}
+                />
+                <ProgressWrapper>
+                  <PrograssBar percent={ourPercent} isEnemy={false} />
+                </ProgressWrapper>
+                <ProgressWrapper>
+                  <PrograssBar percent={enemyPercent} isEnemy={true} />
+                </ProgressWrapper>
+              </Board>
+            </>
 
             {/* <ItemController /> */}
-          </Grid>
+          </div>
         )
       )}
-    </>
+    </Wrapper>
   );
 }
+
+const Wrapper = styled.div`
+  height: 1000px;
+  background-image: ${getTeam() === "red"
+    ? `url(${redTeamBackgroundPath})`
+    : `url(${blueTeamBackgroundPath})`};
+`;
 
 const ColGrid = styled(Grid)`
   display: flex;
   flex-direction: column;
+`;
+
+const Board = styled.div`
+  width: 1320px;
+  display: flex;
+  position: relative;
+  top: 50px;
+  margin: auto;
+  padding: 2%;
+  border-radius: 20px;
+  border: 3px solid ${getTeam() === "red" ? red[400] : blue[400]};
+  background-color: rgba(255, 255, 255, 0.8);
 `;
 
 const ProgressWrapper = styled(Box)`

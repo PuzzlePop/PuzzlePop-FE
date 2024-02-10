@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import styled from "styled-components";
 
 export default function Timer({ num }) {
   const [min, setMin] = useState(0);
@@ -16,10 +17,18 @@ export default function Timer({ num }) {
   }, [num]);
 
   return (
-    <>
+    <Wrapper>
       <h1>
         {min} : {sec}
       </h1>
-    </>
+    </Wrapper>
   );
 }
+
+const Wrapper = styled.div`
+  position: fixed;
+  z-index: 100;
+  top: 30px;
+  left: 50%;
+  transform: translate(-50%, 0);
+`;
