@@ -6,7 +6,6 @@ import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import comboAudioPath from "@/assets/audio/combo.mp3";
-// import { usePuzzleConfig } from "../../hooks/usePuzzleConfig";
 import ItemController from "../../components/ItemController";
 import { configStore } from "../../puzzle-core";
 
@@ -14,8 +13,6 @@ const { connect, send, subscribe } = socket;
 const { lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = configStore;
 
 export default function CooperationGameIngamePage() {
-  // const { config, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = usePuzzleConfig();
-
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [loading, setLoading] = useState(true);
@@ -124,50 +121,6 @@ export default function CooperationGameIngamePage() {
 
             finishGame(data);
             return;
-          }
-
-          //랜덤 아이템 드랍(사실 배틀에 있어야하는데 여기서 테스트)
-          if (data.randomItem) {
-            // 버튼 생성
-            const button = document.createElement("button");
-            button.textContent = data.randomItem.name;
-
-            // 버튼의 위치 설정
-            button.style.position = "absolute";
-            button.style.left = data.randomItem.position_x + "px";
-            button.style.top = data.randomItem.position_y + "px";
-
-            button.onclick = function () {
-              // 부모 요소로부터 버튼 제거
-              //근데 이거 다른 클라이언트들도 이 아이템 먹었다고 버튼 사라지는 이벤트 처리하든가 해야함.
-              button.parentNode.removeChild(button);
-
-              // 서버로 메시지 전송
-              send(
-                "/app/game/message",
-                {},
-                JSON.stringify({
-                  type: "GAME",
-                  roomId: getRoomId(),
-                  sender: getSender(),
-                  message: "USE_RANDOM_ITEM",
-                  targets: data.randomItem.uuid,
-                }),
-              );
-            };
-
-            // 버튼을 body에 추가
-            document.body.appendChild(button);
-
-            // alert 대신 메시지를 콘솔에 출력
-            console.log(
-              data.randomItem.name +
-                " 을 " +
-                data.randomItem.position_x +
-                " " +
-                data.randomItem.position_y +
-                " 에 생성한다!",
-            );
           }
         });
 

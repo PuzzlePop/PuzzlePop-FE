@@ -12,8 +12,6 @@ const { connect, send, subscribe } = socket;
 const { getConfig, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = configStore;
 
 export default function BattleGameIngamePage() {
-  // const { config, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = usePuzzleConfig();
-
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [loading, setLoading] = useState(true);
