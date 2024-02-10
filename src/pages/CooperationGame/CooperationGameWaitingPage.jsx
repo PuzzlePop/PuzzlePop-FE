@@ -91,21 +91,6 @@ export default function CooperationGameWaitingPage() {
     }
   }, [gameData]);
 
-  const handleGameStart = () => {
-    if (getSender()) {
-      send(
-        `/app/game/message`,
-        {},
-        JSON.stringify({
-          roomId,
-          sender: getSender(),
-          message: "GAME_START",
-          type: "GAME",
-        }),
-      );
-    }
-  };
-
   return (
     <>
       <Header />
@@ -113,16 +98,12 @@ export default function CooperationGameWaitingPage() {
         <Loading message="방 정보 불러오는 중..." />
       ) : (
         <>
-          <ChattingTest chatHistory={chatHistory} />
-          <div>
-            <button onClick={handleGameStart}>GAME START</button>
-          </div>
-          {/* 필요한 정보 : 각 플레이어의 상태 (방장, 준비완료, 준비x) */}
           <GameWaitingBoard
             player={getSender()}
             data={gameData}
             allowedPiece={allowedPiece}
             category="cooperation"
+            chatHistory={chatHistory}
           />
         </>
       )}
@@ -132,50 +113,3 @@ export default function CooperationGameWaitingPage() {
 }
 
 const allowedPiece = [100, 200, 300, 400, 500];
-
-const ChattingTest = ({ chatHistory }) => {
-  const [message, setMessage] = useState("");
-
-  const handleMessageSend = (e) => {
-    e.preventDefault();
-    if (getSender()) {
-      send(
-        `/app/game/message`,
-        {},
-        JSON.stringify({
-          roomId: getRoomId(),
-          sender: getSender(),
-          message,
-          type: "CHAT",
-        }),
-      );
-      setMessage("");
-    }
-  };
-
-  return (
-    <div>
-      <div style={{ marginBottom: "10px" }}>
-        {/* 채팅 기록을 화면에 출력 */}
-        {chatHistory.map((chat, index) => (
-          <div key={index}>
-            <strong>
-              {chat.userid}[{chat.time}]:{" "}
-            </strong>
-            {chat.chatMessage}
-          </div>
-        ))}
-      </div>
-
-      <form onSubmit={handleMessageSend}>
-        <input
-          type="text"
-          placeholder="채팅"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
-        <button type="submit">Send</button>
-      </form>
-    </div>
-  );
-};
