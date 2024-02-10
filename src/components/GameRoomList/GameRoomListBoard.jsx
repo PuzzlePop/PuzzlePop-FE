@@ -40,7 +40,7 @@ export default function GameRoomListBoard({ category, roomList }) {
 
   return (
     <Wrapper>
-      <Grid container spacing={4}>
+      <Grid container spacing={2}>
         {rooms.map((room) => {
           return (
             <Grid item xs={6} key={room.gameId}>
@@ -54,6 +54,8 @@ export default function GameRoomListBoard({ category, roomList }) {
         page={page}
         count={totalPage}
         size="large"
+        variant="outlined"
+        color="secondary"
         renderItem={(item) => (
           <PaginationItem
             component={Link}
@@ -72,11 +74,12 @@ const Wrapper = styled.div`
   background-color: rgba(255, 255, 255, 0.6);
   border-radius: 20px;
   padding: 3%;
+  padding-bottom: 2%;
   border: 1px solid #ccc;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
 `;
 
 const EmptyCard = styled(Card)`

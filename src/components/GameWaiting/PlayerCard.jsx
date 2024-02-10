@@ -22,9 +22,9 @@ function PlayerCard(props) {
   // const state = player.isCaptain ? "방 장" : player.isReady ? "준 비 완 료" : "준 비 중";
 
   return (
-    <WrapperCard className={color}>
+    <WrapperCard sx={{ height: "80%" }} className={color}>
       <CardMedia
-        sx={{ width: "110px", height: "110px" }}
+        sx={{ width: "80%", height: "70%" }}
         component="img"
         alt={player.nickname}
         image={player.img}
@@ -45,7 +45,7 @@ function PlayerCard(props) {
 
 function EmptyPlayerCard() {
   return (
-    <WrapperCard sx={{ height: "85%" }}>
+    <WrapperCard sx={{ height: "80%", minHeight: "140px" }}>
       <CardContent sx={{ margin: "auto" }}></CardContent>
     </WrapperCard>
   );
@@ -53,7 +53,7 @@ function EmptyPlayerCard() {
 
 function XPlayerCard() {
   return (
-    <WrapperCard sx={{ height: "85%" }}>
+    <WrapperCard sx={{ height: "80%", minHeight: "140px", backgroundColor: "#eee" }}>
       <CardContent sx={{ margin: "auto" }}>
         <Typography sx={{ color: "#ccc" }} component="div" variant="h1">
           X

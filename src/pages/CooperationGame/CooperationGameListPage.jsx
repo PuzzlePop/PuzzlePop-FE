@@ -20,7 +20,7 @@ export default function CooperationGameListPage() {
   const fetchAllRoom = async () => {
     const res = await request.get("/game/rooms/cooperation", { id: getSender() });
     const { data: fetchedRoomList } = res;
-    console.log(fetchedRoomList)
+    console.log(fetchedRoomList);
     setRoomList(fetchedRoomList);
   };
 
@@ -33,7 +33,7 @@ export default function CooperationGameListPage() {
       <Header />
 
       <div
-        style={{ display: "flex", alignItems: "center", width: "950px", margin: "5% auto 0 auto" }}
+        style={{ display: "flex", alignItems: "center", width: "950px", margin: "3% auto 0 auto" }}
       >
         <h1>협동 플레이</h1>
         <IconButton aria-label="refresh" onClick={refetchAllRoom} sx={{ marginRight: "auto" }}>
@@ -50,6 +50,6 @@ export default function CooperationGameListPage() {
 }
 
 const Wrapper = styled.div`
-  height: 1000px;
+  height: 900px;
   background-image: url(${backgroundPath});
 `;

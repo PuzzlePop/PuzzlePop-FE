@@ -3,6 +3,8 @@ import styled from "styled-components";
 import { getSender, getRoomId } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { TextField, Button } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { deepPurple } from "@mui/material/colors";
 
 const { send } = socket;
 
@@ -46,40 +48,73 @@ export default function Chatting({ chatHistory }) {
     }
   }, [chatHistory, lastHeight]);
 
-  return (
-    <div>
-      {chatHistory && (
-        <div
-          ref={chatElement}
-          style={{ height: "200px", marginBottom: "10px", overflow: "scroll" }}
-        >
-          {/* 채팅 기록을 화면에 출력 */}
-          {chatHistory.map((chat, index) => (
-            <div key={index}>
-              <strong>{chat.userid}: </strong>
-              {chat.chatMessage}
-            </div>
-          ))}
-        </div>
-      )}
+  const theme = createTheme({
+    typography: {
+      fontFamily: "'Galmuri11', sans-serif",
+    },
+    palette: {
+      purple: {
+        light: deepPurple[200],
+        main: deepPurple[300],
+        dark: deepPurple[400],
+        darker: deepPurple[600],
+        contrastText: "#fff",
+      },
+    },
+  });
 
-      <form onSubmit={handleMessageSend}>
-        <ChatInput
-          type="text"
-          placeholder="채팅"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
-        <ChatBtn type="submit">Send</ChatBtn>
-      </form>
-    </div>
+  return (
+    <ThemeProvider theme={theme}>
+      <Wrapper>
+        {chatHistory && (
+          <div
+            ref={chatElement}
+            style={{ height: "75%", marginBottom: "10px", overflow: "scroll" }}
+          >
+            {/* 채팅 기록을 화면에 출력 */}
+            {chatHistory.map((chat, index) => (
+              <div key={index}>
+                <strong>{chat.userid}: </strong>
+                {chat.chatMessage}
+              </div>
+            ))}
+          </div>
+        )}
+
+        <Form onSubmit={handleMessageSend}>
+          <ChatInput
+            type="text"
+            placeholder="채팅"
+            size="small"
+            color="purple"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+          <ChatBtn variant="outlined" color="purple" type="submit">
+            Send
+          </ChatBtn>
+        </Form>
+      </Wrapper>
+    </ThemeProvider>
   );
 }
 
+const Wrapper = styled.div`
+  height: 200px;
+`;
+
+const Form = styled.form`
+  height: 25%;
+  display: flex;
+`;
+
 const ChatInput = styled(TextField)`
   width: 80%;
+  height: 100%;
 `;
 
 const ChatBtn = styled(Button)`
-  width: 20%;
+  width: 16%;
+  margin: 0 auto;
+  height: 80%;
 `;

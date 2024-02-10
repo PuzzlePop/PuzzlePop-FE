@@ -13,7 +13,8 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { request, requestFile } from "../../apis/requestBuilder";
+import { deepPurple } from "@mui/material/colors";
+import { request, requestFile } from "@/apis/requestBuilder";
 import { getSender, getRoomId } from "@/socket-utils/storage";
 
 let idx = 1;
@@ -94,23 +95,56 @@ export default function SelectImgAndPiece({ src, allowedPiece }) {
     typography: {
       fontFamily: "'Galmuri11', sans-serif",
     },
+    palette: {
+      purple: {
+        light: deepPurple[200],
+        main: deepPurple[300],
+        dark: deepPurple[400],
+        darker: deepPurple[600],
+        contrastText: "#fff",
+      },
+    },
+    components: {
+      MuiSelect: {
+        styleOverrides: {
+          root: {
+            "& .Mui-selected": {
+              backgroundColor: deepPurple[100],
+            },
+          },
+        },
+      },
+    },
   });
 
   return (
     <ThemeProvider theme={theme}>
       <InnerBox>
+        <Typography sx={{ mt: 1 }}>그림, 피스 수 선택</Typography>
         <ImgButton src={selectedImg} onClick={handleClickOpen} />
         <FormControl sx={{ m: 1, minWidth: "80%" }}>
           <InputLabel id="piece-num-label">피스 수</InputLabel>
           <PieceSelect
             labelId="piece-num-label"
             label="피스 수"
+            color="purple"
+            size="small"
             value={selectedPieceNum}
             onChange={handleChange}
           >
             {allowedPiece.map((piece) => {
               return (
-                <MenuItem key={piece} value={piece}>
+                <MenuItem
+                  key={piece}
+                  value={piece}
+                  sx={{
+                    ":hover": { backgroundColor: deepPurple[50] },
+                    "&.Mui-selected": {
+                      backgroundColor: deepPurple[100],
+                      ":hover": { backgroundColor: deepPurple[50] },
+                    },
+                  }}
+                >
                   {piece}
                 </MenuItem>
               );
@@ -228,16 +262,21 @@ const InnerBox = styled(Box)`
   width: 95%;
   padding: 2% 3%;
   margin: 5px 0;
-  background-color: #eee;
+  background-color: rgba(231, 224, 255, 0.7);
+  border: 1px solid #c4b6fb;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  & label.Mui-focused {
+    color: ${deepPurple[400]};
+  }
 `;
 
 const ImgButton = styled.img`
   width: 80%;
-  margin: 10% auto 5% auto;
+  margin: 3% auto 5% auto;
   border: 1px solid #ccc;
   border-radius: 10px;
   cursor: pointer;
@@ -251,6 +290,10 @@ const ImgButton = styled.img`
 const PieceSelect = styled(Select)`
   margin-bottom: 5%;
   background-color: white;
+
+  & li.Mui-selected {
+    background-color: ${deepPurple[100]};
+  }
 `;
 
 const PlusButton = styled(Button)`

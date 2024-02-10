@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import styled from "styled-components";
 import { getSender, getRoomId, setTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import Header from "@/components/Header";
@@ -8,6 +9,7 @@ import GameWaitingBoard from "@/components/GameWaiting/GameWaitingBoard";
 import Loading from "@/components/Loading";
 import { request } from "@/apis/requestBuilder";
 import { isAxiosError } from "axios";
+import backgroundPath from "@/assets/background.gif";
 
 const { connect, send, subscribe } = socket;
 
@@ -99,7 +101,7 @@ export default function BattleGameWaitingPage() {
   }, [gameData]);
 
   return (
-    <>
+    <Wrapper>
       <Header />
       {loading ? (
         <Loading message="방 정보 불러오는 중..." />
@@ -115,8 +117,13 @@ export default function BattleGameWaitingPage() {
         </>
       )}
       <Footer />
-    </>
+    </Wrapper>
   );
 }
 
 const allowedPiece = [100, 200, 300, 400, 500];
+
+const Wrapper = styled.div`
+  height: 1000px;
+  background-image: url(${backgroundPath});
+`;
