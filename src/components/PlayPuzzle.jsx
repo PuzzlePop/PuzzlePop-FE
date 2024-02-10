@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-// import PuzzleCanvas from "../components/PlayPuzzle/PuzzleCanvas";
 import PuzzleCanvas from "./PuzzleCanvas";
 
 const PlayPuzzle = ({ category, shapes, board, picture }) => {

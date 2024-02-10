@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import comboAudioPath from "@/assets/audio/combo.mp3";
 import PlayPuzzle from "@/components/PlayPuzzle";
 import Loading from "@/components/Loading";
-import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
-import { socket } from "@/socket-utils/socket";
-import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
-import comboAudioPath from "@/assets/audio/combo.mp3";
 import ItemController from "../../components/ItemController";
 import { configStore } from "../../puzzle-core";
+import { socket } from "../../socket-utils/socket";
+import { getRoomId, getSender, getTeam } from "../../socket-utils/storage";
+import { parsePuzzleShapes } from "../../socket-utils/parsePuzzleShapes";
 
 const { connect, send, subscribe } = socket;
 const { lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = configStore;
@@ -15,22 +15,12 @@ const { lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = configStore
 export default function CooperationGameIngamePage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const [loading, setLoading] = useState(true);
   const [gameData, setGameData] = useState(null);
   const [itemInventory, setItemInventory] = useState([null, null, null, null, null]);
 
-  const finishGame = (data) => {
-    if (data.finished === true) {
-      window.alert("게임이 종료되었습니다.");
-      window.location.href = `/game/cooperation/waiting/${roomId}`;
-      return;
-    }
-  };
-
-  const initializeGame = (data) => {
-    setGameData(data);
-    console.log("gamedata is here!", gameData, data);
-  };
+  const isLoaded = useMemo(() => {
+    return gameData && gameData[`${getTeam()}Puzzle`] && gameData[`${getTeam()}Puzzle`].board;
+  }, [gameData]);
 
   const connectSocket = async () => {
     connect(
@@ -40,13 +30,23 @@ export default function CooperationGameIngamePage() {
           const data = JSON.parse(message.body);
           console.log(data);
 
+          // 매번 게임이 끝났는지 체크
+          if (Boolean(data.finished)) {
+            window.alert("게임 종료!!!");
+            navigate(`/game/cooperation`, {
+              replace: true,
+            });
+            return;
+          }
+
+          // 매번 보유아이템배열을 업데이트
           if (data.redItemList) {
             setItemInventory(data.redItemList);
           }
 
-          // 2. 게임정보 받기
+          // 게임정보 받기
           if (data.gameType && data.gameType === "COOPERATION") {
-            initializeGame(data);
+            setGameData(data);
             return;
           }
 
@@ -118,8 +118,6 @@ export default function CooperationGameIngamePage() {
                 console.log(err);
               }
             }
-
-            finishGame(data);
             return;
           }
         });
@@ -145,12 +143,6 @@ export default function CooperationGameIngamePage() {
     );
   };
 
-  const initialize = async () => {
-    // await fn
-    await connectSocket();
-    setLoading(false);
-  };
-
   useEffect(() => {
     if (roomId !== getRoomId() || !getSender()) {
       navigate("/game/cooperation", {
@@ -159,42 +151,29 @@ export default function CooperationGameIngamePage() {
       return;
     }
 
-    initialize();
+    connectSocket();
 
     // eslint-disable-next-line
   }, []);
 
-  useEffect(() => {
-    if (gameData) {
-      console.log(gameData);
-      setLoading(false);
-    }
-  }, [gameData]);
+  if (!isLoaded) {
+    return <Loading message="게임 정보 받아오는 중..." />;
+  }
 
   return (
     <>
       <h1>CooperationGameIngamePage : {roomId}</h1>
-      {loading ? (
-        <Loading message="게임 정보 받아오는 중..." />
-      ) : (
-        gameData &&
-        gameData[`${getTeam()}Puzzle`] &&
-        gameData[`${getTeam()}Puzzle`].board && (
-          <>
-            <PlayPuzzle
-              category="cooperation"
-              shapes={parsePuzzleShapes(
-                gameData[`${getTeam()}Puzzle`].board,
-                gameData.picture.widthPieceCnt,
-                gameData.picture.lengthPieceCnt,
-              )}
-              board={gameData[`${getTeam()}Puzzle`].board}
-              picture={gameData.picture}
-            />
-            <ItemController itemInventory={itemInventory} />
-          </>
-        )
-      )}
+      <PlayPuzzle
+        category="cooperation"
+        shapes={parsePuzzleShapes(
+          gameData[`${getTeam()}Puzzle`].board,
+          gameData.picture.widthPieceCnt,
+          gameData.picture.lengthPieceCnt,
+        )}
+        board={gameData[`${getTeam()}Puzzle`].board}
+        picture={gameData.picture}
+      />
+      <ItemController itemInventory={itemInventory} />
     </>
   );
 }
