@@ -1,3 +1,7 @@
+import { socket } from "./socket";
+
+const { send } = socket;
+
 const webStorage = sessionStorage;
 
 const SENDER_KEY = "wschat.sender";
@@ -16,6 +20,19 @@ export const getTeam = () => {
 };
 export const setTeam = (value) => {
   webStorage.setItem(TEAM_KEY, value);
+};
+export const setTeamSocket = () => {
+  send(
+    "/app/game/message",
+    {},
+    JSON.stringify({
+      type: "GAME",
+      roomId: getRoomId(),
+      sender: getSender(),
+      message: "CHANGE_TEAM",
+      targets: getSender(),
+    }),
+  );
 };
 
 export const getRoomId = () => {
