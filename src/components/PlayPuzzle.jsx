@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+// import PuzzleCanvas from "../components/PlayPuzzle/PuzzleCanvas";
 import PuzzleCanvas from "./PuzzleCanvas";
 
 const PlayPuzzle = ({ category, shapes, board, picture }) => {
@@ -22,6 +23,8 @@ const PlayPuzzle = ({ category, shapes, board, picture }) => {
       level: 3,
     };
     setPuzzleInfo({ crossOrigin: "anonymous", img: res.img, level: res.level });
+
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {

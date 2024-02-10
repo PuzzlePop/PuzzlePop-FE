@@ -1,28 +1,29 @@
 import Paper from "paper";
 import { Point } from "paper/dist/paper-core";
 import { initializeConfig } from "./initializeConfig";
-import { removeItemStyleToPiece, setItemStyleToAllPiece } from "./item";
+import { removeItemStyleToPiece, searchItemList, setItemStyleToAllPiece } from "./item";
 import { setMoveEvent } from "./setMoveEvent";
 import { uniteTiles } from "./uniteTiles";
 
 const createPuzzleConfig = () => {
   let config = {};
 
-  const initializePuzzle = ({
-    canvasRef,
-    puzzleImg,
-    level,
-    shapes,
-    board = [],
-    itemList = [],
-    picture,
-  }) => {
+  const initializePuzzle = ({ canvasRef, puzzleImg, level, shapes, board = [], picture }) => {
     // 단계별 config 설정
     Paper.setup(canvasRef.current);
     const initializedConfig = initializeConfig({ img: puzzleImg, level, board, shapes, picture });
     const attachedMoveEventConfig = setMoveEvent({ config: initializedConfig });
     const attachedItemToAllPieceConfig = setItemStyleToAllPiece({
       config: attachedMoveEventConfig,
+      itemList: searchItemList(board),
+    });
+
+    config = attachedItemToAllPieceConfig;
+  };
+
+  const initializePuzzle2 = (config2, itemList = []) => {
+    const attachedItemToAllPieceConfig = setItemStyleToAllPiece({
+      config: config2,
       itemList,
     });
 
@@ -94,6 +95,7 @@ const createPuzzleConfig = () => {
 
   return {
     initializePuzzle,
+    initializePuzzle2,
     getConfig,
     lockPuzzle,
     movePuzzle,
