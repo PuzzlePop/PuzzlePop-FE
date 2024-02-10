@@ -70,7 +70,7 @@ export default function CooperationGameIngamePage() {
           }
 
           if (data.message && data.message === "ADD_PIECE") {
-            const { targets, combo } = data;
+            const { targets, combo, comboCnt } = data;
             const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
             addPiece({ fromIndex, toIndex });
 
@@ -80,10 +80,35 @@ export default function CooperationGameIngamePage() {
                 addCombo(fromIndex, toIndex, direction),
               );
 
+              if (comboCnt) {
+                console.log(`${comboCnt} 콤보문구 생성`);
+                const comboText = document.createElement("h2");
+                const canvasContainer = document.getElementById("canvasContainer");
+                comboText.textContent = `${comboCnt}COMBO!!`;
+
+                comboText.style.zIndex = 100;
+                comboText.style.position = "fixed";
+                comboText.style.left = "50%";
+                comboText.style.top = "40px";
+                comboText.style.transform = "translate(-50%, 0)";
+                comboText.style.fontSize = "30px";
+
+                canvasContainer.appendChild(comboText);
+
+                console.log(comboText);
+                setTimeout(() => {
+                  console.log("콤보 문구 삭제");
+                  console.log(comboText);
+                  console.log(comboText.parentNode);
+                  console.log(comboText.parentElement);
+                  comboText.parentNode.removeChild(comboText);
+                }, 2000);
+              }
+
               const audio = new Audio(comboAudioPath);
               audio.loop = false;
               audio.crossOrigin = "anonymous";
-              audio.volume = 0.5;
+              // audio.volume = 0.5;
               audio.load();
               try {
                 audio.play();
@@ -162,6 +187,12 @@ export default function CooperationGameIngamePage() {
     );
   };
 
+  const initialize = async () => {
+    // await fn
+    await connectSocket();
+    setLoading(false);
+  };
+
   useEffect(() => {
     if (roomId !== getRoomId() || !getSender()) {
       navigate("/game/cooperation", {
@@ -170,8 +201,7 @@ export default function CooperationGameIngamePage() {
       return;
     }
 
-    connectSocket();
-    setLoading(false);
+    initialize();
 
     // eslint-disable-next-line
   }, []);
