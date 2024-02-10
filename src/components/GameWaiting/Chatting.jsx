@@ -28,17 +28,6 @@ export default function Chatting({ chatHistory }) {
     }
   };
 
-  const onScroll = (event) => {
-    const chat = event.target;
-
-    if (chat.scrollTop === 0) {
-      console.log("ON TOP");
-      const { scrollHeight } = chatElement.current;
-      setLastHeight(scrollHeight);
-      // loadMessages();
-    }
-  };
-
   useEffect(() => {
     const { scrollTop, scrollHeight, clientHeight } = chatElement.current;
 
@@ -62,7 +51,6 @@ export default function Chatting({ chatHistory }) {
       {chatHistory && (
         <div
           ref={chatElement}
-          onScroll={onscroll}
           style={{ height: "200px", marginBottom: "10px", overflow: "scroll" }}
         >
           {/* 채팅 기록을 화면에 출력 */}
