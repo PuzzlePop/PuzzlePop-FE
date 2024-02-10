@@ -1,29 +1,23 @@
 import { useCallback, useEffect } from "react";
 import styled from "styled-components";
 import Draggable from "react-draggable";
-import { getRoomId, getSender } from "../socket-utils/storage";
-import { socket } from "../socket-utils/socket";
-
-const { send } = socket;
 
 const defaultItemInventory = [null, null, null, null, null];
 
-export default function ItemController({ itemInventory = [...defaultItemInventory] }) {
-  const _useItem = useCallback((keyNumber) => {
-    console.log(`<ItemController /> : ${keyNumber} 키 누름!!!`);
+export default function ItemController({
+  itemInventory = [...defaultItemInventory],
+  onSendUseItemMessage,
+}) {
+  const _useItem = useCallback(
+    (keyNumber) => {
+      console.log(`<ItemController /> : ${keyNumber} 키 누름!!!`);
 
-    send(
-      "/app/game/message",
-      {},
-      JSON.stringify({
-        type: "GAME",
-        roomId: getRoomId(),
-        sender: getSender(),
-        message: "USE_ITEM",
-        targets: keyNumber,
-      }),
-    );
-  }, []);
+      if (itemInventory[keyNumber - 1] !== null && onSendUseItemMessage) {
+        onSendUseItemMessage(keyNumber);
+      }
+    },
+    [onSendUseItemMessage, itemInventory],
+  );
 
   // 1, 2, 3, 4, 5 키에 아이템사용
   const handleKeyDownItem = useCallback(

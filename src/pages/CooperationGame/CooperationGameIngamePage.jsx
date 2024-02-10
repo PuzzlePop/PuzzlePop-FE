@@ -1,26 +1,49 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import comboAudioPath from "@/assets/audio/combo.mp3";
 import PlayPuzzle from "@/components/PlayPuzzle";
 import Loading from "@/components/Loading";
+import Toast from "../../components/Toast";
 import ItemController from "../../components/ItemController";
 import { configStore } from "../../puzzle-core";
 import { socket } from "../../socket-utils/socket";
 import { getRoomId, getSender, getTeam } from "../../socket-utils/storage";
 import { parsePuzzleShapes } from "../../socket-utils/parsePuzzleShapes";
 
-const { connect, send, subscribe } = socket;
+const { connect, send, subscribe, disconnect } = socket;
 const { lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = configStore;
 
 export default function CooperationGameIngamePage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [gameData, setGameData] = useState(null);
+  const [isOpenedToast, setIsOpenedToast] = useState(false);
   const [itemInventory, setItemInventory] = useState([null, null, null, null, null]);
 
   const isLoaded = useMemo(() => {
     return gameData && gameData[`${getTeam()}Puzzle`] && gameData[`${getTeam()}Puzzle`].board;
   }, [gameData]);
+
+  const handleCloseGame = () => {
+    setIsOpenedToast(false);
+    navigate(`/game/cooperation`, {
+      replace: true,
+    });
+  };
+
+  const handleSendUseItemMessage = useCallback((keyNumber) => {
+    send(
+      "/app/game/message",
+      {},
+      JSON.stringify({
+        type: "GAME",
+        roomId: getRoomId(),
+        sender: getSender(),
+        message: "USE_ITEM",
+        targets: keyNumber,
+      }),
+    );
+  }, []);
 
   const connectSocket = async () => {
     connect(
@@ -32,10 +55,8 @@ export default function CooperationGameIngamePage() {
 
           // 매번 게임이 끝났는지 체크
           if (Boolean(data.finished)) {
-            window.alert("게임 종료!!!");
-            navigate(`/game/cooperation`, {
-              replace: true,
-            });
+            disconnect();
+            setIsOpenedToast(true);
             return;
           }
 
@@ -120,6 +141,8 @@ export default function CooperationGameIngamePage() {
             }
             return;
           }
+
+          // if ()
         });
 
         // 서버로 메시지 전송
@@ -162,6 +185,7 @@ export default function CooperationGameIngamePage() {
 
   return (
     <>
+      <Toast open={isOpenedToast} onClose={handleCloseGame} message="게임 끝!!!" />
       <h1>CooperationGameIngamePage : {roomId}</h1>
       <PlayPuzzle
         category="cooperation"
@@ -173,7 +197,10 @@ export default function CooperationGameIngamePage() {
         board={gameData[`${getTeam()}Puzzle`].board}
         picture={gameData.picture}
       />
-      <ItemController itemInventory={itemInventory} />
+      <ItemController
+        itemInventory={itemInventory}
+        onSendUseItemMessage={handleSendUseItemMessage}
+      />
     </>
   );
 }
