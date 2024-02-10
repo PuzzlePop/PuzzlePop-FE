@@ -30,4 +30,5 @@ const Puzzle = {
   exportConfig,
   move,
 };
+
 export default Puzzle;

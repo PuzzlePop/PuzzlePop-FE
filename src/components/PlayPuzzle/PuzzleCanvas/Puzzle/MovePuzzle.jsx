@@ -9,7 +9,7 @@ import comboEffectPath from "@/assets/comboEffect.gif";
 
 const { send } = socket;
 
-export let config;
+let config;
 
 const getPuzzleGroup = (paperEvent) => {
   const puzzleUniqueId = paperEvent.target.id;
