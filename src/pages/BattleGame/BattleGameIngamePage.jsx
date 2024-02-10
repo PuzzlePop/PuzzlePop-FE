@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import styled from "styled-components";
 import PlayPuzzle from "@/components/PlayPuzzle";
 import Loading from "@/components/Loading";
 import Timer from "@/components/GameIngame/Timer";
+import PrograssBar from "@/components/GameIngame/ProgressBar";
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import comboAudioPath from "@/assets/audio/combo.mp3";
 import { configStore } from "@/puzzle-core";
+import { Grid, Box } from "@mui/material";
 
 const { connect, send, subscribe } = socket;
 const { getConfig, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = configStore;
@@ -20,6 +23,8 @@ export default function BattleGameIngamePage() {
   const [loading, setLoading] = useState(true);
   const [gameData, setGameData] = useState(null);
   const [time, setTime] = useState(0);
+  const [ourPercent, setOurPercent] = useState(0);
+  const [enemyPercent, setEnemyPercent] = useState(0);
 
   const finishGame = (data) => {
     if (data.finished === true) {
@@ -51,6 +56,17 @@ export default function BattleGameIngamePage() {
           if (data.gameType && data.gameType === "BATTLE") {
             initializeGame(data);
             return;
+          }
+
+          if (data.redProgressPercent >= 0 && data.blueProgressPercent >= 0) {
+            console.log("진행도?", data.redProgressPercent, data.blueProgressPercent);
+            if (getTeam() === "red") {
+              setOurPercent(data.redProgressPercent);
+              setEnemyPercent(data.blueProgressPercent);
+            } else {
+              setOurPercent(data.blueProgressPercent);
+              setEnemyPercent(data.redProgressPercent);
+            }
           }
 
           if (data.message && data.team === getTeam().toUpperCase()) {
@@ -224,22 +240,45 @@ export default function BattleGameIngamePage() {
         gameData &&
         gameData[`${getTeam()}Puzzle`] &&
         gameData[`${getTeam()}Puzzle`].board && (
-          <>
-            <Timer num={time} />
-            <PlayPuzzle
-              category="battle"
-              shapes={parsePuzzleShapes(
-                gameData[`${getTeam()}Puzzle`].board,
-                gameData.picture.widthPieceCnt,
-                gameData.picture.lengthPieceCnt,
-              )}
-              board={gameData[`${getTeam()}Puzzle`].board}
-              picture={gameData.picture}
-            />
+          <Grid container spacing={2}>
+            <ColGrid item xs={10}>
+              <Timer num={time} />
+              <PlayPuzzle
+                category="battle"
+                shapes={parsePuzzleShapes(
+                  gameData[`${getTeam()}Puzzle`].board,
+                  gameData.picture.widthPieceCnt,
+                  gameData.picture.lengthPieceCnt,
+                )}
+                board={gameData[`${getTeam()}Puzzle`].board}
+                picture={gameData.picture}
+              />
+            </ColGrid>
+
+            <Grid item xs={2}>
+              <ProgressWrapper>
+                <PrograssBar percent={ourPercent} isEnemy={false} />
+              </ProgressWrapper>
+              <ProgressWrapper>
+                <PrograssBar percent={enemyPercent} isEnemy={true} />
+              </ProgressWrapper>
+            </Grid>
+
             {/* <ItemController /> */}
-          </>
+          </Grid>
         )
       )}
     </>
   );
 }
+
+const ColGrid = styled(Grid)`
+  display: flex;
+  flex-direction: column;
+`;
+
+const ProgressWrapper = styled(Box)`
+  margin: 0 1px;
+  display: inline-block;
+  transform: rotate(180deg);
+`;
