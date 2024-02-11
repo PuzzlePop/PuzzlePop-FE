@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { request } from "../../apis/requestBuilder";
 
-export default function FetchDataComponent() {
+export default function FriendList() {
+  const navigate = useNavigate();
   const [friendList, setFriendList] = useState([]);
 
   const fetchFriendList = async () => {
@@ -19,11 +21,15 @@ export default function FetchDataComponent() {
   return (
     <>
       {friendList.map((item) => (
-        <div key={item.id} style={{ border: '3px solid #010', margin: '10px', padding: '20px' }}>
-            {/* <img src={item.img_path}></img> */}
-            <div>nickname: {item.nickname}</div>
-            <div>status: {item.online_status}</div>
-            <div>playing game id: {item.playing_game_id}</div>
+        <div key={item.friend_id} style={{ border: "3px solid #010", margin: "10px", padding: "20px" }}>
+          {/* <img src={item.friend_user_info.img_path}></img> */}
+          <div>id: {item.friend_user_info.id}</div>
+          <div>nickname: {item.friend_user_info.nickname}</div>
+          <div>status: {item.friend_user_info.online_status}</div>
+          <div>playing game id: {item.friend_user_info.playing_game_id}</div>
+          <div>
+            <button onClick={() => navigate(`/dm/${friendId}`)}>DM</button>
+          </div>
         </div>
       ))}
     </>
