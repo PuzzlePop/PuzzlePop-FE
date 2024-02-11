@@ -93,6 +93,36 @@ const createPuzzleConfig = () => {
     config = nextConfig;
   };
 
+  const fire = (bundles, targetList) => {
+    console.log(bundles, targetList);
+    console.log("현재 config", config);
+
+    // bundles의 인덱스만 담은 object
+    const bundlesIdxList = [];
+
+    bundles.forEach((group) => {
+      const idxList = [];
+      group.forEach((g) => {
+        idxList.push(g.index);
+      });
+      bundlesIdxList.push(idxList);
+    });
+
+    console.log("bundlesIdxList ", bundlesIdxList);
+
+    config.groupTiles.forEach((gtile) => {
+      // target이면 그룹 해제 (undefined)
+      if (targetList.includes(gtile[2])) {
+        console.log("얘 target임", gtile);
+        gtile[1] = undefined;
+
+        const randomX = Math.random() * 1000;
+        const randomY = Math.random() * 750;
+        config.tiles[gtile[2]].position = new Point(randomX, randomY);
+      }
+    });
+  };
+
   return {
     initializePuzzle,
     initializePuzzle2,
@@ -102,6 +132,7 @@ const createPuzzleConfig = () => {
     unLockPuzzle,
     addPiece,
     addCombo,
+    fire,
   };
 };
 

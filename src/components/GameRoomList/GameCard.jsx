@@ -10,6 +10,7 @@ import {
   Divider,
   Chip,
   CardActionArea,
+  Snackbar,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
@@ -20,6 +21,8 @@ import { isAxiosError } from "axios";
 export default function GameCard({ room, category }) {
   const navigate = useNavigate();
   const [imgSrc, setImgSrc] = useState("");
+  const [snackOpen, setSnackOpen] = useState(false);
+  const [snackMessage, setSnackMessage] = useState("");
 
   const {
     admin,
@@ -52,15 +55,32 @@ export default function GameCard({ room, category }) {
       navigate(`/game/${category}/waiting/${roomId}`);
     } catch (e) {
       if (isAxiosError(e) && e.response.status === 400) {
-        window.alert("다른 닉네임을 사용해주세요.");
+        // window.alert("다른 닉네임을 사용해주세요.");
+        setSnackMessage("다른 닉네임을 사용해주세요!");
+        setSnackOpen(true);
+      }
+      if (isAxiosError(e) && e.response.status === 403) {
+        setSnackMessage("정원이 가득찬 방입니다!");
+        setSnackOpen(true);
       }
     }
   };
 
   const handleClick = (event, started) => {
-    if (!started) {
+    if (started) {
+      setSnackMessage("이미 게임이 시작된 방입니다!");
+      setSnackOpen(true);
+    } else if (redTeam.players.length + blueTeam.players.length === roomSize) {
+      setSnackMessage("정원이 가득찬 방입니다!");
+      setSnackOpen(true);
+      // alert("정원이 가득찬 방입니다! ㅠㅠ");
+    } else if (!started) {
       enterRoom(event.currentTarget.id);
     }
+  };
+
+  const handleSnackClose = () => {
+    setSnackOpen(false);
   };
 
   const fetchImage = async () => {
@@ -103,8 +123,8 @@ export default function GameCard({ room, category }) {
   });
 
   return (
-    <MyCard onClick={(e) => handleClick(e, started)} id={gameId} started={started.toString()}>
-      <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
+      <MyCard onClick={(e) => handleClick(e, started)} id={gameId} started={started.toString()}>
         <MyCardActionArea>
           <CardMedia
             component="img"
@@ -139,8 +159,15 @@ export default function GameCard({ room, category }) {
             </Box>
           </CardContent>
         </MyCardActionArea>
-      </ThemeProvider>
-    </MyCard>
+      </MyCard>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={snackOpen}
+        autoHideDuration={5000}
+        onClose={handleSnackClose}
+        message={snackMessage}
+      />
+    </ThemeProvider>
   );
 }
 

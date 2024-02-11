@@ -75,6 +75,7 @@ const constant = {
   tileMarginX: 0,
   tileMarginY: 30,
 };
+
 const initConfig = ({ config, board }) => {
   const tileRatio = config.tileWidth / constant.percentageTotal;
   for (let y = 0; y < config.tilesPerColumn; y++) {

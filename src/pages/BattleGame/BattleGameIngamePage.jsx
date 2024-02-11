@@ -1,23 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
+
 import PlayPuzzle from "@/components/PlayPuzzle";
 import Loading from "@/components/Loading";
 import Timer from "@/components/GameIngame/Timer";
 import PrograssBar from "@/components/GameIngame/ProgressBar";
 import Chatting from "@/components/GameWaiting/Chatting";
+
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
+import { configStore } from "@/puzzle-core";
+
 import comboAudioPath from "@/assets/audio/combo.mp3";
 import redTeamBackgroundPath from "@/assets/redTeamBackground.gif";
 import blueTeamBackgroundPath from "@/assets/blueTeamBackground.gif";
-import { configStore } from "@/puzzle-core";
+import dropRandomItemPath from "@/assets/dropRandomItem.gif";
+
 import { Box } from "@mui/material";
 import { red, blue } from "@mui/material/colors";
 
 const { connect, send, subscribe } = socket;
-const { getConfig, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = configStore;
+const { getConfig, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo, fire } = configStore;
 
 export default function BattleGameIngamePage() {
   const navigate = useNavigate();
@@ -29,6 +34,8 @@ export default function BattleGameIngamePage() {
   const [enemyPercent, setEnemyPercent] = useState(0);
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
+  // const [bundles, setBundles] = useState([]);
+  const bundles = useRef([]);
 
   const finishGame = (data) => {
     if (data.finished === true) {
@@ -63,6 +70,7 @@ export default function BattleGameIngamePage() {
             return;
           }
 
+          // 진행도
           if (data.redProgressPercent >= 0 && data.blueProgressPercent >= 0) {
             console.log("진행도?", data.redProgressPercent, data.blueProgressPercent);
             if (getTeam() === "red") {
@@ -74,6 +82,7 @@ export default function BattleGameIngamePage() {
             }
           }
 
+          // 우리팀 event
           if (data.message && data.team === getTeam().toUpperCase()) {
             if (data.message && data.message === "LOCKED" && data.senderId !== getSender()) {
               const { targets } = data;
@@ -97,7 +106,7 @@ export default function BattleGameIngamePage() {
             }
 
             if (data.message && data.message === "ADD_PIECE") {
-              const { targets, combo } = data;
+              const { targets, combo, comboCnt } = data;
               const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
               addPiece({ fromIndex, toIndex });
 
@@ -107,10 +116,35 @@ export default function BattleGameIngamePage() {
                   addCombo(fromIndex, toIndex, direction),
                 );
 
+                if (comboCnt) {
+                  console.log(`${comboCnt} 콤보문구 생성`);
+                  const comboText = document.createElement("h2");
+                  const canvasContainer = document.getElementById("canvasContainer");
+                  comboText.textContent = `${comboCnt}COMBO!!`;
+
+                  comboText.style.zIndex = 100;
+                  comboText.style.position = "fixed";
+                  comboText.style.left = "40%";
+                  comboText.style.top = "100px";
+                  comboText.style.transform = "translate(-50%, 0)";
+                  comboText.style.fontSize = "30px";
+
+                  canvasContainer.appendChild(comboText);
+
+                  console.log(comboText);
+                  setTimeout(() => {
+                    console.log("콤보 문구 삭제");
+                    console.log(comboText);
+                    console.log(comboText.parentNode);
+                    console.log(comboText.parentElement);
+                    comboText.parentNode.removeChild(comboText);
+                  }, 2000);
+                }
+
                 const audio = new Audio(comboAudioPath);
                 audio.loop = false;
                 audio.crossOrigin = "anonymous";
-                audio.volume = 0.5;
+                // audio.volume = 0.5;
                 audio.load();
                 try {
                   audio.play();
@@ -126,6 +160,30 @@ export default function BattleGameIngamePage() {
 
           if (data.message && data.message === "ATTACK") {
             console.log("공격메세지", data);
+            const { targets, targetList, deleted, randomItem } = data;
+
+            console.log("나 게임 인포 보낸다?");
+            send(
+              "/app/game/message",
+              {},
+              JSON.stringify({
+                type: "GAME",
+                message: "GAME_INFO",
+                roomId: getRoomId(),
+                sender: getSender(),
+              }),
+            );
+
+            if (randomItem.name === "FIRE") {
+              console.log("fire 발동 !!");
+            }
+
+            setTimeout(() => {
+              console.log("번들 찾아볼게", bundles.current);
+              if (targetList && targets === getTeam().toUpperCase()) {
+                fire(bundles.current, targetList);
+              }
+            }, 2000);
           }
 
           if (data.message && data.message === "SHIELD") {
@@ -136,23 +194,24 @@ export default function BattleGameIngamePage() {
             console.log("공격메세지 : 거울", data);
           }
 
-          if (data.randomItem) {
+          // drop random Item 생성
+          if (data.message && data.message === "DROP_ITEM" && data.randomItem) {
             // 버튼 생성
             const canvasContainer = document.getElementById("canvasContainer");
-            const button = document.createElement("button");
-            button.textContent = data.randomItem.name;
+            const dropRandomItemImg = document.createElement("img");
+            dropRandomItemImg.src = dropRandomItemPath;
 
             // 버튼의 위치 설정
-            button.style.position = "absolute";
-            button.style.left = data.randomItem.position_x + "px";
-            button.style.top = data.randomItem.position_y + "px";
+            dropRandomItemImg.style.position = "absolute";
+            dropRandomItemImg.style.left = data.randomItem.position_x + "px";
+            dropRandomItemImg.style.top = data.randomItem.position_y + "px";
+            dropRandomItemImg.style.transform = "translate(-50%, -50%)";
 
-            button.onclick = function () {
+            dropRandomItemImg.onclick = function () {
               // 부모 요소로부터 버튼 제거
               //근데 이거 다른 클라이언트들도 이 아이템 먹었다고 버튼 사라지는 이벤트 처리하든가 해야함.
-              console.log("item button 클릭됨");
-              console.log(button.parentNode);
-              button.parentNode.removeChild(button);
+              console.log("item dropRandomItemImg 클릭됨");
+              canvasContainer.removeChild(dropRandomItemImg);
 
               // 서버로 메시지 전송
               send(
@@ -169,7 +228,7 @@ export default function BattleGameIngamePage() {
             };
 
             // 버튼을 canvasContainer에 추가
-            canvasContainer.appendChild(button);
+            canvasContainer.appendChild(dropRandomItemImg);
 
             // alert 대신 메시지를 콘솔에 출력
             console.log(
@@ -183,10 +242,9 @@ export default function BattleGameIngamePage() {
 
             // 3초 뒤 아이템 삭제
             setTimeout(() => {
-              if (button.parentNode) {
-                console.log("3초 끝남! item button 삭제");
-                console.log(button.parentNode);
-                button.parentNode.removeChild(button);
+              if (dropRandomItemImg.parentNode) {
+                console.log("3초 끝남! item dropRandomItemImg 삭제");
+                canvasContainer.removeChild(dropRandomItemImg);
               }
             }, 3000);
           }
@@ -248,6 +306,9 @@ export default function BattleGameIngamePage() {
         gameData.picture.encodedString === "짱구.jpg"
           ? "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp"
           : `data:image/jpeg;base64,${gameData.picture.encodedString}`;
+
+      // const targetTeam = getTeam() === "red" ? "blue" : "red";
+      bundles.current = gameData[`${getTeam()}Puzzle`].bundles;
       setPictureSrc(tempSrc);
       setLoading(false);
     }
@@ -264,8 +325,6 @@ export default function BattleGameIngamePage() {
         gameData[`${getTeam()}Puzzle`].board && (
           <div>
             <>
-              <Timer num={time} />
-
               <Board>
                 <PlayPuzzle
                   category="battle"
@@ -287,13 +346,14 @@ export default function BattleGameIngamePage() {
                 </Row>
 
                 <Col>
+                  <Timer num={time} />
                   <h3>이 그림을 맞춰주세요!</h3>
                   <img
                     src={pictureSrc}
                     alt="퍼즐 그림"
                     style={{ width: "100%", borderRadius: "10px", margin: "5px" }}
                   />
-                  <Chatting chatHistory={chatHistory} isbattleingame={true} />
+                  <Chatting chatHistory={chatHistory} isbattleingame="true" />
                 </Col>
               </Board>
             </>
