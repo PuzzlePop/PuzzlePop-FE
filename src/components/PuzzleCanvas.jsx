@@ -28,7 +28,7 @@ export default function PuzzleCanvas({ puzzleImg, level, shapes, board, picture 
 }
 
 const Canvas = styled.canvas`
-  width: 1300px;
+  width: 1000px;
   height: 750px;
   // width: 2580px;
   // height: 1440px;

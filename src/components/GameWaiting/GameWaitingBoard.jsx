@@ -7,9 +7,8 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
 import { PlayerCard, EmptyPlayerCard, XPlayerCard } from "@/components/GameWaiting/PlayerCard";
 import SelectImgAndPiece from "@/components/GameWaiting/SelectImgAndPiece";
-import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
 import Chatting from "@/components/GameWaiting/Chatting";
-import { getSender, setTeam } from "@/socket-utils/storage";
+import { getSender, getTeam, setTeam, setTeamSocket } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 
 const { send } = socket;
@@ -77,6 +76,19 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category,
           type: "GAME",
         }),
       );
+    }
+  };
+
+  const handleChangeTeam = (value) => {
+    const targetTeamLength = value === "red" ? redTeam.players.length : blueTeam.players.length;
+
+    if (getTeam() === value) {
+      alert(`이미 ${value}팀입니다!`);
+    } else if (parseInt(roomSize / 2) === targetTeamLength) {
+      alert(`${value}팀의 정원이 가득찼습니다!`);
+    } else {
+      setTeam(value);
+      setTeamSocket();
     }
   };
 
@@ -163,7 +175,7 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category,
           </InnerBox>
 
           {/* 텍스트 채팅 */}
-          <InnerBox>
+          <InnerBox style={{ padding: "2%", paddingBottom: 0 }}>
             <Chatting chatHistory={chatHistory} />
           </InnerBox>
         </ColGrid>
@@ -183,7 +195,7 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category,
                   variant="contained"
                   color="redTeam"
                   disableElevation
-                  onClick={() => setTeam("red")}
+                  onClick={() => handleChangeTeam("red")}
                 >
                   Red
                 </TeamButton>
@@ -191,7 +203,7 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category,
                   variant="contained"
                   color="blueTeam"
                   disableElevation
-                  onClick={() => setTeam("blue")}
+                  onClick={() => handleChangeTeam("blue")}
                 >
                   Blue
                 </TeamButton>
@@ -202,7 +214,6 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category,
             GAME START
           </StartButton>
         </ColGrid>
-        <GameOpenVidu gameId={gameId} playerName={player} />
       </Wrapper>
     </ThemeProvider>
   );

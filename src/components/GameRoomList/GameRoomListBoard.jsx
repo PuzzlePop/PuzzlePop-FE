@@ -6,6 +6,8 @@ import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import Pagination from "@mui/material/Pagination";
 import PaginationItem from "@mui/material/PaginationItem";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { deepPurple } from "@mui/material/colors";
 import GameCard from "@/components/GameRoomList/GameCard";
 
 export default function GameRoomListBoard({ category, roomList }) {
@@ -38,33 +40,50 @@ export default function GameRoomListBoard({ category, roomList }) {
     setRooms(roomList.slice((page - 1) * 6, page * 6));
   }, [page, roomList]);
 
+  const theme = createTheme({
+    typography: {
+      fontFamily: "'Galmuri11', sans-serif",
+    },
+    palette: {
+      purple: {
+        light: deepPurple[500],
+        main: deepPurple[600],
+        dark: deepPurple[700],
+        darker: deepPurple[800],
+        contrastText: "#fff",
+      },
+    },
+  });
+
   return (
-    <Wrapper>
-      <Grid container spacing={2}>
-        {rooms.map((room) => {
-          return (
-            <Grid item xs={6} key={room.gameId}>
-              <GameCard room={room} category={category} />
-            </Grid>
-          );
-        })}
-        {makeEmptyRooms(rooms)}
-      </Grid>
-      <Pagination
-        page={page}
-        count={totalPage}
-        size="large"
-        variant="outlined"
-        color="secondary"
-        renderItem={(item) => (
-          <PaginationItem
-            component={Link}
-            to={`/game/${category}${item.page === 1 ? "" : `?page=${item.page}`}`}
-            {...item}
-          />
-        )}
-      />
-    </Wrapper>
+    <ThemeProvider theme={theme}>
+      <Wrapper>
+        <Grid container spacing={2}>
+          {rooms.map((room) => {
+            return (
+              <Grid item xs={6} key={room.gameId}>
+                <GameCard room={room} category={category} />
+              </Grid>
+            );
+          })}
+          {makeEmptyRooms(rooms)}
+        </Grid>
+        <Pagination
+          page={page}
+          count={totalPage}
+          size="large"
+          variant="outlined"
+          color="purple"
+          renderItem={(item) => (
+            <PaginationItem
+              component={Link}
+              to={`/game/${category}${item.page === 1 ? "" : `?page=${item.page}`}`}
+              {...item}
+            />
+          )}
+        />
+      </Wrapper>
+    </ThemeProvider>
   );
 }
 

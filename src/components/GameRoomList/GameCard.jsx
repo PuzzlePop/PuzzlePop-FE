@@ -12,6 +12,7 @@ import {
   CardActionArea,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { deepPurple } from "@mui/material/colors";
 import { setRoomId, setSender, setTeam } from "@/socket-utils/storage";
 import { request } from "../../apis/requestBuilder";
 import { isAxiosError } from "axios";
@@ -35,8 +36,6 @@ export default function GameCard({ room, category }) {
   } = room;
 
   const chipMessage = `${parseInt(roomSize / 2)} : ${parseInt(roomSize / 2)}`;
-  const chipColorArray = ["error", "warning", "success", "info"];
-  const chipColor = chipColorArray[parseInt(roomSize / 2) - 1];
 
   const enterRoom = async (roomId) => {
     const sender = window.prompt("닉네임을 입력해주세요");
@@ -83,6 +82,24 @@ export default function GameCard({ room, category }) {
     typography: {
       fontFamily: "'Galmuri11', sans-serif",
     },
+    palette: {
+      purple1: {
+        main: deepPurple[200],
+        contrastText: "#fff",
+      },
+      purple2: {
+        main: deepPurple[400],
+        contrastText: "#fff",
+      },
+      purple3: {
+        main: deepPurple[600],
+        contrastText: "#fff",
+      },
+      purple4: {
+        main: deepPurple[900],
+        contrastText: "#fff",
+      },
+    },
   });
 
   return (
@@ -96,7 +113,9 @@ export default function GameCard({ room, category }) {
             alt={picture.encodedString}
           />
           <CardContent sx={{ display: "flex", flexDirection: "column", marginRight: "3%" }}>
-            {category === "battle" && <MyChip label={chipMessage} color={chipColor} />}
+            {category === "battle" && (
+              <MyChip label={chipMessage} color={`purple${parseInt(roomSize / 2)}`} />
+            )}
             <Box sx={{ width: "250px", paddingY: "15%" }}>
               <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
                 <Typography component="div" variant="h5">

@@ -5,6 +5,7 @@ import PlayPuzzle from "@/components/PlayPuzzle";
 import Loading from "@/components/Loading";
 import Timer from "@/components/GameIngame/Timer";
 import PrograssBar from "@/components/GameIngame/ProgressBar";
+import Chatting from "@/components/GameWaiting/Chatting";
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
@@ -12,7 +13,7 @@ import comboAudioPath from "@/assets/audio/combo.mp3";
 import redTeamBackgroundPath from "@/assets/redTeamBackground.gif";
 import blueTeamBackgroundPath from "@/assets/blueTeamBackground.gif";
 import { configStore } from "@/puzzle-core";
-import { Grid, Box } from "@mui/material";
+import { Box } from "@mui/material";
 import { red, blue } from "@mui/material/colors";
 
 const { connect, send, subscribe } = socket;
@@ -26,6 +27,8 @@ export default function BattleGameIngamePage() {
   const [time, setTime] = useState(0);
   const [ourPercent, setOurPercent] = useState(0);
   const [enemyPercent, setEnemyPercent] = useState(0);
+  const [chatHistory, setChatHistory] = useState([]);
+  const [pictureSrc, setPictureSrc] = useState("");
 
   const finishGame = (data) => {
     if (data.finished === true) {
@@ -38,6 +41,7 @@ export default function BattleGameIngamePage() {
   const initializeGame = (data) => {
     setGameData(data);
     console.log("gamedata is here!", gameData, data);
+    setLoading(false);
   };
 
   const connectSocket = async () => {
@@ -188,6 +192,15 @@ export default function BattleGameIngamePage() {
           }
         });
 
+        // 채팅
+        subscribe(`/topic/chat/room/${roomId}`, (message) => {
+          const data = JSON.parse(message.body);
+          console.log("채팅왔다", data);
+          const { userid, chatMessage, time } = data;
+          const receivedMessage = { userid, chatMessage, time }; // 받은 채팅
+          setChatHistory((prevChat) => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
+        });
+
         // 서버로 메시지 전송
         send(
           "/app/game/message",
@@ -218,7 +231,7 @@ export default function BattleGameIngamePage() {
     }
 
     connectSocket();
-    setLoading(false);
+    // setLoading(false);
 
     // eslint-disable-next-line
   }, []);
@@ -228,6 +241,12 @@ export default function BattleGameIngamePage() {
       console.log(gameData);
       console.log(getSender(), getTeam());
       console.log(gameData[`${getTeam()}Puzzle`].board);
+
+      const tempSrc =
+        gameData.picture.encodedString === "짱구.jpg"
+          ? "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp"
+          : `data:image/jpeg;base64,${gameData.picture.encodedString}`;
+      setPictureSrc(tempSrc);
       setLoading(false);
     }
   }, [gameData]);
@@ -256,12 +275,24 @@ export default function BattleGameIngamePage() {
                   board={gameData[`${getTeam()}Puzzle`].board}
                   picture={gameData.picture}
                 />
-                <ProgressWrapper>
-                  <PrograssBar percent={ourPercent} isEnemy={false} />
-                </ProgressWrapper>
-                <ProgressWrapper>
-                  <PrograssBar percent={enemyPercent} isEnemy={true} />
-                </ProgressWrapper>
+                <Row>
+                  <ProgressWrapper>
+                    <PrograssBar percent={ourPercent} isEnemy={false} />
+                  </ProgressWrapper>
+                  <ProgressWrapper>
+                    <PrograssBar percent={enemyPercent} isEnemy={true} />
+                  </ProgressWrapper>
+                </Row>
+
+                <Col>
+                  <h3>이 그림을 맞춰주세요!</h3>
+                  <img
+                    src={pictureSrc}
+                    alt="퍼즐 그림"
+                    style={{ width: "100%", borderRadius: "10px", margin: "5px" }}
+                  />
+                  <Chatting chatHistory={chatHistory} isbattleingame={true} />
+                </Col>
               </Board>
             </>
 
@@ -274,24 +305,36 @@ export default function BattleGameIngamePage() {
 }
 
 const Wrapper = styled.div`
-  height: 1000px;
+  height: 100vh;
+  min-height: 1000px;
   background-image: ${getTeam() === "red"
     ? `url(${redTeamBackgroundPath})`
     : `url(${blueTeamBackgroundPath})`};
 `;
 
-const ColGrid = styled(Grid)`
+const Row = styled(Box)`
   display: flex;
+  height: 100%;
+  margin-left: 10px;
+`;
+
+const Col = styled(Box)`
+  display: flex;
+  flex-grow: 1;
   flex-direction: column;
+  align-items: center;
+  margin-left: 10px;
 `;
 
 const Board = styled.div`
   width: 1320px;
+  height: 754px;
   display: flex;
   position: relative;
   top: 50px;
   margin: auto;
   padding: 2%;
+  padding-right: 1.5%;
   border-radius: 20px;
   border: 3px solid ${getTeam() === "red" ? red[400] : blue[400]};
   background-color: rgba(255, 255, 255, 0.8);
