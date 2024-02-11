@@ -141,8 +141,8 @@ export const fitTiles = ({
   const yUp = findYUp(nowShape, preShape, width);
 
   if (flag === false) {
-    console.log("fitTiles: ", nowIndex, preIndex);
-    console.log("xChange, yChange, xUp, yUp: ", xChange, yChange, xUp, yUp);
+    // console.log("fitTiles: ", nowIndex, preIndex);
+    // console.log("xChange, yChange, xUp, yUp: ", xChange, yChange, xUp, yUp);
   }
   const range = config.tileWidth;
   // 오차 범위
@@ -157,12 +157,12 @@ export const fitTiles = ({
           Math.abs(nowTile.position._y - preTile.position._y) < errorRange) ||
         flag === false
       ) {
-        console.log("좌", nowTile.position, range, xChange, yChange);
+        // console.log("좌", nowTile.position, range, xChange, yChange);
         nowTile.position = new Point(
           preTile.position._x + range + xChange,
           preTile.position._y + yChange,
         );
-        console.log(nowTile.position);
+        // console.log(nowTile.position);
         uniteFlag = true;
       }
       break;
@@ -173,12 +173,12 @@ export const fitTiles = ({
           Math.abs(nowTile.position._y - preTile.position._y) < errorRange) ||
         flag === false
       ) {
-        console.log("우", nowTile.position, range, xChange, yChange);
+        // console.log("우", nowTile.position, range, xChange, yChange);
         nowTile.position = new Point(
           preTile.position._x - (range + xChange),
           preTile.position._y + yChange,
         );
-        console.log(nowTile.position);
+        // console.log(nowTile.position);
         uniteFlag = true;
       }
       break;
@@ -189,10 +189,10 @@ export const fitTiles = ({
           Math.abs(nowTile.position._x - preTile.position._x) < errorRange) ||
         flag === false
       ) {
-        console.log("상", nowTile.position, range, xUp, yUp);
+        // console.log("상", nowTile.position, range, xUp, yUp);
         nowTile.position = new Point(preTile.position._x + xUp, preTile.position._y + range + yUp);
         uniteFlag = true;
-        console.log(nowTile.position);
+        // console.log(nowTile.position);
       }
       break;
     // 하
@@ -227,12 +227,12 @@ export const fitTiles = ({
 
       canvasContainer && canvasContainer.appendChild(comboEffect);
 
-      console.log(comboEffect);
+      // console.log(comboEffect);
       setTimeout(() => {
-        console.log("effect 삭제");
-        console.log(comboEffect);
-        console.log(comboEffect.parentNode);
-        console.log(comboEffect.parentElement);
+        // console.log("effect 삭제");
+        // console.log(comboEffect);
+        // console.log(comboEffect.parentNode);
+        // console.log(comboEffect.parentElement);
         comboEffect.parentNode.removeChild(comboEffect);
       }, 500);
     }
