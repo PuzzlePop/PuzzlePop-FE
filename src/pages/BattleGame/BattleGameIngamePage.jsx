@@ -196,9 +196,11 @@ export default function BattleGameIngamePage() {
         subscribe(`/topic/chat/room/${roomId}`, (message) => {
           const data = JSON.parse(message.body);
           console.log("채팅왔다", data);
-          const { userid, chatMessage, time } = data;
-          const receivedMessage = { userid, chatMessage, time }; // 받은 채팅
-          setChatHistory((prevChat) => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
+          const { userid, chatMessage, time, teamColor } = data;
+          if (teamColor === getTeam().toUpperCase()) {
+            const receivedMessage = { userid, chatMessage, time }; // 받은 채팅
+            setChatHistory((prevChat) => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
+          }
         });
 
         // 서버로 메시지 전송
