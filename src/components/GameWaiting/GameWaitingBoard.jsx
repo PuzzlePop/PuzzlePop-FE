@@ -176,7 +176,7 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category,
           </InnerBox>
 
           {/* 텍스트 채팅 */}
-          <InnerBox>
+          <InnerBox style={{ padding: "2%" }}>
             <Chatting chatHistory={chatHistory} />
           </InnerBox>
         </ColGrid>
@@ -215,7 +215,7 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category,
             GAME START
           </StartButton>
         </ColGrid>
-        <GameOpenVidu gameId={gameId} playerName={player} />
+        {/* <GameOpenVidu gameId={gameId} playerName={player} /> */}
       </Wrapper>
     </ThemeProvider>
   );

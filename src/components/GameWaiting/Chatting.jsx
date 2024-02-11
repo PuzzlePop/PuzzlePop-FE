@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
+import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
 import { getSender, getRoomId } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { TextField, Button } from "@mui/material";
@@ -67,10 +68,7 @@ export default function Chatting({ chatHistory }) {
     <ThemeProvider theme={theme}>
       <Wrapper>
         {chatHistory && (
-          <div
-            ref={chatElement}
-            style={{ height: "75%", marginBottom: "10px", overflow: "scroll" }}
-          >
+          <div ref={chatElement} style={{ height: "75%", margin: "10px", overflow: "scroll" }}>
             {/* 채팅 기록을 화면에 출력 */}
             {chatHistory.map((chat, index) => (
               <div key={index}>
@@ -82,6 +80,7 @@ export default function Chatting({ chatHistory }) {
         )}
 
         <Form onSubmit={handleMessageSend}>
+          <GameOpenVidu gameId={getRoomId()} playerName={getSender()} />
           <ChatInput
             type="text"
             placeholder="채팅"
@@ -109,12 +108,12 @@ const Form = styled.form`
 `;
 
 const ChatInput = styled(TextField)`
-  width: 80%;
+  width: 74%;
   height: 100%;
 `;
 
 const ChatBtn = styled(Button)`
   width: 16%;
-  margin: 0 auto;
+  margin-left: auto;
   height: 80%;
 `;

@@ -2,6 +2,11 @@ import { useState, useEffect } from "react";
 import { OpenVidu } from "openvidu-browser";
 import axios from "axios";
 import UserAudioComponent from "./UserAudioComponent";
+import IconButton from "@mui/material/IconButton";
+import MicIcon from "@mui/icons-material/Mic";
+import MicOffIcon from "@mui/icons-material/MicOff";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { deepPurple } from "@mui/material/colors";
 
 const OPENVIDU_SERVER_URL = "https://i10a304.p.ssafy.io:4443/openvidu/";
 const OPENVIDU_SERVER_SECRET = "MY_SECRET";
@@ -14,6 +19,7 @@ const GameOpenVidu = ({ gameId, playerName }) => {
   const [publisher, setPublisher] = useState(null);
   const [subscribers, setSubscribers] = useState([]);
   const [currentVideoDevice, setCurrentVideoDevice] = useState(null);
+  const [isUnMuted, setIsUnMuted] = useState(true);
 
   useEffect(() => {
     joinSession();
@@ -57,7 +63,7 @@ const GameOpenVidu = ({ gameId, playerName }) => {
       const publisher = await OV.initPublisherAsync(undefined, {
         audioSource: undefined,
         videoSource: false,
-        publishAudio: true,
+        publishAudio: isUnMuted,
         publishVideo: false,
         resolution: "640x480",
         frameRate: 30,
@@ -96,25 +102,54 @@ const GameOpenVidu = ({ gameId, playerName }) => {
     setCurrentVideoDevice(null);
   };
 
+  const toggleMute = () => {
+    setIsUnMuted(!isUnMuted);
+  };
+
+  const theme = createTheme({
+    typography: {
+      fontFamily: "'Galmuri11', sans-serif",
+    },
+    palette: {
+      purple: {
+        light: deepPurple[300],
+        main: deepPurple[400],
+        dark: deepPurple[500],
+        darker: deepPurple[600],
+        contrastText: "#fff",
+      },
+    },
+  });
+
   const renderSession = () => {
     return (
       <div id="session">
         <div id="session-header">
-          <h1 id="session-title">{mySessionId}</h1>
-          <input
+          {/* <h1 id="session-title">{mySessionId}</h1> */}
+          <ThemeProvider theme={theme}>
+            <IconButton
+              aria-label="mic"
+              color="purple"
+              onClick={toggleMute}
+              sx={{ marginRight: "5px" }}
+            >
+              {isUnMuted ? <MicOffIcon fontSize="inherit" /> : <MicIcon fontSize="inherit" />}
+            </IconButton>
+          </ThemeProvider>
+          {/* <input
             className="btn btn-large btn-danger"
             type="button"
             id="buttonLeaveSession"
             onClick={leaveSession}
             value="Leave session"
-          />
+          /> */}
         </div>
 
-        {mainStreamManager && (
+        {/* {mainStreamManager && (
           <div id="main-video" className="col-md-6">
             <UserAudioComponent streamManager={mainStreamManager} />
           </div>
-        )}
+        )} */}
 
         <div id="video-container" className="col-md-6">
           {publisher && (
@@ -134,7 +169,7 @@ const GameOpenVidu = ({ gameId, playerName }) => {
     );
   };
 
-  return <div style={{ width: "100%" }}>{session && renderSession()}</div>;
+  return <div>{session && renderSession()}</div>;
 };
 
 async function createSession(sessionId) {

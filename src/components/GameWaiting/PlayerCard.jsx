@@ -45,7 +45,7 @@ function PlayerCard(props) {
 
 function EmptyPlayerCard() {
   return (
-    <WrapperCard sx={{ height: "80%", minHeight: "140px" }}>
+    <WrapperCard sx={{ height: "80%", minHeight: "120px" }}>
       <CardContent sx={{ margin: "auto" }}></CardContent>
     </WrapperCard>
   );
@@ -53,7 +53,7 @@ function EmptyPlayerCard() {
 
 function XPlayerCard() {
   return (
-    <WrapperCard sx={{ height: "80%", minHeight: "140px", backgroundColor: "#eee" }}>
+    <WrapperCard sx={{ height: "80%", minHeight: "120px", backgroundColor: "#eee" }}>
       <CardContent sx={{ margin: "auto" }}>
         <Typography sx={{ color: "#ccc" }} component="div" variant="h1">
           X

@@ -13,9 +13,9 @@ export default class UserAudioComponent extends Component {
         {this.props.streamManager !== undefined ? (
           <div className="streamcomponent">
             <OpenViduAudiocomponent streamManager={this.props.streamManager} />
-            <div>
+            {/* <div>
               <p>{this.getNicknameTag()}</p>
-            </div>
+            </div> */}
           </div>
         ) : null}
       </div>
