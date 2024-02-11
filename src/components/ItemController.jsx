@@ -50,7 +50,7 @@ export default function ItemController({
           {itemInventory.map((item, index) => (
             <ItemSpace key={index}>
               <ItemButton onClick={() => _useItem(index + 1)}>
-                <div>{item ? item.name : "비어있음"}</div>
+                <div>{item ? matchItemNameToKorean(item.name) : "비어있음"}</div>
               </ItemButton>
               <div>{index + 1}</div>
             </ItemSpace>
@@ -61,6 +61,24 @@ export default function ItemController({
   );
 }
 
+/************************ utils ************************/
+const itemNameToKoreanMatcher = {
+  MAGNET: "자석",
+  HINT: "힌트",
+  FRAME: "액자",
+};
+
+const match = (matcher) => (key) => {
+  const value = matcher[key];
+  if (value === undefined) {
+    throw new Error("matcher value is undefined");
+  }
+  return matcher[key];
+};
+
+const matchItemNameToKorean = match(itemNameToKoreanMatcher);
+
+/************************ styled ************************/
 const Container = styled.div`
   max-width: 300px;
   z-index: 9999;

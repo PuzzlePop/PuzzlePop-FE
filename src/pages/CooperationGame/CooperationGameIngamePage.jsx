@@ -142,6 +142,26 @@ export default function CooperationGameIngamePage() {
             return;
           }
 
+          // "FRAME(액자)" 아이템 사용
+          if (data.message && data.message === "FRAME") {
+            const { targetList } = data;
+            console.log("액자 사용한다~~!!!");
+            // targetList에 나온 index를 다 맞춰버린다.
+            return;
+          }
+
+          // "HINT(힌트)" 아이템 사용
+          if (data.message && data.message === "HINT") {
+            console.log("힌트 사용한다~~!!!");
+            return;
+          }
+
+          // "MAGNET(자석)" 아이템 사용
+          if (data.message && data.message === "MAGNET") {
+            console.log("자석 사용한다~~!!!");
+            return;
+          }
+
           // if ()
         });
 
