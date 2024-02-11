@@ -93,7 +93,10 @@ const createPuzzleConfig = () => {
     config = nextConfig;
   };
 
-  const usingItemFrame = (targetList) => {};
+  const usingItemFrame = (puzzleIndexList) => {
+    console.log(puzzleIndexList);
+    console.log(getConfig());
+  };
 
   return {
     initializePuzzle,

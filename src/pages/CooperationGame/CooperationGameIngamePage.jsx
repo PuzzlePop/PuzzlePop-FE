@@ -14,7 +14,8 @@ import Hint from "../../components/GameItemEffects/Hint";
 import { useHint } from "../../hooks/useHint";
 
 const { connect, send, subscribe, disconnect } = socket;
-const { getConfig, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = configStore;
+const { getConfig, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo, usingItemFrame } =
+  configStore;
 
 export default function CooperationGameIngamePage() {
   const navigate = useNavigate();
@@ -54,10 +55,8 @@ export default function CooperationGameIngamePage() {
       0, 11, 1, 2, 13, 3, 5, 6, 10, 21, 12, 23, 14, 25, 19, 30, 20, 22, 33, 24, 35, 32, 34, 45, 36,
       44, 46, 54,
     ];
-
     const sortedTargetList = [...targetList].sort((a, b) => a - b);
-
-    console.log(getConfig());
+    usingItemFrame(sortedTargetList);
   };
 
   const getGameInfo = () => {
