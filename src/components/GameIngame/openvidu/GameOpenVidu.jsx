@@ -6,12 +6,12 @@ import IconButton from "@mui/material/IconButton";
 import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { deepPurple } from "@mui/material/colors";
+import { red, blue, deepPurple } from "@mui/material/colors";
 
 const OPENVIDU_SERVER_URL = "https://i10a304.p.ssafy.io:4443/openvidu/";
 const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
-const GameOpenVidu = ({ gameId, playerName }) => {
+const GameOpenVidu = ({ gameId, playerName, color = "purple" }) => {
   const [mySessionId, setMySessionId] = useState(gameId);
   const [myUserName, setMyUserName] = useState(playerName);
   const [session, setSession] = useState(null);
@@ -108,6 +108,20 @@ const GameOpenVidu = ({ gameId, playerName }) => {
       fontFamily: "'Galmuri11', sans-serif",
     },
     palette: {
+      redTeam: {
+        light: red[300],
+        main: red[400],
+        dark: red[500],
+        darker: red[600],
+        contrastText: "#fff",
+      },
+      blueTeam: {
+        light: blue[300],
+        main: blue[400],
+        dark: blue[500],
+        darker: blue[600],
+        contrastText: "#fff",
+      },
       purple: {
         light: deepPurple[300],
         main: deepPurple[400],
@@ -126,7 +140,7 @@ const GameOpenVidu = ({ gameId, playerName }) => {
           <ThemeProvider theme={theme}>
             <IconButton
               aria-label="mic"
-              color="purple"
+              color={color}
               onClick={toggleMute}
               sx={{ marginRight: "3px" }}
             >

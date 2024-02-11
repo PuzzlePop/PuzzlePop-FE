@@ -1,15 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
-import { getSender, getRoomId } from "@/socket-utils/storage";
+import { getSender, getRoomId, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { TextField, Button } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { deepPurple } from "@mui/material/colors";
+import { red, blue, deepPurple } from "@mui/material/colors";
 
 const { send } = socket;
 
-export default function Chatting({ chatHistory }) {
+export default function Chatting({ chatHistory, isbattleingame = false }) {
   const [message, setMessage] = useState("");
   const [lastHeight, setLastHeight] = useState(null);
   const chatElement = useRef();
@@ -54,6 +54,20 @@ export default function Chatting({ chatHistory }) {
       fontFamily: "'Galmuri11', sans-serif",
     },
     palette: {
+      redTeam: {
+        light: red[300],
+        main: red[400],
+        dark: red[500],
+        darker: red[600],
+        contrastText: "#fff",
+      },
+      blueTeam: {
+        light: blue[300],
+        main: blue[400],
+        dark: blue[500],
+        darker: blue[600],
+        contrastText: "#fff",
+      },
       purple: {
         light: deepPurple[200],
         main: deepPurple[300],
@@ -64,11 +78,13 @@ export default function Chatting({ chatHistory }) {
     },
   });
 
+  const currentTheme = !isbattleingame ? "purple" : getTeam() === "red" ? "redTeam" : "blueTeam";
+
   return (
     <ThemeProvider theme={theme}>
-      <Wrapper>
+      <Wrapper isbattleingame={isbattleingame}>
         {chatHistory && (
-          <div ref={chatElement} style={{ height: "75%", margin: "10px", overflow: "scroll" }}>
+          <div ref={chatElement} style={{ flexGrow: 1, margin: "10px", overflow: "scroll" }}>
             {/* 채팅 기록을 화면에 출력 */}
             {chatHistory.map((chat, index) => (
               <div key={index}>
@@ -80,16 +96,24 @@ export default function Chatting({ chatHistory }) {
         )}
 
         <Form onSubmit={handleMessageSend}>
-          <GameOpenVidu gameId={getRoomId()} playerName={getSender()} />
+          {isbattleingame ? (
+            <GameOpenVidu
+              gameId={`${getRoomId()}_${getTeam()}`}
+              playerName={getSender()}
+              color={currentTheme}
+            />
+          ) : (
+            <GameOpenVidu gameId={getRoomId()} playerName={getSender()} />
+          )}
           <ChatInput
             type="text"
             placeholder="채팅"
             size="small"
-            color="purple"
+            color={currentTheme}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
-          <ChatBtn variant="outlined" color="purple" type="submit">
+          <ChatBtn variant="outlined" color={currentTheme} type="submit">
             Send
           </ChatBtn>
         </Form>
@@ -99,11 +123,20 @@ export default function Chatting({ chatHistory }) {
 }
 
 const Wrapper = styled.div`
-  height: 200px;
+  display: flex;
+  flex-direction: column;
+  height: ${(props) => {
+    if (props.isbattleingame) {
+      return "750px";
+    } else {
+      return "200px";
+    }
+  }};
+  margin: 0 3px;
 `;
 
 const Form = styled.form`
-  height: 25%;
+  height: 50px;
   display: flex;
 `;
 
@@ -115,6 +148,6 @@ const ChatInput = styled(TextField)`
 
 const ChatBtn = styled(Button)`
   width: 16%;
-  margin-left: auto;
+  margin-left: 4px;
   height: 80%;
 `;

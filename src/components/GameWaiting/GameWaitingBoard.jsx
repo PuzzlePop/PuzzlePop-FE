@@ -175,7 +175,7 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category,
           </InnerBox>
 
           {/* 텍스트 채팅 */}
-          <InnerBox style={{ padding: "2%" }}>
+          <InnerBox style={{ padding: "2%", paddingBottom: 0 }}>
             <Chatting chatHistory={chatHistory} />
           </InnerBox>
         </ColGrid>
