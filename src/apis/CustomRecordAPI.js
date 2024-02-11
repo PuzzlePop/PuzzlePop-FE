@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 export const RecordAPI = axios.create({
-    // baseURL: 'https://i10a304.p.ssafy.io/api',
-    baseURL: 'http://localhost:8080',
+    baseURL: 'https://i10a304.p.ssafy.io/api',
+    // baseURL: 'http://localhost:8080',
     timeout: 5000,
     headers: {
         'Content-Type': 'application/json',
