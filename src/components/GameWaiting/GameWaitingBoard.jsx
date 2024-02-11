@@ -7,7 +7,6 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
 import { PlayerCard, EmptyPlayerCard, XPlayerCard } from "@/components/GameWaiting/PlayerCard";
 import SelectImgAndPiece from "@/components/GameWaiting/SelectImgAndPiece";
-import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
 import Chatting from "@/components/GameWaiting/Chatting";
 import { getSender, getTeam, setTeam, setTeamSocket } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
@@ -215,7 +214,6 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category,
             GAME START
           </StartButton>
         </ColGrid>
-        {/* <GameOpenVidu gameId={gameId} playerName={player} /> */}
       </Wrapper>
     </ThemeProvider>
   );
