@@ -121,23 +121,24 @@ const createPuzzleConfig = () => {
         config.tiles[gtile[2]].position = new Point(randomX, randomY);
       }
     });
-    const usingItemFrame = (puzzleIndexList) => {
-      console.log(puzzleIndexList);
-      console.log(getConfig());
-    };
+  };
 
-    return {
-      initializePuzzle,
-      initializePuzzle2,
-      getConfig,
-      lockPuzzle,
-      movePuzzle,
-      unLockPuzzle,
-      addPiece,
-      addCombo,
-      fire,
-      usingItemFrame,
-    };
+  const usingItemFrame = (puzzleIndexList) => {
+    console.log(puzzleIndexList);
+    console.log(getConfig());
+  };
+
+  return {
+    initializePuzzle,
+    initializePuzzle2,
+    getConfig,
+    lockPuzzle,
+    movePuzzle,
+    unLockPuzzle,
+    addPiece,
+    addCombo,
+    fire,
+    usingItemFrame,
   };
 };
 
