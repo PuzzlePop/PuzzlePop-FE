@@ -224,6 +224,7 @@ export const fitTiles = ({
       comboEffect.style.position = "absolute";
       comboEffect.style.left = `${nowTile.position._x}px`;
       comboEffect.style.top = `${nowTile.position._y}px`;
+      comboEffect.style.transform = "translate(-50%, -50%)";
 
       canvasContainer && canvasContainer.appendChild(comboEffect);
 

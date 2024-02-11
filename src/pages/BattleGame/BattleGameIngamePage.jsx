@@ -97,7 +97,7 @@ export default function BattleGameIngamePage() {
             }
 
             if (data.message && data.message === "ADD_PIECE") {
-              const { targets, combo } = data;
+              const { targets, combo, comboCnt } = data;
               const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
               addPiece({ fromIndex, toIndex });
 
@@ -107,10 +107,35 @@ export default function BattleGameIngamePage() {
                   addCombo(fromIndex, toIndex, direction),
                 );
 
+                if (comboCnt) {
+                  console.log(`${comboCnt} 콤보문구 생성`);
+                  const comboText = document.createElement("h2");
+                  const canvasContainer = document.getElementById("canvasContainer");
+                  comboText.textContent = `${comboCnt}COMBO!!`;
+
+                  comboText.style.zIndex = 100;
+                  comboText.style.position = "fixed";
+                  comboText.style.left = "40%";
+                  comboText.style.top = "100px";
+                  comboText.style.transform = "translate(-50%, 0)";
+                  comboText.style.fontSize = "30px";
+
+                  canvasContainer.appendChild(comboText);
+
+                  console.log(comboText);
+                  setTimeout(() => {
+                    console.log("콤보 문구 삭제");
+                    console.log(comboText);
+                    console.log(comboText.parentNode);
+                    console.log(comboText.parentElement);
+                    comboText.parentNode.removeChild(comboText);
+                  }, 2000);
+                }
+
                 const audio = new Audio(comboAudioPath);
                 audio.loop = false;
                 audio.crossOrigin = "anonymous";
-                audio.volume = 0.5;
+                // audio.volume = 0.5;
                 audio.load();
                 try {
                   audio.play();
@@ -264,8 +289,6 @@ export default function BattleGameIngamePage() {
         gameData[`${getTeam()}Puzzle`].board && (
           <div>
             <>
-              <Timer num={time} />
-
               <Board>
                 <PlayPuzzle
                   category="battle"
@@ -287,6 +310,7 @@ export default function BattleGameIngamePage() {
                 </Row>
 
                 <Col>
+                  <Timer num={time} />
                   <h3>이 그림을 맞춰주세요!</h3>
                   <img
                     src={pictureSrc}
