@@ -33,7 +33,7 @@ const createPuzzleConfig = () => {
   const getConfig = () => ({ ...config });
 
   const lockPuzzle = (x, y, index) => {
-    console.log(x, y, index);
+    // console.log(x, y, index);
     // TODO: "Lock"이 걸려있다는 처리해야함
     // 피그마처럼 유저별로 "색깔"을 지정해두고 border 색깔을 변경하는 것도 좋을듯?
   };
@@ -43,7 +43,7 @@ const createPuzzleConfig = () => {
   };
 
   const unLockPuzzle = (x, y, index) => {
-    console.log(x, y, index);
+    // console.log(x, y, index);
     // TODO: 여기서 Lock에 대한 UI처리를 해제한다.
   };
 

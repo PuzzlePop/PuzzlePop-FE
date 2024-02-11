@@ -1,39 +1,49 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import comboAudioPath from "@/assets/audio/combo.mp3";
 import PlayPuzzle from "@/components/PlayPuzzle";
 import Loading from "@/components/Loading";
-import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
-import { socket } from "@/socket-utils/socket";
-import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
-import comboAudioPath from "@/assets/audio/combo.mp3";
-// import { usePuzzleConfig } from "../../hooks/usePuzzleConfig";
+import Toast from "../../components/Toast";
 import ItemController from "../../components/ItemController";
 import { configStore } from "../../puzzle-core";
+import { socket } from "../../socket-utils/socket";
+import { getRoomId, getSender, getTeam } from "../../socket-utils/storage";
+import { parsePuzzleShapes } from "../../socket-utils/parsePuzzleShapes";
 
-const { connect, send, subscribe } = socket;
+const { connect, send, subscribe, disconnect } = socket;
 const { lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = configStore;
 
 export default function CooperationGameIngamePage() {
-  // const { config, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = usePuzzleConfig();
-
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const [loading, setLoading] = useState(true);
   const [gameData, setGameData] = useState(null);
+  const [isOpenedToast, setIsOpenedToast] = useState(false);
   const [itemInventory, setItemInventory] = useState([null, null, null, null, null]);
 
-  const finishGame = (data) => {
-    if (data.finished === true) {
-      window.alert("게임이 종료되었습니다.");
-      window.location.href = `/game/cooperation/waiting/${roomId}`;
-      return;
-    }
+  const isLoaded = useMemo(() => {
+    return gameData && gameData[`${getTeam()}Puzzle`] && gameData[`${getTeam()}Puzzle`].board;
+  }, [gameData]);
+
+  const handleCloseGame = () => {
+    setIsOpenedToast(false);
+    navigate(`/game/cooperation`, {
+      replace: true,
+    });
   };
 
-  const initializeGame = (data) => {
-    setGameData(data);
-    console.log("gamedata is here!", gameData, data);
-  };
+  const handleSendUseItemMessage = useCallback((keyNumber) => {
+    send(
+      "/app/game/message",
+      {},
+      JSON.stringify({
+        type: "GAME",
+        roomId: getRoomId(),
+        sender: getSender(),
+        message: "USE_ITEM",
+        targets: keyNumber,
+      }),
+    );
+  }, []);
 
   const connectSocket = async () => {
     connect(
@@ -43,13 +53,21 @@ export default function CooperationGameIngamePage() {
           const data = JSON.parse(message.body);
           console.log(data);
 
+          // 매번 게임이 끝났는지 체크
+          if (Boolean(data.finished)) {
+            disconnect();
+            setIsOpenedToast(true);
+            return;
+          }
+
+          // 매번 보유아이템배열을 업데이트
           if (data.redItemList) {
             setItemInventory(data.redItemList);
           }
 
-          // 2. 게임정보 받기
+          // 게임정보 받기
           if (data.gameType && data.gameType === "COOPERATION") {
-            initializeGame(data);
+            setGameData(data);
             return;
           }
 
@@ -121,54 +139,30 @@ export default function CooperationGameIngamePage() {
                 console.log(err);
               }
             }
-
-            finishGame(data);
             return;
           }
 
-          //랜덤 아이템 드랍(사실 배틀에 있어야하는데 여기서 테스트)
-          if (data.randomItem) {
-            // 버튼 생성
-            const button = document.createElement("button");
-            button.textContent = data.randomItem.name;
-
-            // 버튼의 위치 설정
-            button.style.position = "absolute";
-            button.style.left = data.randomItem.position_x + "px";
-            button.style.top = data.randomItem.position_y + "px";
-
-            button.onclick = function () {
-              // 부모 요소로부터 버튼 제거
-              //근데 이거 다른 클라이언트들도 이 아이템 먹었다고 버튼 사라지는 이벤트 처리하든가 해야함.
-              button.parentNode.removeChild(button);
-
-              // 서버로 메시지 전송
-              send(
-                "/app/game/message",
-                {},
-                JSON.stringify({
-                  type: "GAME",
-                  roomId: getRoomId(),
-                  sender: getSender(),
-                  message: "USE_RANDOM_ITEM",
-                  targets: data.randomItem.uuid,
-                }),
-              );
-            };
-
-            // 버튼을 body에 추가
-            document.body.appendChild(button);
-
-            // alert 대신 메시지를 콘솔에 출력
-            console.log(
-              data.randomItem.name +
-                " 을 " +
-                data.randomItem.position_x +
-                " " +
-                data.randomItem.position_y +
-                " 에 생성한다!",
-            );
+          // "FRAME(액자)" 아이템 사용
+          if (data.message && data.message === "FRAME") {
+            const { targetList } = data;
+            console.log("액자 사용한다~~!!!");
+            // targetList에 나온 index를 다 맞춰버린다.
+            return;
           }
+
+          // "HINT(힌트)" 아이템 사용
+          if (data.message && data.message === "HINT") {
+            console.log("힌트 사용한다~~!!!");
+            return;
+          }
+
+          // "MAGNET(자석)" 아이템 사용
+          if (data.message && data.message === "MAGNET") {
+            console.log("자석 사용한다~~!!!");
+            return;
+          }
+
+          // if ()
         });
 
         // 서버로 메시지 전송
@@ -192,12 +186,6 @@ export default function CooperationGameIngamePage() {
     );
   };
 
-  const initialize = async () => {
-    // await fn
-    await connectSocket();
-    setLoading(false);
-  };
-
   useEffect(() => {
     if (roomId !== getRoomId() || !getSender()) {
       navigate("/game/cooperation", {
@@ -206,42 +194,33 @@ export default function CooperationGameIngamePage() {
       return;
     }
 
-    initialize();
+    connectSocket();
 
     // eslint-disable-next-line
   }, []);
 
-  useEffect(() => {
-    if (gameData) {
-      console.log(gameData);
-      setLoading(false);
-    }
-  }, [gameData]);
+  if (!isLoaded) {
+    return <Loading message="게임 정보 받아오는 중..." />;
+  }
 
   return (
     <>
+      <Toast open={isOpenedToast} onClose={handleCloseGame} message="게임 끝!!!" />
       <h1>CooperationGameIngamePage : {roomId}</h1>
-      {loading ? (
-        <Loading message="게임 정보 받아오는 중..." />
-      ) : (
-        gameData &&
-        gameData[`${getTeam()}Puzzle`] &&
-        gameData[`${getTeam()}Puzzle`].board && (
-          <>
-            <PlayPuzzle
-              category="cooperation"
-              shapes={parsePuzzleShapes(
-                gameData[`${getTeam()}Puzzle`].board,
-                gameData.picture.widthPieceCnt,
-                gameData.picture.lengthPieceCnt,
-              )}
-              board={gameData[`${getTeam()}Puzzle`].board}
-              picture={gameData.picture}
-            />
-            <ItemController itemInventory={itemInventory} />
-          </>
-        )
-      )}
+      <PlayPuzzle
+        category="cooperation"
+        shapes={parsePuzzleShapes(
+          gameData[`${getTeam()}Puzzle`].board,
+          gameData.picture.widthPieceCnt,
+          gameData.picture.lengthPieceCnt,
+        )}
+        board={gameData[`${getTeam()}Puzzle`].board}
+        picture={gameData.picture}
+      />
+      <ItemController
+        itemInventory={itemInventory}
+        onSendUseItemMessage={handleSendUseItemMessage}
+      />
     </>
   );
 }
