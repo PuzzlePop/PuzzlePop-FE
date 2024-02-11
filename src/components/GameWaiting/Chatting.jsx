@@ -110,6 +110,7 @@ const Form = styled.form`
 const ChatInput = styled(TextField)`
   width: 74%;
   height: 100%;
+  margin-left: auto;
 `;
 
 const ChatBtn = styled(Button)`

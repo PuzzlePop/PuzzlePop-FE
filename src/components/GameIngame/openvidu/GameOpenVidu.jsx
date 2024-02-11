@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { OpenVidu } from "openvidu-browser";
 import axios from "axios";
 import UserAudioComponent from "./UserAudioComponent";
@@ -16,7 +16,7 @@ const GameOpenVidu = ({ gameId, playerName }) => {
   const [myUserName, setMyUserName] = useState(playerName);
   const [session, setSession] = useState(null);
   const [mainStreamManager, setMainStreamManager] = useState(null);
-  const [publisher, setPublisher] = useState(null);
+  const publisher = useRef(null);
   const [subscribers, setSubscribers] = useState([]);
   const [currentVideoDevice, setCurrentVideoDevice] = useState(null);
   const [isUnMuted, setIsUnMuted] = useState(true);
@@ -33,6 +33,12 @@ const GameOpenVidu = ({ gameId, playerName }) => {
       window.removeEventListener("beforeunload", onbeforeunload);
     };
   }, []);
+
+  useEffect(() => {
+    if (publisher.current) {
+      publisher.current.publishAudio(isUnMuted);
+    }
+  }, [publisher, isUnMuted]);
 
   const deleteSubscriber = (streamManager) => {
     setSubscribers((prevSubscribers) => prevSubscribers.filter((sub) => sub !== streamManager));
@@ -60,7 +66,7 @@ const GameOpenVidu = ({ gameId, playerName }) => {
       const token = await createToken(sessionId);
       mySession.connect(token, { clientData: myUserName });
 
-      const publisher = await OV.initPublisherAsync(undefined, {
+      const publisherOV = await OV.initPublisherAsync(undefined, {
         audioSource: undefined,
         videoSource: false,
         publishAudio: isUnMuted,
@@ -71,18 +77,10 @@ const GameOpenVidu = ({ gameId, playerName }) => {
         mirror: false,
       });
 
-      mySession.publish(publisher);
+      mySession.publish(publisherOV);
 
-      const devices = await OV.getDevices();
-      const videoDevices = devices.filter((device) => device.kind === "videoinput");
-      const currentVideoDeviceId = publisher.stream.getVideoTracks()[0].getSettings().deviceId;
-      const currentVideoDevice = videoDevices.find(
-        (device) => device.deviceId === currentVideoDeviceId,
-      );
-
-      setMainStreamManager(publisher);
-      setPublisher(publisher);
-      setCurrentVideoDevice(currentVideoDevice);
+      setMainStreamManager(publisherOV);
+      publisher.current = publisherOV;
     } catch (error) {
       console.log("There was an error connecting to the session:", error.code, error.message);
     }
@@ -98,7 +96,6 @@ const GameOpenVidu = ({ gameId, playerName }) => {
     setSession(null);
     setSubscribers([]);
     setMainStreamManager(null);
-    setPublisher(null);
     setCurrentVideoDevice(null);
   };
 
@@ -131,7 +128,7 @@ const GameOpenVidu = ({ gameId, playerName }) => {
               aria-label="mic"
               color="purple"
               onClick={toggleMute}
-              sx={{ marginRight: "5px" }}
+              sx={{ marginRight: "3px" }}
             >
               {isUnMuted ? <MicOffIcon fontSize="inherit" /> : <MicIcon fontSize="inherit" />}
             </IconButton>
@@ -152,11 +149,12 @@ const GameOpenVidu = ({ gameId, playerName }) => {
         )} */}
 
         <div id="video-container" className="col-md-6">
-          {publisher && (
+          {/* {publisher.current && (
             <div className="stream-container col-md-6 col-xs-6">
-              <UserAudioComponent streamManager={publisher} />
+              <p>publisher: </p>
+              <UserAudioComponent streamManager={publisher.current} />
             </div>
-          )}
+          )} */}
 
           {subscribers.map((sub, i) => (
             <div key={sub.id} className="stream-container col-md-6 col-xs-6">
