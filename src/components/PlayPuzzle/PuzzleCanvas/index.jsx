@@ -6,7 +6,7 @@ import { createTiles } from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/CreateP
 import { configStore } from "../../../puzzle-core";
 
 // level 임의로 3단계로
-const levelSize = { 1: 500, 2: 600, 3: 800 };
+const levelSize = { 1: 400, 2: 500, 3: 600 };
 
 const setConfig = (img, level, picture) => {
   const originHeight = picture.length;
@@ -19,7 +19,7 @@ const setConfig = (img, level, picture) => {
     originHeight >= originWidth
       ? levelSize[level]
       : Math.round((levelSize[level] * originHeight) / originWidth / 100) * 100;
-  const tileWidth = 70;
+  const tileWidth = 40;
 
   const config = {
     originHeight: originHeight, // 실제 사진의 높이
