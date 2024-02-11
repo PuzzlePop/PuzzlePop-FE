@@ -60,15 +60,18 @@ export default function GameCard({ room, category }) {
         setSnackOpen(true);
       }
       if (isAxiosError(e) && e.response.status === 403) {
-        setSnackMessage("정원이 가득찬 방입니다! ㅠㅠ");
+        setSnackMessage("정원이 가득찬 방입니다!");
         setSnackOpen(true);
       }
     }
   };
 
   const handleClick = (event, started) => {
-    if (redTeam.players.length + blueTeam.players.length === roomSize) {
-      setSnackMessage("정원이 가득찬 방입니다! ㅠㅠ");
+    if (started) {
+      setSnackMessage("이미 게임이 시작된 방입니다!");
+      setSnackOpen(true);
+    } else if (redTeam.players.length + blueTeam.players.length === roomSize) {
+      setSnackMessage("정원이 가득찬 방입니다!");
       setSnackOpen(true);
       // alert("정원이 가득찬 방입니다! ㅠㅠ");
     } else if (!started) {
