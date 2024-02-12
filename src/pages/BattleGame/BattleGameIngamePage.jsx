@@ -34,8 +34,9 @@ export default function BattleGameIngamePage() {
   const [enemyPercent, setEnemyPercent] = useState(0);
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
-  // const [bundles, setBundles] = useState([]);
+
   const bundles = useRef([]);
+  const dropRandomItem = useRef(null);
 
   const finishGame = (data) => {
     if (data.finished === true) {
@@ -160,6 +161,9 @@ export default function BattleGameIngamePage() {
 
           if (data.message && data.message === "ATTACK") {
             console.log("공격메세지", data);
+            // dropRandomItem 삭제
+            dropRandomItem.current.parentNode.removeChild(dropRandomItem.current);
+
             const { targets, targetList, deleted, randomItem } = data;
 
             console.log("나 게임 인포 보낸다?");
@@ -175,23 +179,73 @@ export default function BattleGameIngamePage() {
             );
 
             if (randomItem.name === "FIRE") {
-              console.log("fire 발동 !!");
+              console.log("랜덤 아이템 fire 였어!");
+
+              // // fire 당하는 팀의 효과
+              // if (targets === getTeam().toUpperCase()) {
+
+              // } else { // fire 발동하는 팀의 효과
+
+              // }
+
+              setTimeout(() => {
+                console.log("번들 찾아볼게", bundles.current);
+                if (targetList && targets === getTeam().toUpperCase()) {
+                  console.log("fire 발동 !!");
+                  fire(bundles.current, targetList);
+                }
+              }, 2000);
             }
 
-            setTimeout(() => {
-              console.log("번들 찾아볼게", bundles.current);
-              if (targetList && targets === getTeam().toUpperCase()) {
-                fire(bundles.current, targetList);
-              }
-            }, 2000);
+            if (randomItem.name === "ROCKET") {
+              console.log("랜덤 아이템 rocket 였어!");
+
+              // // rocket 당하는 팀의 효과
+              // if (targets === getTeam().toUpperCase()) {
+
+              // } else { // rocket 발동하는 팀의 효과
+
+              // }
+
+              setTimeout(() => {
+                console.log("번들 찾아볼게", bundles.current);
+                if (targetList && targets === getTeam().toUpperCase()) {
+                  console.log("rocket 발동 !!");
+                  fire(bundles.current, targetList);
+                }
+              }, 2000);
+            }
+
+            if (randomItem.name === "EARTHQUAKE") {
+              console.log("랜덤 아이템 earthquake 였어!");
+
+              // // earthquake 당하는 팀의 효과
+              // if (targets === getTeam().toUpperCase()) {
+
+              // } else { // earthquake 발동하는 팀의 효과
+
+              // }
+
+              setTimeout(() => {
+                console.log("번들 찾아볼게", bundles.current);
+                if (targetList && targets === getTeam().toUpperCase()) {
+                  console.log("rocket 발동 !!");
+                  fire(bundles.current, targetList);
+                }
+              }, 2000);
+            }
           }
 
           if (data.message && data.message === "SHIELD") {
             console.log("공격메세지 : 쉴드", data);
+            // dropRandomItem 삭제
+            dropRandomItem.current.parentNode.removeChild(dropRandomItem.current);
           }
 
           if (data.message && data.message === "MIRROR") {
             console.log("공격메세지 : 거울", data);
+            // dropRandomItem 삭제
+            dropRandomItem.current.parentNode.removeChild(dropRandomItem.current);
           }
 
           // drop random Item 생성
@@ -228,6 +282,7 @@ export default function BattleGameIngamePage() {
             };
 
             // 버튼을 canvasContainer에 추가
+            dropRandomItem.current = dropRandomItemImg;
             canvasContainer.appendChild(dropRandomItemImg);
 
             // alert 대신 메시지를 콘솔에 출력
