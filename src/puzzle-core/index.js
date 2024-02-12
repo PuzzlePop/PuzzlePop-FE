@@ -128,9 +128,24 @@ const createPuzzleConfig = () => {
     console.log(getConfig());
   };
 
+  // 왜 자꾸 퍼즐 하나가 안붙냐...
   const usingItemMagnet = (targetList) => {
-    console.log(targetList);
-    console.log(getConfig());
+    const config = getConfig();
+    const [targetPuzzleIndex, ...aroundPuzzleIndexList] = targetList;
+    for (let direction = 0; direction < 4; direction += 1) {
+      const puzzleIndex = aroundPuzzleIndexList[direction];
+      if (puzzleIndex === -1) {
+        continue;
+      }
+      uniteTiles({
+        config,
+        nowIndex: puzzleIndex,
+        preIndex: targetPuzzleIndex,
+        direction,
+        isCombo: false,
+        isSender: false,
+      });
+    }
   };
 
   return {

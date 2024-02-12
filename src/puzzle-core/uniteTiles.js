@@ -26,17 +26,17 @@ export const uniteTiles = ({
       }),
     );
 
-    send(
-      "/app/game/message",
-      {},
-      JSON.stringify({
-        type: "GAME",
-        roomId: getRoomId(),
-        sender: getSender(),
-        message: "GAME_INFO",
-        targets: nowIndex.toString() + "," + preIndex.toString(),
-      }),
-    );
+    // send(
+    //   "/app/game/message",
+    //   {},
+    //   JSON.stringify({
+    //     type: "GAME",
+    //     roomId: getRoomId(),
+    //     sender: getSender(),
+    //     message: "GAME_INFO",
+    //     targets: nowIndex.toString() + "," + preIndex.toString(),
+    //   }),
+    // );
   }
 
   const nowGroup = config.groupTiles[nowIndex][1];
@@ -77,7 +77,7 @@ export const uniteTiles = ({
   return config;
 };
 
-const dismantling = ({ config, groupIndexNow }) => {
+export const dismantling = ({ config, groupIndexNow }) => {
   let count = 0;
   config.groupTiles.forEach((gtile) => {
     if (gtile[1] === groupIndexNow) {
@@ -95,7 +95,7 @@ const dismantling = ({ config, groupIndexNow }) => {
   return false;
 };
 
-const comboFit = ({ config, nowIndex, preIndex, direction }) => {
+export const comboFit = ({ config, nowIndex, preIndex, direction }) => {
   const nowTile = config.groupTiles[nowIndex][0];
   const preTile = config.groupTiles[preIndex][0];
 
@@ -114,7 +114,7 @@ const comboFit = ({ config, nowIndex, preIndex, direction }) => {
   });
 };
 
-const groupFit = ({ config, nowGroup, nowIdx }) => {
+export const groupFit = ({ config, nowGroup, nowIdx }) => {
   const xTileCount = config.tilesPerRow;
   const yTileCount = config.tilesPerColumn;
   const groupArr = [];

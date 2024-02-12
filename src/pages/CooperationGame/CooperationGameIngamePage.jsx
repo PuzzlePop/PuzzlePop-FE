@@ -67,9 +67,9 @@ export default function CooperationGameIngamePage() {
   };
 
   const magnetTest = () => {
-    // const targetList = [32, -1, -1, -1, -1] // 상 우 하 좌
-    const targetList = [0, -1, 1, 8, -1];
-
+    // const targetList = [32, -1, -1, -1, -1]; // 상 우 하 좌
+    // const targetList = [0, -1, 1, 10, -1];
+    const targetList = [11, 1, 12, 21, 10];
     usingItemMagnet(targetList);
   };
 
