@@ -123,8 +123,13 @@ const createPuzzleConfig = () => {
     });
   };
 
-  const usingItemFrame = (puzzleIndexList) => {
-    console.log(puzzleIndexList);
+  const usingItemFrame = (targetList) => {
+    console.log(targetList);
+    console.log(getConfig());
+  };
+
+  const usingItemMagnet = (targetList) => {
+    console.log(targetList);
     console.log(getConfig());
   };
 
@@ -139,6 +144,7 @@ const createPuzzleConfig = () => {
     addCombo,
     fire,
     usingItemFrame,
+    usingItemMagnet,
   };
 };
 
