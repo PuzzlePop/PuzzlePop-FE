@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-// import PuzzleCanvas from "../components/PlayPuzzle/PuzzleCanvas";
 import PuzzleCanvas from "./PuzzleCanvas";
 
 const PlayPuzzle = ({ category, shapes, board, picture }) => {
@@ -20,7 +19,7 @@ const PlayPuzzle = ({ category, shapes, board, picture }) => {
         : `data:image/jpeg;base64,${picture.encodedString}`;
     const res = {
       img,
-      level: 3,
+      level: 1,
     };
     setPuzzleInfo({ crossOrigin: "anonymous", img: res.img, level: res.level });
 

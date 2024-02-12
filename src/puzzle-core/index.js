@@ -78,8 +78,8 @@ const createPuzzleConfig = () => {
         break;
     }
 
-    console.log("addCombo 함수 실행 :", fromIndex, toIndex, direction, dir);
-    console.log(config);
+    // console.log("addCombo 함수 실행 :", fromIndex, toIndex, direction, dir);
+    // console.log(config);
 
     const nextConfig = uniteTiles({
       config,
@@ -93,6 +93,72 @@ const createPuzzleConfig = () => {
     config = nextConfig;
   };
 
+  // 공격형 아이템 fire
+  const usingItemFire = (bundles, targetList) => {
+    // bundles의 인덱스만 담은 object
+    const bundlesIdxList = [];
+
+    bundles.forEach((group) => {
+      const idxList = [];
+      group.forEach((g) => {
+        idxList.push(g.index);
+      });
+      bundlesIdxList.push(idxList);
+    });
+
+    // 불 지르기로 없어지는 타겟 list 그룹 해제
+    config.groupTiles.forEach((gtile) => {
+      // 일단 모두 그룹 해제
+      gtile[1] = undefined;
+      // target이면 랜덤 위치에 떨어뜨림
+      if (targetList.includes(gtile[2])) {
+        const randomX = Math.random() * 960 + 20;
+        const randomY = Math.random() * 710 + 20;
+        config.tiles[gtile[2]].position = new Point(randomX, randomY);
+      }
+    });
+
+    // 남아있는 그룹 번호 다시 쓰기
+    bundlesIdxList.forEach((list, groupNum) => {
+      console.log(groupNum, "번째 그룹", list);
+      list.forEach((i) => {
+        console.log(config.groupTiles[i]);
+        config.groupTiles[i][1] = groupNum;
+      });
+    });
+  };
+
+  // 공격형 아이템 rocket
+  const usingItemRocket = (targetList) => {
+    config.groupTiles.forEach((gtile) => {
+      // target이면 그룹 해제 (undefined)
+      if (targetList.includes(gtile[2])) {
+        gtile[1] = undefined;
+
+        const randomX = Math.random() * 1000;
+        const randomY = Math.random() * 750;
+        config.tiles[gtile[2]].position = new Point(randomX, randomY);
+      }
+    });
+  };
+
+  // 공격형 아이템 earthquake
+  const usingItemEarthquake = (targetList, deleted) => {
+    console.log(targetList, deleted);
+
+    config.groupTiles.forEach((gtile) => {
+      if (targetList.includes(gtile[2])) {
+        const position = deleted[gtile[2]];
+        config.tiles[gtile[2]].position = new Point(position[0], position[1]);
+      }
+    });
+  };
+
+  const usingItemFrame = (puzzleIndexList) => {
+    console.log(puzzleIndexList);
+    console.log(getConfig());
+  };
+
   return {
     initializePuzzle,
     initializePuzzle2,
@@ -102,6 +168,10 @@ const createPuzzleConfig = () => {
     unLockPuzzle,
     addPiece,
     addCombo,
+    usingItemFire,
+    usingItemRocket,
+    usingItemEarthquake,
+    usingItemFrame,
   };
 };
 

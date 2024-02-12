@@ -10,7 +10,7 @@ export const initializeConfig = ({ img, level, shapes, board, picture }) => {
 };
 
 // level 임의로 3단계로
-const levelSize = { 1: 500, 2: 600, 3: 800 };
+const levelSize = { 1: 400, 2: 500, 3: 600 };
 
 const setConfig = (img, level, picture) => {
   const originHeight = picture.length;
@@ -23,7 +23,7 @@ const setConfig = (img, level, picture) => {
     originHeight >= originWidth
       ? levelSize[level]
       : Math.round((levelSize[level] * originHeight) / originWidth / 100) * 100;
-  const tileWidth = 70;
+  const tileWidth = 40;
 
   const config = {
     originHeight: originHeight, // 실제 사진의 높이
@@ -75,6 +75,7 @@ const constant = {
   tileMarginX: 0,
   tileMarginY: 30,
 };
+
 const initConfig = ({ config, board }) => {
   const tileRatio = config.tileWidth / constant.percentageTotal;
   for (let y = 0; y < config.tilesPerColumn; y++) {

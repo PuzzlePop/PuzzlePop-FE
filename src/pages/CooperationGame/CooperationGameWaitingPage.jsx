@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getSender, getRoomId } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
@@ -12,11 +12,14 @@ import { isAxiosError } from "axios";
 const { connect, send, subscribe } = socket;
 
 export default function CooperationGameWaitingPage() {
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [gameData, setGameData] = useState(null);
   const [chatHistory, setChatHistory] = useState([]); // 채팅 기록을 저장하는 상태 추가
+
+  const isLoading = useMemo(() => {
+    return gameData === null;
+  }, [gameData]);
 
   const connectSocket = async () => {
     // websocket 연결 시도
@@ -27,8 +30,10 @@ export default function CooperationGameWaitingPage() {
         const data = JSON.parse(message.body);
 
         // 1. 게임이 시작되면 인게임 화면으로 보낸다.
-        if (data.gameId && data.started && data.started === true) {
-          window.location.href = `/game/cooperation/ingame/${data.gameId}`;
+        if (data.gameId && Boolean(data.started) && !Boolean(data.finished)) {
+          navigate(`/game/cooperation/ingame/${data.gameId}`, {
+            replace: true,
+          });
           return;
         }
         setGameData(data);
@@ -77,36 +82,23 @@ export default function CooperationGameWaitingPage() {
 
     initialize();
 
-    return () => {
-      // disconnect();
-      // console.log("WebSocket 연결 종료");
-    };
-
     // eslint-disable-next-line
   }, []);
 
-  useEffect(() => {
-    if (gameData) {
-      setLoading(false);
-    }
-  }, [gameData]);
+  if (isLoading) {
+    return <Loading message="방 정보 불러오는 중..." />;
+  }
 
   return (
     <>
       <Header />
-      {loading ? (
-        <Loading message="방 정보 불러오는 중..." />
-      ) : (
-        <>
-          <GameWaitingBoard
-            player={getSender()}
-            data={gameData}
-            allowedPiece={allowedPiece}
-            category="cooperation"
-            chatHistory={chatHistory}
-          />
-        </>
-      )}
+      <GameWaitingBoard
+        player={getSender()}
+        data={gameData}
+        allowedPiece={allowedPiece}
+        category="cooperation"
+        chatHistory={chatHistory}
+      />
       <Footer />
     </>
   );

@@ -57,7 +57,7 @@ const FooterBar = styled(AppBar)`
   position: fixed;
   top: auto;
   bottom: 0;
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.5);
   border-top: 1px solid ${deepPurple[100]};
   padding: 3px 10px;
 `;
