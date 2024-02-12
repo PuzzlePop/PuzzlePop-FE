@@ -93,10 +93,8 @@ const createPuzzleConfig = () => {
     config = nextConfig;
   };
 
-  const fire = (bundles, targetList) => {
-    console.log(bundles, targetList);
-    console.log("현재 config", config);
-
+  // 공격형 아이템 fire
+  const usingItemFire = (bundles, targetList) => {
     // bundles의 인덱스만 담은 object
     const bundlesIdxList = [];
 
@@ -108,12 +106,33 @@ const createPuzzleConfig = () => {
       bundlesIdxList.push(idxList);
     });
 
-    console.log("bundlesIdxList ", bundlesIdxList);
+    // 불 지르기로 없어지는 타겟 list 그룹 해제
+    config.groupTiles.forEach((gtile) => {
+      // 일단 모두 그룹 해제
+      gtile[1] = undefined;
+      // target이면 랜덤 위치에 떨어뜨림
+      if (targetList.includes(gtile[2])) {
+        const randomX = Math.random() * 960 + 20;
+        const randomY = Math.random() * 710 + 20;
+        config.tiles[gtile[2]].position = new Point(randomX, randomY);
+      }
+    });
 
+    // 남아있는 그룹 번호 다시 쓰기
+    bundlesIdxList.forEach((list, groupNum) => {
+      console.log(groupNum, "번째 그룹", list);
+      list.forEach((i) => {
+        console.log(config.groupTiles[i]);
+        config.groupTiles[i][1] = groupNum;
+      });
+    });
+  };
+
+  // 공격형 아이템 rocket
+  const usingItemRocket = (targetList) => {
     config.groupTiles.forEach((gtile) => {
       // target이면 그룹 해제 (undefined)
       if (targetList.includes(gtile[2])) {
-        console.log("얘 target임", gtile);
         gtile[1] = undefined;
 
         const randomX = Math.random() * 1000;
@@ -121,6 +140,11 @@ const createPuzzleConfig = () => {
         config.tiles[gtile[2]].position = new Point(randomX, randomY);
       }
     });
+  };
+
+  // 공격형 아이템 earthquake
+  const usingItemEarthquake = () => {
+    console.log();
   };
 
   const usingItemFrame = (puzzleIndexList) => {
@@ -137,7 +161,8 @@ const createPuzzleConfig = () => {
     unLockPuzzle,
     addPiece,
     addCombo,
-    fire,
+    usingItemFire,
+    usingItemRocket,
     usingItemFrame,
   };
 };

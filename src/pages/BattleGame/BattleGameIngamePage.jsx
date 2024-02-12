@@ -22,7 +22,16 @@ import { Box } from "@mui/material";
 import { red, blue } from "@mui/material/colors";
 
 const { connect, send, subscribe } = socket;
-const { getConfig, lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo, fire } = configStore;
+const {
+  getConfig,
+  lockPuzzle,
+  movePuzzle,
+  unLockPuzzle,
+  addPiece,
+  addCombo,
+  usingItemFire,
+  usingItemRocket,
+} = configStore;
 
 export default function BattleGameIngamePage() {
   const navigate = useNavigate();
@@ -35,7 +44,7 @@ export default function BattleGameIngamePage() {
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
 
-  const bundles = useRef([]);
+  // const bundles = useRef([]);
   const dropRandomItem = useRef(null);
 
   const finishGame = (data) => {
@@ -72,6 +81,7 @@ export default function BattleGameIngamePage() {
           }
 
           // 진행도
+          // TODO : ATTACK일때 시간 초 늦게 반영되는 효과
           if (data.redProgressPercent >= 0 && data.blueProgressPercent >= 0) {
             console.log("진행도?", data.redProgressPercent, data.blueProgressPercent);
             if (getTeam() === "red") {
@@ -162,21 +172,23 @@ export default function BattleGameIngamePage() {
           if (data.message && data.message === "ATTACK") {
             console.log("공격메세지", data);
             // dropRandomItem 삭제
-            dropRandomItem.current.parentNode.removeChild(dropRandomItem.current);
+            if (dropRandomItem.current.parentNode) {
+              dropRandomItem.current.parentNode.removeChild(dropRandomItem.current);
+            }
 
-            const { targets, targetList, deleted, randomItem } = data;
+            const { targets, targetList, deleted, randomItem, redBundles, blueBundles } = data;
 
-            console.log("나 게임 인포 보낸다?");
-            send(
-              "/app/game/message",
-              {},
-              JSON.stringify({
-                type: "GAME",
-                message: "GAME_INFO",
-                roomId: getRoomId(),
-                sender: getSender(),
-              }),
-            );
+            // console.log("나 게임 인포 보낸다?");
+            // send(
+            //   "/app/game/message",
+            //   {},
+            //   JSON.stringify({
+            //     type: "GAME",
+            //     message: "GAME_INFO",
+            //     roomId: getRoomId(),
+            //     sender: getSender(),
+            //   }),
+            // );
 
             if (randomItem.name === "FIRE") {
               console.log("랜덤 아이템 fire 였어!");
@@ -189,10 +201,12 @@ export default function BattleGameIngamePage() {
               // }
 
               setTimeout(() => {
-                console.log("번들 찾아볼게", bundles.current);
+                console.log("레드팀 번들", redBundles);
+                console.log("블루팀 번들", blueBundles);
                 if (targetList && targets === getTeam().toUpperCase()) {
                   console.log("fire 발동 !!");
-                  fire(bundles.current, targetList);
+                  const attackedTeamBundles = getTeam() === "red" ? redBundles : blueBundles;
+                  usingItemFire(attackedTeamBundles, targetList);
                 }
               }, 2000);
             }
@@ -208,16 +222,19 @@ export default function BattleGameIngamePage() {
               // }
 
               setTimeout(() => {
-                console.log("번들 찾아볼게", bundles.current);
+                // console.log("레드팀 번들", redBundles);
+                // console.log("블루팀 번들", blueBundles);
                 if (targetList && targets === getTeam().toUpperCase()) {
                   console.log("rocket 발동 !!");
-                  fire(bundles.current, targetList);
+                  usingItemRocket(targetList);
                 }
               }, 2000);
             }
 
             if (randomItem.name === "EARTHQUAKE") {
               console.log("랜덤 아이템 earthquake 였어!");
+
+              console.log("지진 발동", data);
 
               // // earthquake 당하는 팀의 효과
               // if (targets === getTeam().toUpperCase()) {
@@ -227,10 +244,10 @@ export default function BattleGameIngamePage() {
               // }
 
               setTimeout(() => {
-                console.log("번들 찾아볼게", bundles.current);
+                // console.log();
                 if (targetList && targets === getTeam().toUpperCase()) {
-                  console.log("rocket 발동 !!");
-                  fire(bundles.current, targetList);
+                  console.log("earthquake 발동 !!");
+                  // fire(bundles.current, targetList);
                 }
               }, 2000);
             }
@@ -363,7 +380,7 @@ export default function BattleGameIngamePage() {
           : `data:image/jpeg;base64,${gameData.picture.encodedString}`;
 
       // const targetTeam = getTeam() === "red" ? "blue" : "red";
-      bundles.current = gameData[`${getTeam()}Puzzle`].bundles;
+      // bundles.current = gameData[`${getTeam()}Puzzle`].bundles;
       setPictureSrc(tempSrc);
       setLoading(false);
     }
