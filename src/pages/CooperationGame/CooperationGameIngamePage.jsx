@@ -9,9 +9,12 @@ import { configStore } from "../../puzzle-core";
 import { socket } from "../../socket-utils/socket";
 import { getRoomId, getSender, getTeam } from "../../socket-utils/storage";
 import { parsePuzzleShapes } from "../../socket-utils/parsePuzzleShapes";
+import { createPortal } from "react-dom";
+import Hint from "../../components/GameItemEffects/Hint";
+import { useHint } from "../../hooks/useHint";
 
 const { connect, send, subscribe, disconnect } = socket;
-const { lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo } = configStore;
+const { lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo, usingItemFrame } = configStore;
 
 export default function CooperationGameIngamePage() {
   const navigate = useNavigate();
@@ -19,6 +22,7 @@ export default function CooperationGameIngamePage() {
   const [gameData, setGameData] = useState(null);
   const [isOpenedToast, setIsOpenedToast] = useState(false);
   const [itemInventory, setItemInventory] = useState([null, null, null, null, null]);
+  const { hintList, addHint, closeHint, cleanHint } = useHint();
 
   const isLoaded = useMemo(() => {
     return gameData && gameData[`${getTeam()}Puzzle`] && gameData[`${getTeam()}Puzzle`].board;
@@ -44,6 +48,28 @@ export default function CooperationGameIngamePage() {
       }),
     );
   }, []);
+
+  const frameTest = () => {
+    const targetList = [
+      0, 11, 1, 2, 13, 3, 5, 6, 10, 21, 12, 23, 14, 25, 19, 30, 20, 22, 33, 24, 35, 32, 34, 45, 36,
+      44, 46, 54,
+    ];
+    const sortedTargetList = [...targetList].sort((a, b) => a - b);
+    usingItemFrame(sortedTargetList);
+  };
+
+  const getGameInfo = () => {
+    send(
+      "/app/game/message",
+      {},
+      JSON.stringify({
+        type: "GAME",
+        message: "GAME_INFO",
+        roomId: getRoomId(),
+        sender: getSender(),
+      }),
+    );
+  };
 
   const connectSocket = async () => {
     connect(
@@ -96,6 +122,7 @@ export default function CooperationGameIngamePage() {
             const { targets, combo, comboCnt } = data;
             const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
             addPiece({ fromIndex, toIndex });
+            cleanHint({ fromIndex, toIndex });
 
             if (combo) {
               console.log("콤보 효과 발동 !! : ", combo);
@@ -144,21 +171,25 @@ export default function CooperationGameIngamePage() {
 
           // "FRAME(액자)" 아이템 사용
           if (data.message && data.message === "FRAME") {
-            const { targetList } = data;
             console.log("액자 사용한다~~!!!");
+            const { targetList } = data;
+            console.log(targetList);
             // targetList에 나온 index를 다 맞춰버린다.
             return;
           }
 
           // "HINT(힌트)" 아이템 사용
           if (data.message && data.message === "HINT") {
-            console.log("힌트 사용한다~~!!!");
+            const { targetList } = data;
+            addHint(...targetList);
             return;
           }
 
           // "MAGNET(자석)" 아이템 사용
           if (data.message && data.message === "MAGNET") {
             console.log("자석 사용한다~~!!!");
+            const { targetList } = data;
+            console.log(targetList);
             return;
           }
 
@@ -205,6 +236,8 @@ export default function CooperationGameIngamePage() {
 
   return (
     <>
+      <button onClick={frameTest}>frame test</button>
+      <button onClick={() => getGameInfo()}>게임 정보좀요</button>
       <Toast open={isOpenedToast} onClose={handleCloseGame} message="게임 끝!!!" />
       <h1>CooperationGameIngamePage : {roomId}</h1>
       <PlayPuzzle
@@ -221,6 +254,11 @@ export default function CooperationGameIngamePage() {
         itemInventory={itemInventory}
         onSendUseItemMessage={handleSendUseItemMessage}
       />
+      {document.querySelector("#canvasContainer") &&
+        createPortal(
+          <Hint hintList={hintList} onClose={closeHint} />,
+          document.querySelector("#canvasContainer"),
+        )}
     </>
   );
 }

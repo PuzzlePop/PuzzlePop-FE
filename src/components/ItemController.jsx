@@ -2,17 +2,12 @@ import { useCallback, useEffect } from "react";
 import styled from "styled-components";
 import Draggable from "react-draggable";
 
-const defaultItemInventory = [null, null, null, null, null];
-
-export default function ItemController({
-  itemInventory = [...defaultItemInventory],
-  onSendUseItemMessage,
-}) {
+export default function ItemController({ itemInventory, onSendUseItemMessage }) {
   const _useItem = useCallback(
     (keyNumber) => {
       console.log(`<ItemController /> : ${keyNumber} 키 누름!!!`);
 
-      if (itemInventory[keyNumber - 1] !== null && onSendUseItemMessage) {
+      if (itemInventory[keyNumber - 1] && onSendUseItemMessage) {
         onSendUseItemMessage(keyNumber);
       }
     },
