@@ -31,6 +31,7 @@ const {
   addCombo,
   usingItemFire,
   usingItemRocket,
+  usingItemEarthquake,
 } = configStore;
 
 export default function BattleGameIngamePage() {
@@ -247,7 +248,7 @@ export default function BattleGameIngamePage() {
                 // console.log();
                 if (targetList && targets === getTeam().toUpperCase()) {
                   console.log("earthquake 발동 !!");
-                  // fire(bundles.current, targetList);
+                  usingItemEarthquake(targetList, deleted);
                 }
               }, 2000);
             }
