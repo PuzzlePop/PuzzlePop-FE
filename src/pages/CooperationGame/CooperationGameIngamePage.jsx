@@ -97,21 +97,21 @@ export default function CooperationGameIngamePage() {
             return;
           }
 
-          if (data.message && data.message === "LOCKED") {
+          if (data.message && data.message === "LOCKED" && data.senderId !== getSender()) {
             const { targets } = data;
             const targetList = JSON.parse(targets);
             targetList.forEach(({ x, y, index }) => lockPuzzle(x, y, index));
             return;
           }
 
-          if (data.message && data.message === "MOVE") {
+          if (data.message && data.message === "MOVE" && data.senderId !== getSender()) {
             const { targets } = data;
             const targetList = JSON.parse(targets);
             targetList.forEach(({ x, y, index }) => movePuzzle(x, y, index));
             return;
           }
 
-          if (data.message && data.message === "UNLOCKED") {
+          if (data.message && data.message === "UNLOCKED" && data.senderId !== getSender()) {
             const { targets } = data;
             const targetList = JSON.parse(targets);
             targetList.forEach(({ x, y, index }) => unLockPuzzle(x, y, index));
