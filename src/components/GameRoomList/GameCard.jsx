@@ -163,7 +163,7 @@ export default function GameCard({ room, category }) {
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={snackOpen}
-        autoHideDuration={5000}
+        autoHideDuration={3000}
         onClose={handleSnackClose}
         message={snackMessage}
       />

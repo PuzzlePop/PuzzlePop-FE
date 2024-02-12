@@ -1,8 +1,6 @@
+import { useState } from "react";
 import styled from "styled-components";
-import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
+import { Grid, Box, Typography, Button, Snackbar } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
 import { PlayerCard, EmptyPlayerCard, XPlayerCard } from "@/components/GameWaiting/PlayerCard";
@@ -16,6 +14,8 @@ const { send } = socket;
 export default function GameWaitingBoard({ player, data, allowedPiece, category, chatHistory }) {
   // const redTeam = data.player.filter((player) => player.isRedTeam);
   // const blueTeam = data.player.filter((player) => !player.isRedTeam);
+  const [snackOpen, setSnackOpen] = useState(false);
+  const [snackMessage, setSnackMessage] = useState("");
   const { redTeam, blueTeam, gameId, gameName, picture, roomSize } = data;
 
   // 배틀의 경우 [red팀 빈칸 수, blue팀 빈칸 수]
@@ -83,13 +83,21 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category,
     const targetTeamLength = value === "red" ? redTeam.players.length : blueTeam.players.length;
 
     if (getTeam() === value) {
-      alert(`이미 ${value}팀입니다!`);
+      // alert(`이미 ${value}팀입니다!`);
+      setSnackMessage(`이미 ${value}팀입니다!`);
+      setSnackOpen(true);
     } else if (parseInt(roomSize / 2) === targetTeamLength) {
-      alert(`${value}팀의 정원이 가득찼습니다!`);
+      // alert(`${value}팀의 정원이 가득찼습니다!`);
+      setSnackMessage(`${value}팀의 정원이 가득찼습니다!`);
+      setSnackOpen(true);
     } else {
       setTeam(value);
       setTeamSocket();
     }
+  };
+
+  const handleSnackClose = () => {
+    setSnackOpen(false);
   };
 
   const theme = createTheme({
@@ -215,6 +223,14 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category,
           </StartButton>
         </ColGrid>
       </Wrapper>
+
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={snackOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackClose}
+        message={snackMessage}
+      />
     </ThemeProvider>
   );
 }
