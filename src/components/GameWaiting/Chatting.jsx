@@ -84,7 +84,15 @@ export default function Chatting({ chatHistory, isbattleingame = false }) {
     <ThemeProvider theme={theme}>
       <Wrapper isbattleingame={isbattleingame}>
         {chatHistory && (
-          <div ref={chatElement} style={{ flexGrow: 1, margin: "10px", overflow: "scroll" }}>
+          <div
+            ref={chatElement}
+            style={{
+              flexGrow: 1,
+              margin: "10px",
+              overflowY: "scroll",
+              scrollbarColor: "#9575cd rgba(255, 255, 255, 0)",
+            }}
+          >
             {/* 채팅 기록을 화면에 출력 */}
             {chatHistory.map((chat, index) => (
               <div key={index}>
@@ -142,12 +150,18 @@ const Form = styled.form`
 
 const ChatInput = styled(TextField)`
   width: 74%;
-  height: 100%;
+  height: 50px;
+  margin: 0;
   margin-left: auto;
+
+  & .MuiInputBase-input {
+    padding: 10px 14px;
+    height: 20px;
+  }
 `;
 
 const ChatBtn = styled(Button)`
   width: 16%;
   margin-left: 4px;
-  height: 80%;
+  height: 40px;
 `;

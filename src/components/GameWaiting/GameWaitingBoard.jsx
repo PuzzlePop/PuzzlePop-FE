@@ -183,14 +183,14 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category,
           </InnerBox>
 
           {/* 텍스트 채팅 */}
-          <InnerBox style={{ padding: "2%", paddingBottom: 0 }}>
+          <InnerBox style={{ padding: "1% 2% 0 2%" }}>
             <Chatting chatHistory={chatHistory} />
           </InnerBox>
         </ColGrid>
 
         {/* 퍼즐 이미지 선택, 피스 수 선택 */}
         <ColGrid item={true} xs={4}>
-          <SelectImgAndPiece src={picture.encodedString} allowedPiece={allowedPiece} />
+          <SelectImgAndPiece src={picture.encodedString} />
           {category === "battle" && (
             <InnerBox>
               <Typography variant="subtitle1" sx={{ textAlign: "center" }}>

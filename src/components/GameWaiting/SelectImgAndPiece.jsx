@@ -68,7 +68,7 @@ const dummyData = [
 export default function SelectImgAndPiece({ src, allowedPiece }) {
   const [open, setOpen] = useState(false);
   const [selectedImg, setSelectedImg] = useState(src);
-  const [selectedPieceNum, setSelectedPieceNum] = useState(allowedPiece[0]);
+  // const [selectedPieceNum, setSelectedPieceNum] = useState(allowedPiece[0]);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -79,9 +79,9 @@ export default function SelectImgAndPiece({ src, allowedPiece }) {
     setSelectedImg(value);
   };
 
-  const handleChange = (event) => {
-    setSelectedPieceNum(event.target.value);
-  };
+  // const handleChange = (event) => {
+  //   setSelectedPieceNum(event.target.value);
+  // };
 
   useEffect(() => {
     if (src === "짱구.jpg") {
@@ -120,9 +120,9 @@ export default function SelectImgAndPiece({ src, allowedPiece }) {
   return (
     <ThemeProvider theme={theme}>
       <InnerBox>
-        <Typography sx={{ mt: 1 }}>그림, 피스 수 선택</Typography>
+        <Typography sx={{ mt: 1 }}>그림 선택</Typography>
         <ImgButton src={selectedImg} onClick={handleClickOpen} />
-        <FormControl sx={{ m: 1, minWidth: "80%" }}>
+        {/* <FormControl sx={{ m: 1, minWidth: "80%" }}>
           <InputLabel id="piece-num-label">피스 수</InputLabel>
           <PieceSelect
             labelId="piece-num-label"
@@ -150,7 +150,7 @@ export default function SelectImgAndPiece({ src, allowedPiece }) {
               );
             })}
           </PieceSelect>
-        </FormControl>
+        </FormControl> */}
 
         <ImgDialog selectedImg={selectedImg} open={open} onClose={handleClose} />
       </InnerBox>
