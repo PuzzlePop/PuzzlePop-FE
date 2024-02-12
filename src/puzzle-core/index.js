@@ -130,21 +130,34 @@ const createPuzzleConfig = () => {
 
   // 왜 자꾸 퍼즐 하나가 안붙냐...
   const usingItemMagnet = (targetList) => {
+    console.log(targetList);
     const config = getConfig();
     const [targetPuzzleIndex, ...aroundPuzzleIndexList] = targetList;
-    for (let direction = 0; direction < 4; direction += 1) {
-      const puzzleIndex = aroundPuzzleIndexList[direction];
-      if (puzzleIndex === -1) {
-        continue;
+    try {
+      for (let direction = 0; direction < 4; direction += 1) {
+        const puzzleIndex = aroundPuzzleIndexList[direction];
+        if (puzzleIndex === -1) {
+          continue;
+        }
+        uniteTiles({
+          config,
+          nowIndex: targetPuzzleIndex,
+          preIndex: puzzleIndex,
+          direction,
+          isCombo: false,
+          isSender: false,
+        });
       }
-      uniteTiles({
-        config,
-        nowIndex: puzzleIndex,
-        preIndex: targetPuzzleIndex,
-        direction,
-        isCombo: false,
-        isSender: false,
-      });
+
+      // TODO: 새롭게 그룹화된 녀석들을 붙여줘야함.
+      // 이미 "그룹" 인데 거리가 떨어져있다면 강제로 붙인다 ?
+      // 그룹을 해제할 수는 없음 (서버에서 이미 그룹으로 묶어놓았기 때문에...)
+      // 클라이언트에서 한번 그룹을 순회하면서 붙여버리기 ?
+      // 그룹과 그룹을 붙이는 함수 개발 ?
+
+      console.log(config);
+    } catch (error) {
+      console.log("자석 아이템을 사용할 퍼즐이 없어요.");
     }
   };
 
