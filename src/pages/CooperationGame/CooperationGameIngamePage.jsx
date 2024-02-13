@@ -105,7 +105,7 @@ export default function CooperationGameIngamePage() {
 
           // 매번 게임이 끝났는지 체크
           if (Boolean(data.finished)) {
-            disconnect();
+            // disconnect();
             console.log("게임 끝남 !");
             // TODO : 게임 끝났을 때 effect
             setTimeout(() => {
