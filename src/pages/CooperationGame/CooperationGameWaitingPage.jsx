@@ -1,13 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getSender, getRoomId } from "@/socket-utils/storage";
-import { socket } from "@/socket-utils/socket";
+import styled from "styled-components";
+import { isAxiosError } from "axios";
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import GameWaitingBoard from "@/components/GameWaiting/GameWaitingBoard";
 import Loading from "@/components/Loading";
+
+import { getSender, getRoomId } from "@/socket-utils/storage";
+import { socket } from "@/socket-utils/socket";
 import { request } from "@/apis/requestBuilder";
-import { isAxiosError } from "axios";
+
+import backgroundPath from "@/assets/background.gif";
 
 const { connect, send, subscribe } = socket;
 
@@ -90,7 +95,7 @@ export default function CooperationGameWaitingPage() {
   }
 
   return (
-    <>
+    <Wrapper>
       <Header />
       <GameWaitingBoard
         player={getSender()}
@@ -100,8 +105,13 @@ export default function CooperationGameWaitingPage() {
         chatHistory={chatHistory}
       />
       <Footer />
-    </>
+    </Wrapper>
   );
 }
 
 const allowedPiece = [100, 200, 300, 400, 500];
+
+const Wrapper = styled.div`
+  height: 1000px;
+  background-image: url(${backgroundPath});
+`;

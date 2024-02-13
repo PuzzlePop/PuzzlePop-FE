@@ -9,7 +9,7 @@ import { red, blue, deepPurple } from "@mui/material/colors";
 
 const { send } = socket;
 
-export default function Chatting({ chatHistory, isbattleingame = false }) {
+export default function Chatting({ chatHistory, isIngame = false, isBattle = false }) {
   const [message, setMessage] = useState("");
   const [lastHeight, setLastHeight] = useState(null);
   const chatElement = useRef();
@@ -78,11 +78,16 @@ export default function Chatting({ chatHistory, isbattleingame = false }) {
     },
   });
 
-  const currentTheme = !isbattleingame ? "purple" : getTeam() === "red" ? "redTeam" : "blueTeam";
+  const currentTheme = !isBattle ? "purple" : getTeam() === "red" ? "redTeam" : "blueTeam";
+  const currentScrollbarTheme = !isBattle
+    ? deepPurple[300]
+    : getTeam() === "red"
+      ? red[300]
+      : blue[300];
 
   return (
     <ThemeProvider theme={theme}>
-      <Wrapper isbattleingame={isbattleingame}>
+      <Wrapper $isIngame={isIngame}>
         {chatHistory && (
           <div
             ref={chatElement}
@@ -90,7 +95,7 @@ export default function Chatting({ chatHistory, isbattleingame = false }) {
               flexGrow: 1,
               margin: "10px",
               overflowY: "scroll",
-              scrollbarColor: "#9575cd rgba(255, 255, 255, 0)",
+              scrollbarColor: `${currentScrollbarTheme} rgba(255, 255, 255, 0)`,
             }}
           >
             {/* 채팅 기록을 화면에 출력 */}
@@ -104,7 +109,7 @@ export default function Chatting({ chatHistory, isbattleingame = false }) {
         )}
 
         <Form onSubmit={handleMessageSend}>
-          {isbattleingame ? (
+          {isBattle ? (
             <GameOpenVidu
               gameId={`${getRoomId()}_${getTeam()}`}
               playerName={getSender()}
@@ -134,7 +139,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   height: ${(props) => {
-    if (props.isbattleingame) {
+    if (props.$isIngame) {
       return "750px";
     } else {
       return "200px";

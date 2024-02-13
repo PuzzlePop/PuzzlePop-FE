@@ -3,13 +3,13 @@ import styled from "styled-components";
 import { getTeam } from "@/socket-utils/storage";
 import { Typography } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { red, blue } from "@mui/material/colors";
+import { red, blue, deepPurple } from "@mui/material/colors";
 
-export default function Timer({ num }) {
+export default function Timer({ num, isCooperation = false }) {
   const [min, setMin] = useState(0);
   const [sec, setSec] = useState(0);
 
-  const teamColor = getTeam() === "red" ? red[300] : blue[300];
+  const teamColor = isCooperation ? deepPurple[300] : getTeam() === "red" ? red[300] : blue[300];
 
   useEffect(() => {
     setMin(Math.floor(num / 60));
