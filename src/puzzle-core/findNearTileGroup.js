@@ -122,6 +122,24 @@ const checkUndefined = ({ config, nowIndex, nextIndex, direction }) => {
   return flag;
 };
 
+const sendFitTilePosition = (tile, tileIdx) => {
+  console.log("fittile 에서 위치 보냄!", tile.position.x, tile.position.y);
+  // // socket 전송
+  send(
+    "/app/game/message",
+    {},
+    JSON.stringify({
+      type: "GAME",
+      roomId: getRoomId(),
+      sender: getSender(),
+      message: "MOUSE_DRAG",
+      targets: JSON.stringify({ x: tile.position.x, y: tile.position.y, index: tileIdx }),
+      position_x: tile.position.x,
+      position_y: tile.position.y,
+    }),
+  );
+};
+
 export const fitTiles = ({
   config,
   nowIndex,
@@ -162,8 +180,10 @@ export const fitTiles = ({
           preTile.position._x + range + xChange,
           preTile.position._y + yChange,
         );
-        // console.log(nowTile.position);
         uniteFlag = true;
+        console.log("보정값 적용된거 ", nowTile.position);
+
+        sendFitTilePosition(nowTile, nowIndex);
       }
       break;
     // 우
@@ -178,8 +198,10 @@ export const fitTiles = ({
           preTile.position._x - (range + xChange),
           preTile.position._y + yChange,
         );
-        // console.log(nowTile.position);
         uniteFlag = true;
+        console.log("보정값 적용된거 ", nowTile.position);
+
+        sendFitTilePosition(nowTile, nowIndex);
       }
       break;
     // 상
@@ -192,7 +214,9 @@ export const fitTiles = ({
         // console.log("상", nowTile.position, range, xUp, yUp);
         nowTile.position = new Point(preTile.position._x + xUp, preTile.position._y + range + yUp);
         uniteFlag = true;
-        // console.log(nowTile.position);
+        console.log("보정값 적용된거 ", nowTile.position);
+
+        sendFitTilePosition(nowTile, nowIndex);
       }
       break;
     // 하
@@ -207,8 +231,10 @@ export const fitTiles = ({
           preTile.position._x + xUp,
           preTile.position._y - (range + yUp),
         );
-        // console.log(nowTile.position);
         uniteFlag = true;
+        console.log("보정값 적용된거 ", nowTile.position);
+
+        sendFitTilePosition(nowTile, nowIndex);
       }
       break;
   }

@@ -14,6 +14,7 @@ import { socket } from "@/socket-utils/socket";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import { configStore } from "@/puzzle-core";
 import { attackRocket } from "@/puzzle-core/attackItem";
+import { updateGroupByBundles } from "@/puzzle-core/utils";
 
 import comboAudioPath from "@/assets/audio/combo.mp3";
 import redTeamBackgroundPath from "@/assets/redTeamBackground.gif";
@@ -29,6 +30,7 @@ import { createPortal } from "react-dom";
 
 const { connect, send, subscribe, disconnect } = socket;
 const {
+  getConfig,
   lockPuzzle,
   movePuzzle,
   unLockPuzzle,
@@ -147,6 +149,14 @@ export default function BattleGameIngamePage() {
           // 게임정보 받기
           if (data.gameType && data.gameType === "BATTLE") {
             initializeGame(data);
+            setTimeout(() => {
+              console.log("번들로 그룹화 해볼게", getConfig(), data[`${getTeam()}Puzzle`].bundles);
+              updateGroupByBundles({
+                config: getConfig(),
+                bundles: data[`${getTeam()}Puzzle`].bundles,
+              });
+            }, 400);
+
             return;
           }
 
