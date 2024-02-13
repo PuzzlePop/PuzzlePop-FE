@@ -11,8 +11,12 @@ export default function FriendList() {
   // const request_status = "accepted";
   const [friendList, setFriendList] = useState([]);
 
-  const fetchFriendList = async () => {
-    const response = await request.post(`/friend/list/accepted`, { id: 1 }); // TODO: 현재 로그인 중인 사용자 ID로 교체할 것
+  const fetchFriendList = async (userId) => {
+    if(!userId) {
+      alert("로그인이 필요합니다.");
+      navigate("/");
+    }
+    const response = await request.post(`/friend/list/accepted`, { id: userId }); // TODO: 현재 로그인 중인 사용자 ID로 교체할 것
     const { data: friendList } = response;
 
     console.log(friendList);
@@ -20,8 +24,19 @@ export default function FriendList() {
   };
 
   useEffect(() => {
-    fetchFriendList();
+    fetchFriendList(getCookie("userId"));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const getCookie = (name) => {
+    const cookies = document.cookie.split('; ');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.startsWith(name + '=')) {
+        return cookie.substring(name.length + 1);
+      }
+    }
+  };
 
   const FriendCard = ({ item }) => {
     return (
