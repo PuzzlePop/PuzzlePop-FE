@@ -2,7 +2,6 @@ import styled from "styled-components";
 import LinearProgress from "@mui/material/LinearProgress";
 
 export default function PrograssBar({ percent, isEnemy }) {
-  console.log("progress bar!!", isEnemy, percent);
   const barColor = isEnemy ? "#FF8888" : "#FFDB95";
 
   return (

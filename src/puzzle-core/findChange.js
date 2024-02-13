@@ -13,13 +13,13 @@ export const findXUp = (nowShape, preShape) => {
     xUp = 0;
   } else {
     if (nR === 0 || (nR === 1 && pR === 1)) {
-      xUp = 5 * nL * -1;
+      xUp = 3 * nL * -1;
     } else if (nR === 1 && pR === -1) {
-      xUp = nL === pL ? 5 : 10;
+      xUp = nL === pL ? 3 : 6;
     } else if (nR === -1 && pR === 1) {
-      xUp = nL === pL ? -5 : -10;
+      xUp = nL === pL ? -3 : -4;
     } else {
-      xUp = 5 * nL * -1;
+      xUp = 3 * nL * -1;
     }
   }
   return xUp;
@@ -32,11 +32,11 @@ export const findYUp = (nowShape, preShape) => {
   let yUp = 0;
 
   if (sum === 1 || sum === -2) {
-    yUp = -5;
+    yUp = -3;
   } else if (sum === 2) {
-    yUp = 5;
+    yUp = 3;
   } else if (sum === -1) {
-    yUp = -10;
+    yUp = -6;
   }
 
   return yUp;
@@ -58,16 +58,16 @@ export const findYChange = (nowShape, preShape) => {
     yChange = 0;
   } else {
     if (nT === 0) {
-      yChange = 5 * nB;
+      yChange = 3 * nB;
     } else if (nB === 0) {
-      yChange = 5 * pT;
+      yChange = 3 * pT;
     } else if (pT === nB) {
-      yChange = 5 * pT;
+      yChange = 3 * pT;
     } else {
       if (Math.abs(sum) === 1) {
-        yChange = sum * -5;
+        yChange = sum * -3;
       } else {
-        yChange = (sum * -5) / 2;
+        yChange = (sum * -3) / 2;
       }
     }
   }
@@ -78,16 +78,16 @@ export const findYChange = (nowShape, preShape) => {
 export const findXChange = (nowShape, preShape) => {
   const sum = nowShape.leftTab + nowShape.rightTab + preShape.leftTab + preShape.rightTab;
 
-  let xChange = -5;
+  let xChange = -4;
 
   if (sum === -1) {
-    xChange = -10;
+    xChange = -6;
   } else if (sum === -2) {
-    xChange = -7;
+    xChange = -6;
   } else if (sum === 0) {
     xChange = 0;
   } else if (sum === 2) {
-    xChange = 5;
+    xChange = 3;
   }
 
   return xChange;

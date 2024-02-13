@@ -74,7 +74,7 @@ export default function Header() {
         <nav style={{ display: "flex", gap: "20px" }}>
           <ImageIcon imageSource={HeaderPuzzleImage} size="md" onClick={() => navigate("/game")} />
           <ImageIcon imageSource={HeaderRankImage} size="md" onClick={() => navigate("/rank")} />
-          <ImageIcon imageSource={HeaderShopImage} size="md" onClick={() => navigate("/shop")} />
+          {/* <ImageIcon imageSource={HeaderShopImage} size="md" onClick={() => navigate("/shop")} /> */}
           <ThemeProvider theme={theme}>
           <Button variant="text" sx={{ px: 2.5 }} size="large" onClick={moveLogin}>
               {isLoggedIn ? 'Log out' : 'Log in'}
