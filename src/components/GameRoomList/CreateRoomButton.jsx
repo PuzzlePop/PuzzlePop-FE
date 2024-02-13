@@ -43,6 +43,14 @@ export default function CreateRoomButton({ category }) {
     }
   };
 
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+      return parts.pop().split(';').shift();
+    }
+  }
+
   const createRoom = async () => {
     if (!roomTitle) {
       return;
@@ -55,7 +63,7 @@ export default function CreateRoomButton({ category }) {
         return;
       }
     }
-    
+
     setSender(sender);
     setTeam("red");
 
