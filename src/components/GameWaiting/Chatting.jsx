@@ -109,7 +109,7 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
         )}
 
         <Form onSubmit={handleMessageSend}>
-          {isBattle ? (
+          {isIngame ? (
             <GameOpenVidu
               gameId={`${getRoomId()}_${getTeam()}`}
               playerName={getSender()}

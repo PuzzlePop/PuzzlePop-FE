@@ -88,20 +88,20 @@ export default function CooperationGameWaitingPage() {
     // eslint-disable-next-line
   }, []);
 
-  if (isLoading) {
-    return <Loading message="방 정보 불러오는 중..." />;
-  }
-
   return (
     <Wrapper>
       <Header />
-      <GameWaitingBoard
-        player={getSender()}
-        data={gameData}
-        allowedPiece={allowedPiece}
-        category="cooperation"
-        chatHistory={chatHistory}
-      />
+      {isLoading ? (
+        <Loading message="방 정보 불러오는 중..." />
+      ) : (
+        <GameWaitingBoard
+          player={getSender()}
+          data={gameData}
+          allowedPiece={allowedPiece}
+          category="cooperation"
+          chatHistory={chatHistory}
+        />
+      )}
       <Footer />
     </Wrapper>
   );

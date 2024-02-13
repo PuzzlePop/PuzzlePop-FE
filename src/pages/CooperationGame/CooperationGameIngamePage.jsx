@@ -258,58 +258,60 @@ export default function CooperationGameIngamePage() {
     },
   });
 
-  if (!isLoaded) {
-    return <Loading message="게임 정보 받아오는 중..." />;
-  }
-
   return (
     <Wrapper>
-      <button onClick={frameTest}>frame test</button>
-      <button onClick={() => getGameInfo()}>게임 정보좀요</button>
-      <Board>
-        <PlayPuzzle
-          category="cooperation"
-          shapes={parsePuzzleShapes(
-            gameData[`${getTeam()}Puzzle`].board,
-            gameData.picture.widthPieceCnt,
-            gameData.picture.lengthPieceCnt,
-          )}
-          board={gameData[`${getTeam()}Puzzle`].board}
-          picture={gameData.picture}
-        />
-        <Row>
-          <ProgressWrapper>
-            <PrograssBar percent={ourPercent} isEnemy={false} />
-          </ProgressWrapper>
-        </Row>
+      {!isLoaded ? (
+        <Loading message="게임 정보 받아오는 중..." />
+      ) : (
+        <>
+          <button onClick={frameTest}>frame test</button>
+          <button onClick={() => getGameInfo()}>게임 정보좀요</button>
+          <Board>
+            <PlayPuzzle
+              category="cooperation"
+              shapes={parsePuzzleShapes(
+                gameData[`${getTeam()}Puzzle`].board,
+                gameData.picture.widthPieceCnt,
+                gameData.picture.lengthPieceCnt,
+              )}
+              board={gameData[`${getTeam()}Puzzle`].board}
+              picture={gameData.picture}
+            />
+            <Row>
+              <ProgressWrapper>
+                <PrograssBar percent={ourPercent} isEnemy={false} />
+              </ProgressWrapper>
+            </Row>
 
-        <Col>
-          <Timer num={time} isCooperation="true" />
-          <h3>이 그림을 맞춰주세요!</h3>
-          <img
-            src={pictureSrc}
-            alt="퍼즐 그림"
-            style={{ width: "100%", borderRadius: "10px", margin: "5px" }}
+            <Col>
+              <Timer num={time} isCooperation="true" />
+              <h3>이 그림을 맞춰주세요!</h3>
+              <img
+                src={pictureSrc}
+                alt="퍼즐 그림"
+                style={{ width: "100%", borderRadius: "10px", margin: "5px" }}
+              />
+              <Chatting chatHistory={chatHistory} isIngame={true} isBattle={false} />
+            </Col>
+          </Board>
+
+          <ItemController
+            itemInventory={itemInventory}
+            onSendUseItemMessage={handleSendUseItemMessage}
           />
-          <Chatting chatHistory={chatHistory} isIngame={true} isBattle={false} />
-        </Col>
-      </Board>
+          {document.querySelector("#canvasContainer") &&
+            createPortal(
+              <Hint hintList={hintList} onClose={closeHint} />,
+              document.querySelector("#canvasContainer"),
+            )}
 
-      <ItemController
-        itemInventory={itemInventory}
-        onSendUseItemMessage={handleSendUseItemMessage}
-      />
-      {document.querySelector("#canvasContainer") &&
-        createPortal(
-          <Hint hintList={hintList} onClose={closeHint} />,
-          document.querySelector("#canvasContainer"),
-        )}
-
-      <ThemeProvider theme={theme}>
-        <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
-          <DialogTitle>게임 결과</DialogTitle>
-        </Dialog>
-      </ThemeProvider>
+          <ThemeProvider theme={theme}>
+            <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
+              <DialogTitle>게임 결과</DialogTitle>
+            </Dialog>
+          </ThemeProvider>
+        </>
+      )}
     </Wrapper>
   );
 }

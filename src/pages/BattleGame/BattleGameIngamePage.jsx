@@ -43,7 +43,6 @@ const {
 export default function BattleGameIngamePage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
-  // const [loading, setLoading] = useState(true);
   const [gameData, setGameData] = useState(null);
   const [isOpenedDialog, setIsOpenedDialog] = useState(false);
 
