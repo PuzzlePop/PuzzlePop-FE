@@ -293,11 +293,33 @@ export default function BattleGameIngamePage() {
             if (randomItem.name === "ROCKET") {
               console.log("랜덤 아이템 rocket 였어!");
 
-              // // rocket 당하는 팀의 효과
-              // if (targets === getTeam().toUpperCase()) {
-              // } else {
-              //   // rocket 발동하는 팀의 효과
-              // }
+              // rocket 당하는 팀의 효과
+              if (targets === getTeam().toUpperCase()) {
+                console.log("rocket 맞을거임");
+              } else {
+                // rocket 발동하는 팀의 효과
+                console.log("rocket 보낼거임");
+
+                const rocketImg = document.createElement("img");
+                const canvasContainer = document.getElementById("canvasContainer");
+                rocketImg.src = rocketPath;
+
+                rocketImg.style.zIndex = 100;
+                rocketImg.style.position = "absolute";
+                rocketImg.style.left = "1000px";
+                rocketImg.style.top = "240px";
+                rocketImg.style.transform = "translate(-50%, -50%)";
+
+                canvasContainer.appendChild(rocketImg);
+
+                console.log(rocketImg);
+                setTimeout(() => {
+                  console.log("로켓 효과 삭제");
+                  if (rocketImg.parentNode) {
+                    rocketImg.parentNode.removeChild(rocketImg);
+                  }
+                }, 2000);
+              }
 
               setTimeout(() => {
                 // console.log("레드팀 번들", redBundles);
