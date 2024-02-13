@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 
@@ -39,7 +39,7 @@ const {
 export default function BattleGameIngamePage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [gameData, setGameData] = useState(null);
   const [isOpenedDialog, setIsOpenedDialog] = useState(false);
 
@@ -50,8 +50,11 @@ export default function BattleGameIngamePage() {
   const [pictureSrc, setPictureSrc] = useState("");
   const [itemInventory, setItemInventory] = useState([null, null, null, null, null]);
 
-  // const bundles = useRef([]);
   const dropRandomItem = useRef(null);
+
+  const isLoaded = useMemo(() => {
+    return gameData && gameData[`${getTeam()}Puzzle`] && gameData[`${getTeam()}Puzzle`].board;
+  }, [gameData]);
 
   const handleCloseGame = () => {
     setIsOpenedDialog(false);
@@ -63,7 +66,6 @@ export default function BattleGameIngamePage() {
   const initializeGame = (data) => {
     setGameData(data);
     console.log("gamedata is here!", gameData, data);
-    setLoading(false);
   };
 
   const handleSendUseItemMessage = useCallback((keyNumber) => {
@@ -397,26 +399,18 @@ export default function BattleGameIngamePage() {
     }
 
     connectSocket();
-    // setLoading(false);
 
     // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
     if (gameData) {
-      console.log(gameData);
-      console.log(getSender(), getTeam());
-      console.log(gameData[`${getTeam()}Puzzle`].board);
-
       const tempSrc =
         gameData.picture.encodedString === "짱구.jpg"
           ? "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp"
           : `data:image/jpeg;base64,${gameData.picture.encodedString}`;
 
-      // const targetTeam = getTeam() === "red" ? "blue" : "red";
-      // bundles.current = gameData[`${getTeam()}Puzzle`].bundles;
       setPictureSrc(tempSrc);
-      setLoading(false);
     }
   }, [gameData]);
 
@@ -426,63 +420,54 @@ export default function BattleGameIngamePage() {
     },
   });
 
+  if (!isLoaded) {
+    return <Loading message="게임 정보 받아오는 중..." />;
+  }
+
   return (
     <Wrapper>
-      {/* <h1>BattleGameIngamePage : {roomId}</h1> */}
-      {loading ? (
-        <Loading message="게임 정보 받아오는 중..." />
-      ) : (
-        gameData &&
-        gameData[`${getTeam()}Puzzle`] &&
-        gameData[`${getTeam()}Puzzle`].board && (
-          <div>
-            <>
-              <Board>
-                <PlayPuzzle
-                  category="battle"
-                  shapes={parsePuzzleShapes(
-                    gameData[`${getTeam()}Puzzle`].board,
-                    gameData.picture.widthPieceCnt,
-                    gameData.picture.lengthPieceCnt,
-                  )}
-                  board={gameData[`${getTeam()}Puzzle`].board}
-                  picture={gameData.picture}
-                />
-                <Row>
-                  <ProgressWrapper>
-                    <PrograssBar percent={ourPercent} isEnemy={false} />
-                  </ProgressWrapper>
-                  <ProgressWrapper>
-                    <PrograssBar percent={enemyPercent} isEnemy={true} />
-                  </ProgressWrapper>
-                </Row>
+      <Board>
+        <PlayPuzzle
+          category="battle"
+          shapes={parsePuzzleShapes(
+            gameData[`${getTeam()}Puzzle`].board,
+            gameData.picture.widthPieceCnt,
+            gameData.picture.lengthPieceCnt,
+          )}
+          board={gameData[`${getTeam()}Puzzle`].board}
+          picture={gameData.picture}
+        />
+        <Row>
+          <ProgressWrapper>
+            <PrograssBar percent={ourPercent} isEnemy={false} />
+          </ProgressWrapper>
+          <ProgressWrapper>
+            <PrograssBar percent={enemyPercent} isEnemy={true} />
+          </ProgressWrapper>
+        </Row>
 
-                <Col>
-                  <Timer num={time} />
-                  <h3>이 그림을 맞춰주세요!</h3>
-                  <img
-                    src={pictureSrc}
-                    alt="퍼즐 그림"
-                    style={{ width: "100%", borderRadius: "10px", margin: "5px" }}
-                  />
-                  <Chatting chatHistory={chatHistory} isbattleingame="true" />
-                </Col>
-              </Board>
-            </>
+        <Col>
+          <Timer num={time} />
+          <h3>이 그림을 맞춰주세요!</h3>
+          <img
+            src={pictureSrc}
+            alt="퍼즐 그림"
+            style={{ width: "100%", borderRadius: "10px", margin: "5px" }}
+          />
+          <Chatting chatHistory={chatHistory} isIngame={true} isBattle={true} />
+        </Col>
+      </Board>
 
-            <ItemController
-              itemInventory={itemInventory}
-              onSendUseItemMessage={handleSendUseItemMessage}
-            />
+      <ItemController
+        itemInventory={itemInventory}
+        onSendUseItemMessage={handleSendUseItemMessage}
+      />
 
-            <ThemeProvider theme={theme}>
-              <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
-                <DialogTitle>게임 결과</DialogTitle>
-              </Dialog>
-            </ThemeProvider>
-          </div>
-        )
-      )}
+      <ThemeProvider theme={theme}>
+        <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
+          <DialogTitle>게임 결과</DialogTitle>
+        </Dialog>
+      </ThemeProvider>
     </Wrapper>
   );
 }
