@@ -45,53 +45,83 @@ export const removeItemStyleToPiece = ({ config, fromIndex, toIndex }) => {
 };
 
 export const itemFrame = ({ config, bundles, targetList }) => {
-  const sortedBundles = bundles.map((bundle) => [...bundle].sort((a, b) => a.index - b.index));
+  const attach = ({ fromIndex, toIndex, direction }) => {
+    const unitedConfig = uniteTiles2({
+      config,
+      preIndex: fromIndex,
+      nowIndex: toIndex,
+      direction: switchDirection(direction),
+    });
+    const updatedConfig = updateGroupByBundles({ config: unitedConfig, bundles });
+    config = cleanBorderStyle({ config: updatedConfig });
+  };
 
-  for (const bundle of sortedBundles) {
-    const bundleSet = new Set(bundle.map((item) => item.index));
-    // 1. currentPuzzle을 prevPuzzle에 붙인다..
-    // 2. 이미 순회했다면 방문처리..
-    for (const puzzle of bundle) {
-      const {
-        index: currentPuzzleIndex,
-        correctTopIndex,
-        correctBottomIndex,
-        correctLeftIndex,
-        correctRightIndex,
-      } = puzzle;
+  const visited = new Set(); // 순회한 퍼즐인덱스
+  const isSameBundle = (bundleSet, puzzleIndex) => bundleSet.has(puzzleIndex);
 
-      bundleSet.delete(currentPuzzleIndex); // 방문처리
+  // BFS
+  const processBundle = (bundle) => {
+    const result = [];
+    const bundleSet = new Set(bundle.map((b) => b.index));
+    const q = [];
 
-      // 상우하좌로 순회
-      const aroundPuzzles = [
-        correctTopIndex,
-        correctRightIndex,
-        correctBottomIndex,
-        correctLeftIndex,
-      ];
-      for (let direction = 0; direction < 4; direction += 1) {
-        const nextPuzzleIndex = aroundPuzzles[direction];
+    for (const p of bundle) {
+      if (!visited.has(p.index)) {
+        visited.add(p.index);
+        q.push(p);
+      }
 
-        // 범위를 벗어났거나 같은 그룹이 아니면 패스
-        if (nextPuzzleIndex === -1 || !bundleSet.has(nextPuzzleIndex)) {
-          continue;
+      while (q.length > 0) {
+        const puzzle = q.shift();
+        const {
+          index: currentPuzzleIndex,
+          correctTopIndex,
+          correctBottomIndex,
+          correctLeftIndex,
+          correctRightIndex,
+        } = puzzle;
+
+        result.push(currentPuzzleIndex);
+
+        // 상우하좌로 순회
+        const aroundPuzzles = [
+          correctTopIndex,
+          correctRightIndex,
+          correctBottomIndex,
+          correctLeftIndex,
+        ];
+        for (let direction = 0; direction < 4; direction += 1) {
+          const neighborPuzzleIndex = aroundPuzzles[direction];
+
+          // 순회할 수 없거나 같은 번들이 아니거나 이미 처리(방문)한 퍼즐이라면 패스
+          if (
+            neighborPuzzleIndex === -1 ||
+            !isSameBundle(bundleSet, neighborPuzzleIndex) ||
+            visited.has(neighborPuzzleIndex)
+          ) {
+            continue;
+          }
+
+          visited.add(neighborPuzzleIndex);
+          q.push(bundle.find((b) => b.index === neighborPuzzleIndex));
+
+          // console.log(`${neighborPuzzleIndex} 가 ${currentPuzzleIndex} 에 붙는다!`);
+          attach({
+            fromIndex: neighborPuzzleIndex,
+            toIndex: currentPuzzleIndex,
+            direction,
+          });
         }
-
-        // 같은 그룹이라면 nextPuzzleIndex를 방향에 맞게 currentPuzzleIndex에 붙인다.
-        const unitedConfig = uniteTiles2({
-          config,
-          nowIndex: currentPuzzleIndex,
-          preIndex: nextPuzzleIndex,
-          direction: switchDirection(direction),
-        });
-
-        bundleSet.delete(nextPuzzleIndex); // 방문처리
-
-        const updatedConfig = updateGroupByBundles({ config: unitedConfig, bundles });
-        config = cleanBorderStyle({ config: updatedConfig });
       }
     }
-  }
+
+    return result;
+  };
+
+  bundles.forEach((bundle) => {
+    const result = processBundle(bundle);
+    // console.log(result);
+  });
 
   return config;
 };

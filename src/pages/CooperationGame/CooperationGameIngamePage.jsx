@@ -23,7 +23,7 @@ import cooperationBackgroundPath from "@/assets/cooperationBackground.gif";
 import { Box, Dialog, DialogTitle } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
-import * as testcases from "./frameTest";
+import * as testcases from "../../_lib/item-frame-testcases";
 import { randomSprinkle } from "../../puzzle-core/utils";
 
 const { connect, send, subscribe, disconnect } = socket;
