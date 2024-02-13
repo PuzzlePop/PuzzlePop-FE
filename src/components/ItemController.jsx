@@ -38,7 +38,7 @@ export default function ItemController({ itemInventory, onSendUseItemMessage }) 
   }, [handleKeyDownItem]);
 
   return (
-    <Draggable defaultPosition={{ x: 1000, y: -200 }}>
+    <Draggable defaultPosition={{ x: 20, y: -800 }}>
       <Container>
         <h3>인벤토리</h3>
         <ItemSpaces>
@@ -61,6 +61,8 @@ const itemNameToKoreanMatcher = {
   MAGNET: "자석",
   HINT: "힌트",
   FRAME: "액자",
+  SHIELD: "쉴드",
+  MIRROR: "거울",
 };
 
 const match = (matcher) => (key) => {
