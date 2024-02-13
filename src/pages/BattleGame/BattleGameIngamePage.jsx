@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 
@@ -7,6 +7,7 @@ import Loading from "@/components/Loading";
 import Timer from "@/components/GameIngame/Timer";
 import PrograssBar from "@/components/GameIngame/ProgressBar";
 import Chatting from "@/components/GameWaiting/Chatting";
+import ItemController from "@/components/ItemController";
 
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
@@ -44,6 +45,7 @@ export default function BattleGameIngamePage() {
   const [enemyPercent, setEnemyPercent] = useState(0);
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
+  const [itemInventory, setItemInventory] = useState([null, null, null, null, null]);
 
   // const bundles = useRef([]);
   const dropRandomItem = useRef(null);
@@ -62,6 +64,20 @@ export default function BattleGameIngamePage() {
     setLoading(false);
   };
 
+  const handleSendUseItemMessage = useCallback((keyNumber) => {
+    send(
+      "/app/game/message",
+      {},
+      JSON.stringify({
+        type: "GAME",
+        roomId: getRoomId(),
+        sender: getSender(),
+        message: "USE_ITEM",
+        targets: keyNumber,
+      }),
+    );
+  }, []);
+
   const connectSocket = async () => {
     connect(
       () => {
@@ -70,12 +86,17 @@ export default function BattleGameIngamePage() {
           const data = JSON.parse(message.body);
           console.log(data);
 
-          // 1. timer 설정
+          // timer 설정
           if (!data.gameType && data.time) {
             setTime(data.time);
           }
 
-          // 2. 게임정보 받기
+          // 매번 보유아이템배열을 업데이트
+          if (data.redItemList) {
+            setItemInventory(data.redItemList);
+          }
+
+          // 게임정보 받기
           if (data.gameType && data.gameType === "BATTLE") {
             initializeGame(data);
             return;
@@ -431,7 +452,10 @@ export default function BattleGameIngamePage() {
               </Board>
             </>
 
-            {/* <ItemController /> */}
+            <ItemController
+              itemInventory={itemInventory}
+              onSendUseItemMessage={handleSendUseItemMessage}
+            />
           </div>
         )
       )}

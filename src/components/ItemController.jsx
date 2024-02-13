@@ -61,6 +61,8 @@ const itemNameToKoreanMatcher = {
   MAGNET: "자석",
   HINT: "힌트",
   FRAME: "액자",
+  SHIELD: "쉴드",
+  MIRROR: "거울",
 };
 
 const match = (matcher) => (key) => {
