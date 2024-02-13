@@ -142,7 +142,7 @@ const createPuzzleConfig = () => {
     });
   };
 
-  const usingItemFrame = (targetList) => {
+  const usingItemFrame = (targetList, bundles = []) => {
     console.log(targetList);
     console.log(config);
   };

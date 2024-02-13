@@ -41,3 +41,32 @@ export const removeItemStyleToPiece = ({ config, fromIndex, toIndex }) => {
   });
   return config;
 };
+
+export const itemFrame = ({ config, bundles, targetList }) => {
+  const N = config.redPuzzle.board.length;
+  const M = config.redPuzzle.board[0].length;
+
+  const frameIndexSet = new Set(targetList);
+
+  const visited = Array.from({ length: N }, () => new Array(M).fill(false));
+  const validateRange = (nx, ny) => {
+    return 0 <= nx && nx < N && 0 <= ny && ny < M;
+  };
+  const dx = [-1, 0, 1, 0];
+  const dy = [0, -1, 0, 1];
+
+  const queue = [[0, 0]];
+
+  while (queue.length > 0) {
+    const [x, y] = queue.shift();
+    for (let i = 0; i < 4; i += 1) {
+      const nx = x + dx[i];
+      const ny = y + dy[i];
+
+      // 범위를 벗어나거나 이미 방문한 곳이라면 pass
+      if (!validateRange(nx, ny) || visited[nx][ny]) {
+        continue;
+      }
+    }
+  }
+};

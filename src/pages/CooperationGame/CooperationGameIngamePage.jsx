@@ -23,6 +23,7 @@ import cooperationBackgroundPath from "@/assets/cooperationBackground.gif";
 import { Box, Dialog, DialogTitle } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
+import * as testcases from "./frameTest";
 
 const { connect, send, subscribe, disconnect } = socket;
 const {
@@ -73,13 +74,24 @@ export default function CooperationGameIngamePage() {
     );
   }, []);
 
-  const frameTest = () => {
-    const targetList = [
-      0, 11, 1, 2, 13, 3, 5, 6, 10, 21, 12, 23, 14, 25, 19, 30, 20, 22, 33, 24, 35, 32, 34, 45, 36,
-      44, 46, 54,
-    ];
-    const sortedTargetList = [...targetList].sort((a, b) => a - b);
-    usingItemFrame(sortedTargetList);
+  const frameTest1 = () => {
+    const { targetList, bundles } = testcases.testcase1;
+    usingItemFrame(targetList, bundles);
+  };
+
+  const frameTest2 = () => {
+    const { targetList, bundles } = testcases.testcase2;
+    usingItemFrame(targetList, bundles);
+  };
+
+  const frameTest3 = () => {
+    const { targetList, bundles } = testcases.testcase3;
+    usingItemFrame(targetList, bundles);
+  };
+
+  const frameTest4 = () => {
+    const { targetList, bundles } = testcases.testcase4;
+    usingItemFrame(targetList, bundles);
   };
 
   const getGameInfo = () => {
@@ -171,8 +183,8 @@ export default function CooperationGameIngamePage() {
 
           // "FRAME(액자)" 아이템 사용
           if (data.message && data.message === "FRAME") {
-            const { targetList } = data;
-            // usingItemFrame(targetList)
+            const { targetList, redBundles } = data;
+            usingItemFrame(targetList, redBundles);
             return;
           }
 
@@ -264,8 +276,11 @@ export default function CooperationGameIngamePage() {
         <Loading message="게임 정보 받아오는 중..." />
       ) : (
         <>
-          <button onClick={frameTest}>frame test</button>
           <button onClick={() => getGameInfo()}>게임 정보좀요</button>
+          <button onClick={frameTest1}>frame test1</button>
+          <button onClick={frameTest2}>frame test2</button>
+          <button onClick={frameTest3}>frame test3</button>
+          <button onClick={frameTest4}>frame test4</button>
           <Board>
             <PlayPuzzle
               category="cooperation"
