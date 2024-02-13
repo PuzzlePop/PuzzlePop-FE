@@ -15,8 +15,7 @@ import {
   RadioGroup,
   Radio,
 } from "@mui/material";
-import backgroundPath from "@/assets/background.gif";
-
+import backgroundPath from "@/assets/backgrounds/background.gif";
 
 export default function RankPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,7 +26,7 @@ export default function RankPage() {
   const [playedGameCountRankings, setPlayedGameCountRankings] = useState([]);
   const [soloBattleWindCountRankings, setSoloBattleWindCountRankings] = useState([]);
   const [teamBattleWindCountRankings, setTeamBattleWindCountRankings] = useState([]);
-  const [currentRankingType, setCurrentRankingType] = useState('winningRate'); // Default to winning rate
+  const [currentRankingType, setCurrentRankingType] = useState("winningRate"); // Default to winning rate
 
   useEffect(() => {
     // Fetch data when component mounts
@@ -54,18 +53,17 @@ export default function RankPage() {
 
   let rankings;
   const renderRankings = () => {
-    
     switch (currentRankingType) {
-      case 'winningRate':
+      case "winningRate":
         rankings = winningRateRankings;
         break;
-      case 'playedGameCount':
+      case "playedGameCount":
         rankings = playedGameCountRankings;
         break;
-      case 'soloBattleWinCount':
+      case "soloBattleWinCount":
         rankings = soloBattleWindCountRankings;
         break;
-      case 'teamBattleWinCount':
+      case "teamBattleWinCount":
         rankings = teamBattleWindCountRankings;
         break;
       default:
@@ -76,13 +74,14 @@ export default function RankPage() {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentRankings = rankings.slice(indexOfFirstItem, indexOfLastItem);
 
-    
     return (
       <CardContainer>
         {currentRankings.map((ranking, index) => (
           <Card key={index}>
             <ul>
-              <li>{currentRankingType} Rank: {ranking[currentRankingType]}</li>
+              <li>
+                {currentRankingType} Rank: {ranking[currentRankingType]}
+              </li>
               <li>Win Count: {ranking.winCount}</li>
               <li>Played Game Count: {ranking.playedGameCount}</li>
               <li>User ID: {ranking.user.id}</li>
@@ -101,22 +100,50 @@ export default function RankPage() {
 
       {/* Buttons for filtering rankings */}
       <ButtonContainer>
-        <Button variant="contained" onClick={() => setCurrentRankingType('winningRate')}
-        sx = {{backgroundColor: currentRankingType === 'winningRate' ? 'white' : 'black',
-        color: currentRankingType === 'winningRate' ? 'black' : 'white',
-        margin: '5px'}}>Winning Rate</Button>
-        <Button variant="contained" onClick={() => setCurrentRankingType('playedGameCount')}
-        sx = {{backgroundColor: currentRankingType === 'playedGameCount' ? 'white' : 'black',
-        color: currentRankingType === 'playedGameCount' ? 'black' : 'white',
-        margin: '5px'}}>Played Game Count</Button>
-        <Button variant="contained" onClick={() => setCurrentRankingType('soloBattleWinCount')}
-        sx = {{backgroundColor: currentRankingType === 'soloBattleWinCount' ? 'white' : 'black',
-        color: currentRankingType === 'soloBattleWinCount' ? 'black' : 'white',
-        margin: '5px'}}>Solo Battle Win Count</Button>
-        <Button variant="contained" onClick={() => setCurrentRankingType('teamBattleWinCount')}
-        sx = {{backgroundColor: currentRankingType === 'teamBattleWinCount' ? 'white' : 'black',
-        color: currentRankingType === 'teamBattleWinCount' ? 'black' : 'white',
-        margin: '5px'}}>Team Battle Win Count</Button>
+        <Button
+          variant="contained"
+          onClick={() => setCurrentRankingType("winningRate")}
+          sx={{
+            backgroundColor: currentRankingType === "winningRate" ? "white" : "black",
+            color: currentRankingType === "winningRate" ? "black" : "white",
+            margin: "5px",
+          }}
+        >
+          Winning Rate
+        </Button>
+        <Button
+          variant="contained"
+          onClick={() => setCurrentRankingType("playedGameCount")}
+          sx={{
+            backgroundColor: currentRankingType === "playedGameCount" ? "white" : "black",
+            color: currentRankingType === "playedGameCount" ? "black" : "white",
+            margin: "5px",
+          }}
+        >
+          Played Game Count
+        </Button>
+        <Button
+          variant="contained"
+          onClick={() => setCurrentRankingType("soloBattleWinCount")}
+          sx={{
+            backgroundColor: currentRankingType === "soloBattleWinCount" ? "white" : "black",
+            color: currentRankingType === "soloBattleWinCount" ? "black" : "white",
+            margin: "5px",
+          }}
+        >
+          Solo Battle Win Count
+        </Button>
+        <Button
+          variant="contained"
+          onClick={() => setCurrentRankingType("teamBattleWinCount")}
+          sx={{
+            backgroundColor: currentRankingType === "teamBattleWinCount" ? "white" : "black",
+            color: currentRankingType === "teamBattleWinCount" ? "black" : "white",
+            margin: "5px",
+          }}
+        >
+          Team Battle Win Count
+        </Button>
       </ButtonContainer>
 
       <hr />
@@ -124,9 +151,21 @@ export default function RankPage() {
       {/* <h2>{currentRankingType === 'winningRate' ? 'Winning Rate' : currentRankingType === 'playedGameCount' ? 'Played Game Count' : currentRankingType === 'soloBattleWinCount' ? 'Solo Battle Win Count' : currentRankingType === 'teamBattleWinCount' ? 'Team Battle Win Count' : 'User Ranking'} Rankings</h2> */}
       {renderRankings()}
       <PaginationContainer>
-        <StyledButton  variant="outlined" disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>Previous</StyledButton>
+        <StyledButton
+          variant="outlined"
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage(currentPage - 1)}
+        >
+          Previous
+        </StyledButton>
         <Typography>{currentPage}</Typography>
-        <StyledButton  variant="outlined" disabled={currentPage === Math.ceil(rankings.length / itemsPerPage)} onClick={() => setCurrentPage(currentPage + 1)}>Next</StyledButton>
+        <StyledButton
+          variant="outlined"
+          disabled={currentPage === Math.ceil(rankings.length / itemsPerPage)}
+          onClick={() => setCurrentPage(currentPage + 1)}
+        >
+          Next
+        </StyledButton>
       </PaginationContainer>
     </Wrapper>
   );
@@ -141,9 +180,6 @@ const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
 `;
-
-
-
 
 const CardContainer = styled.div`
   display: flex;

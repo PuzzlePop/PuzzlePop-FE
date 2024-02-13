@@ -13,13 +13,13 @@ import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import { configStore } from "@/puzzle-core";
-import { attackRocket } from "@/puzzle-core/attackItem";
+import { attackFire, attackRocket } from "@/puzzle-core/attackItem";
 import { updateGroupByBundles } from "@/puzzle-core/utils";
 
 import comboAudioPath from "@/assets/audio/combo.mp3";
-import redTeamBackgroundPath from "@/assets/redTeamBackground.gif";
-import blueTeamBackgroundPath from "@/assets/blueTeamBackground.gif";
-import dropRandomItemPath from "@/assets/dropRandomItem.gif";
+import redTeamBackgroundPath from "@/assets/backgrounds/redTeamBackground.gif";
+import blueTeamBackgroundPath from "@/assets/backgrounds/blueTeamBackground.gif";
+import dropRandomItemPath from "@/assets/effects/dropRandomItem.gif";
 
 import { Box, Dialog, DialogTitle } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -69,7 +69,8 @@ export default function BattleGameIngamePage() {
     cleanHint: blueCleanHint,
   } = useHint();
 
-  const dropRandomItem = useRef(null);
+  const dropRandomItemElement = useRef(null);
+  const currentDropRandomItem = useRef(null);
 
   const isLoaded = useMemo(() => {
     return gameData && gameData[`${getTeam()}Puzzle`] && gameData[`${getTeam()}Puzzle`].board;
@@ -289,8 +290,8 @@ export default function BattleGameIngamePage() {
           if (data.message && data.message === "ATTACK") {
             console.log("공격메세지", data);
             // dropRandomItem 삭제
-            if (dropRandomItem.current.parentNode) {
-              dropRandomItem.current.parentNode.removeChild(dropRandomItem.current);
+            if (dropRandomItemElement.current.parentNode) {
+              dropRandomItemElement.current.parentNode.removeChild(dropRandomItemElement.current);
             }
 
             const { targets, targetList, deleted, randomItem, redBundles, blueBundles } = data;
@@ -298,6 +299,8 @@ export default function BattleGameIngamePage() {
             if (randomItem.name === "FIRE") {
               console.log("랜덤 아이템 fire 였어!");
 
+              const attackedTeamBundles = getTeam() === "red" ? redBundles : blueBundles;
+              attackFire(targets, targetList, deleted, attackedTeamBundles);
               // // fire 당하는 팀의 효과
               // if (targets === getTeam().toUpperCase()) {
 
@@ -305,15 +308,15 @@ export default function BattleGameIngamePage() {
 
               // }
 
-              setTimeout(() => {
-                console.log("레드팀 번들", redBundles);
-                console.log("블루팀 번들", blueBundles);
-                if (targetList && targets === getTeam().toUpperCase()) {
-                  console.log("fire 발동 !!");
-                  const attackedTeamBundles = getTeam() === "red" ? redBundles : blueBundles;
-                  usingItemFire(attackedTeamBundles, targetList);
-                }
-              }, 2000);
+              // setTimeout(() => {
+              //   console.log("레드팀 번들", redBundles);
+              //   console.log("블루팀 번들", blueBundles);
+              //   if (targetList && targets === getTeam().toUpperCase()) {
+              //     console.log("fire 발동 !!");
+              //     const attackedTeamBundles = getTeam() === "red" ? redBundles : blueBundles;
+              //     usingItemFire(attackedTeamBundles, targetList);
+              //   }
+              // }, 2000);
             }
 
             if (randomItem.name === "ROCKET") {
@@ -346,16 +349,16 @@ export default function BattleGameIngamePage() {
           if (data.message && data.message === "SHIELD") {
             console.log("공격메세지 : 쉴드", data);
             // dropRandomItem 삭제
-            if (dropRandomItem.current.parentNode) {
-              dropRandomItem.current.parentNode.removeChild(dropRandomItem.current);
+            if (dropRandomItemElement.current.parentNode) {
+              dropRandomItemElement.current.parentNode.removeChild(dropRandomItemElement.current);
             }
           }
 
           if (data.message && data.message === "MIRROR") {
             console.log("공격메세지 : 거울", data);
             // dropRandomItem 삭제
-            if (dropRandomItem.current.parentNode) {
-              dropRandomItem.current.parentNode.removeChild(dropRandomItem.current);
+            if (dropRandomItemElement.current.parentNode) {
+              dropRandomItemElement.current.parentNode.removeChild(dropRandomItemElement.current);
             }
           }
 
@@ -394,8 +397,11 @@ export default function BattleGameIngamePage() {
             };
 
             // 버튼을 canvasContainer에 추가
-            dropRandomItem.current = dropRandomItemImg;
+            dropRandomItemElement.current = dropRandomItemImg;
             canvasContainer.appendChild(dropRandomItemImg);
+
+            // 현재 아이템 저장 (MIRROR 효과를 위해)
+            currentDropRandomItem.current = data.randomItem.name;
 
             // alert 대신 메시지를 콘솔에 출력
             console.log(

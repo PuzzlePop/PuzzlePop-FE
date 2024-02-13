@@ -12,7 +12,7 @@ import { getSender, getRoomId, setTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { request } from "@/apis/requestBuilder";
 
-import backgroundPath from "@/assets/battleBackground.gif";
+import backgroundPath from "@/assets/backgrounds/battleBackground.gif";
 
 const { connect, send, subscribe } = socket;
 

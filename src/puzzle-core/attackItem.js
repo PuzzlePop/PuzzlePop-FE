@@ -2,10 +2,24 @@ import { configStore } from "@/puzzle-core";
 import { getPuzzlePositionByIndex } from "@/puzzle-core/utils";
 import { getTeam } from "@/socket-utils/storage";
 
-import rocketPath from "@/assets/rocket.gif";
-import explosionPath from "@/assets/explosion.gif";
+import rocketPath from "@/assets/effects/rocket.gif";
+import explosionPath from "@/assets/effects/explosion.gif";
 
 const { getConfig, usingItemFire, usingItemRocket, usingItemEarthquake } = configStore;
+
+// 불 지르기 맞는 or 보내는 효과 + usingItemFire 함수 호출
+export const attackFire = (targets, targetList, deleted, bundles) => {
+  if (targetList.length === 0) {
+    return;
+  }
+
+  setTimeout(() => {
+    if (targetList && targets === getTeam().toUpperCase()) {
+      console.log("fire 발동 !!");
+      usingItemFire(bundles, targetList);
+    }
+  }, 2000);
+};
 
 // 로켓 맞는 or 보내는 효과 + usingItemRocket 함수 호출
 export const attackRocket = (targets, targetList, deleted) => {
