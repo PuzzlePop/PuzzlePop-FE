@@ -28,7 +28,7 @@ export default function FriendList() {
           <div>status: {item.friend_user_info.online_status}</div>
           <div>playing game id: {item.friend_user_info.playing_game_id}</div>
           <div>
-            <button onClick={() => navigate(`/dm/${friendId}`)}>DM</button>
+            <button onClick={() => navigate(`/dm/${item.friend_id}`)}>DM</button>
           </div>
         </div>
       ))}
