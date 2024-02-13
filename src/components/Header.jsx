@@ -54,7 +54,7 @@ export default function Header() {
   };
 
   const moveLogin = async () => {
-    const SERVER_URL = "https://i10a304.p.ssafy.io:8080"
+    const SERVER_URL = "https://i10a304.p.ssafy.io/api"
 
     if (isLoggedIn) {
       // 로그인 상태이면 로그아웃 처리
