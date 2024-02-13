@@ -419,54 +419,56 @@ export default function BattleGameIngamePage() {
     },
   });
 
-  if (!isLoaded) {
-    return <Loading message="게임 정보 받아오는 중..." />;
-  }
-
   return (
     <Wrapper>
-      <Board>
-        <PlayPuzzle
-          category="battle"
-          shapes={parsePuzzleShapes(
-            gameData[`${getTeam()}Puzzle`].board,
-            gameData.picture.widthPieceCnt,
-            gameData.picture.lengthPieceCnt,
-          )}
-          board={gameData[`${getTeam()}Puzzle`].board}
-          picture={gameData.picture}
-        />
-        <Row>
-          <ProgressWrapper>
-            <PrograssBar percent={ourPercent} isEnemy={false} />
-          </ProgressWrapper>
-          <ProgressWrapper>
-            <PrograssBar percent={enemyPercent} isEnemy={true} />
-          </ProgressWrapper>
-        </Row>
+      {!isLoaded ? (
+        <Loading message="게임 정보 받아오는 중..." />
+      ) : (
+        <>
+          <Board>
+            <PlayPuzzle
+              category="battle"
+              shapes={parsePuzzleShapes(
+                gameData[`${getTeam()}Puzzle`].board,
+                gameData.picture.widthPieceCnt,
+                gameData.picture.lengthPieceCnt,
+              )}
+              board={gameData[`${getTeam()}Puzzle`].board}
+              picture={gameData.picture}
+            />
+            <Row>
+              <ProgressWrapper>
+                <PrograssBar percent={ourPercent} isEnemy={false} />
+              </ProgressWrapper>
+              <ProgressWrapper>
+                <PrograssBar percent={enemyPercent} isEnemy={true} />
+              </ProgressWrapper>
+            </Row>
 
-        <Col>
-          <Timer num={time} />
-          <h3>이 그림을 맞춰주세요!</h3>
-          <img
-            src={pictureSrc}
-            alt="퍼즐 그림"
-            style={{ width: "100%", borderRadius: "10px", margin: "5px" }}
+            <Col>
+              <Timer num={time} />
+              <h3>이 그림을 맞춰주세요!</h3>
+              <img
+                src={pictureSrc}
+                alt="퍼즐 그림"
+                style={{ width: "100%", borderRadius: "10px", margin: "5px" }}
+              />
+              <Chatting chatHistory={chatHistory} isIngame={true} isBattle={true} />
+            </Col>
+          </Board>
+
+          <ItemController
+            itemInventory={itemInventory}
+            onSendUseItemMessage={handleSendUseItemMessage}
           />
-          <Chatting chatHistory={chatHistory} isIngame={true} isBattle={true} />
-        </Col>
-      </Board>
 
-      <ItemController
-        itemInventory={itemInventory}
-        onSendUseItemMessage={handleSendUseItemMessage}
-      />
-
-      <ThemeProvider theme={theme}>
-        <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
-          <DialogTitle>게임 결과</DialogTitle>
-        </Dialog>
-      </ThemeProvider>
+          <ThemeProvider theme={theme}>
+            <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
+              <DialogTitle>게임 결과</DialogTitle>
+            </Dialog>
+          </ThemeProvider>
+        </>
+      )}
     </Wrapper>
   );
 }
