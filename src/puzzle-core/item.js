@@ -1,4 +1,6 @@
 import { Color } from "paper/dist/paper-core";
+import { uniteTiles2 } from "./uniteTiles";
+import { cleanBorderStyle, switchDirection, updateGroupByBundles } from "./utils";
 
 // return { targetPuzzleIndex: number; name: string; itemId: number }[]
 export const searchItemList = (board) => {
@@ -43,30 +45,53 @@ export const removeItemStyleToPiece = ({ config, fromIndex, toIndex }) => {
 };
 
 export const itemFrame = ({ config, bundles, targetList }) => {
-  const N = config.redPuzzle.board.length;
-  const M = config.redPuzzle.board[0].length;
+  const sortedBundles = bundles.map((bundle) => [...bundle].sort((a, b) => a.index - b.index));
 
-  const frameIndexSet = new Set(targetList);
+  for (const bundle of sortedBundles) {
+    const bundleSet = new Set(bundle.map((item) => item.index));
+    // 1. currentPuzzle을 prevPuzzle에 붙인다..
+    // 2. 이미 순회했다면 방문처리..
+    for (const puzzle of bundle) {
+      const {
+        index: currentPuzzleIndex,
+        correctTopIndex,
+        correctBottomIndex,
+        correctLeftIndex,
+        correctRightIndex,
+      } = puzzle;
 
-  const visited = Array.from({ length: N }, () => new Array(M).fill(false));
-  const validateRange = (nx, ny) => {
-    return 0 <= nx && nx < N && 0 <= ny && ny < M;
-  };
-  const dx = [-1, 0, 1, 0];
-  const dy = [0, -1, 0, 1];
+      bundleSet.delete(currentPuzzleIndex); // 방문처리
 
-  const queue = [[0, 0]];
+      // 상우하좌로 순회
+      const aroundPuzzles = [
+        correctTopIndex,
+        correctRightIndex,
+        correctBottomIndex,
+        correctLeftIndex,
+      ];
+      for (let direction = 0; direction < 4; direction += 1) {
+        const nextPuzzleIndex = aroundPuzzles[direction];
 
-  while (queue.length > 0) {
-    const [x, y] = queue.shift();
-    for (let i = 0; i < 4; i += 1) {
-      const nx = x + dx[i];
-      const ny = y + dy[i];
+        // 범위를 벗어났거나 같은 그룹이 아니면 패스
+        if (nextPuzzleIndex === -1 || !bundleSet.has(nextPuzzleIndex)) {
+          continue;
+        }
 
-      // 범위를 벗어나거나 이미 방문한 곳이라면 pass
-      if (!validateRange(nx, ny) || visited[nx][ny]) {
-        continue;
+        // 같은 그룹이라면 nextPuzzleIndex를 방향에 맞게 currentPuzzleIndex에 붙인다.
+        const unitedConfig = uniteTiles2({
+          config,
+          nowIndex: currentPuzzleIndex,
+          preIndex: nextPuzzleIndex,
+          direction: switchDirection(direction),
+        });
+
+        bundleSet.delete(nextPuzzleIndex); // 방문처리
+
+        const updatedConfig = updateGroupByBundles({ config: unitedConfig, bundles });
+        config = cleanBorderStyle({ config: updatedConfig });
       }
     }
   }
+
+  return config;
 };

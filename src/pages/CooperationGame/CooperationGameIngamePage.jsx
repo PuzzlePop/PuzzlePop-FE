@@ -24,9 +24,11 @@ import { Box, Dialog, DialogTitle } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 import * as testcases from "./frameTest";
+import { randomSprinkle } from "../../puzzle-core/utils";
 
 const { connect, send, subscribe, disconnect } = socket;
 const {
+  getConfig,
   lockPuzzle,
   movePuzzle,
   unLockPuzzle,
@@ -94,6 +96,10 @@ export default function CooperationGameIngamePage() {
     usingItemFrame(targetList, bundles);
   };
 
+  const sprinkle = () => {
+    randomSprinkle({ config: getConfig() });
+  };
+
   const getGameInfo = () => {
     send(
       "/app/game/message",
@@ -113,7 +119,7 @@ export default function CooperationGameIngamePage() {
         console.log("@@@@@@@@@@@@@@@@ 인게임 소켓 연결 @@@@@@@@@@@@@@@@@@");
         subscribe(`/topic/game/room/${roomId}`, (message) => {
           const data = JSON.parse(message.body);
-          console.log(data);
+          // console.log(data);
 
           // 매번 게임이 끝났는지 체크
           if (Boolean(data.finished)) {
@@ -281,6 +287,7 @@ export default function CooperationGameIngamePage() {
           <button onClick={frameTest2}>frame test2</button>
           <button onClick={frameTest3}>frame test3</button>
           <button onClick={frameTest4}>frame test4</button>
+          <button onClick={sprinkle}>랜덤 뿌리기</button>
           <Board>
             <PlayPuzzle
               category="cooperation"

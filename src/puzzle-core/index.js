@@ -1,7 +1,7 @@
 import Paper from "paper";
 import { Point } from "paper/dist/paper-core";
 import { initializeConfig } from "./initializeConfig";
-import { removeItemStyleToPiece, searchItemList, setItemStyleToAllPiece } from "./item";
+import { itemFrame, removeItemStyleToPiece, searchItemList, setItemStyleToAllPiece } from "./item";
 import { setMoveEvent } from "./setMoveEvent";
 import { uniteTiles, uniteTiles2 } from "./uniteTiles";
 import { cleanBorderStyle, updateGroupByBundles } from "./utils";
@@ -143,8 +143,7 @@ const createPuzzleConfig = () => {
   };
 
   const usingItemFrame = (targetList, bundles = []) => {
-    console.log(targetList);
-    console.log(config);
+    config = itemFrame({ config, targetList, bundles });
   };
 
   const usingItemMagnet = (targetList, bundles = []) => {
