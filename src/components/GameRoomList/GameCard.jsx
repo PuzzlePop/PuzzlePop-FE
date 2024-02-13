@@ -41,10 +41,15 @@ export default function GameCard({ room, category }) {
   const chipMessage = `${parseInt(roomSize / 2)} : ${parseInt(roomSize / 2)}`;
 
   const enterRoom = async (roomId) => {
-    const sender = window.prompt("닉네임을 입력해주세요");
+
+    let sender = getCookie("userId"); // 쿠키에서 userId 가져오기
     if (!sender) {
-      return;
+      sender = window.prompt("닉네임을 입력해주세요");
+      if (!sender) {
+        return;
+      }
     }
+    
     setSender(sender);
     setRoomId(roomId);
     setTeam("red");
