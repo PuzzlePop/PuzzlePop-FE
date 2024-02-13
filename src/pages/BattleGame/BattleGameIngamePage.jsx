@@ -293,11 +293,11 @@ export default function BattleGameIngamePage() {
             if (randomItem.name === "ROCKET") {
               console.log("랜덤 아이템 rocket 였어!");
 
-              // rocket 당하는 팀의 효과
-              if (targets === getTeam().toUpperCase()) {
-              } else {
-                // rocket 발동하는 팀의 효과
-              }
+              // // rocket 당하는 팀의 효과
+              // if (targets === getTeam().toUpperCase()) {
+              // } else {
+              //   // rocket 발동하는 팀의 효과
+              // }
 
               setTimeout(() => {
                 // console.log("레드팀 번들", redBundles);
