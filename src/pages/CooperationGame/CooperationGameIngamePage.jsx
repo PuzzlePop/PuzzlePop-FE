@@ -14,7 +14,15 @@ import Hint from "../../components/GameItemEffects/Hint";
 import { useHint } from "../../hooks/useHint";
 
 const { connect, send, subscribe, disconnect } = socket;
-const { lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo, usingItemFrame } = configStore;
+const {
+  lockPuzzle,
+  movePuzzle,
+  unLockPuzzle,
+  addPiece,
+  addCombo,
+  usingItemFrame,
+  usingItemMagnet,
+} = configStore;
 
 export default function CooperationGameIngamePage() {
   const navigate = useNavigate();
@@ -58,6 +66,14 @@ export default function CooperationGameIngamePage() {
     usingItemFrame(sortedTargetList);
   };
 
+  const magnetExceptionTest1 = () => {
+    usingItemMagnet([0, -1, 1, 10, -1]);
+  };
+
+  const magnetExceptionTest2 = () => {
+    usingItemMagnet([2, -1, 3, 12, -1]);
+  };
+
   const getGameInfo = () => {
     send(
       "/app/game/message",
@@ -79,39 +95,26 @@ export default function CooperationGameIngamePage() {
           const data = JSON.parse(message.body);
           console.log(data);
 
-          // 매번 게임이 끝났는지 체크
-          if (Boolean(data.finished)) {
-            disconnect();
-            setIsOpenedToast(true);
-            return;
-          }
-
           // 매번 보유아이템배열을 업데이트
           if (data.redItemList) {
             setItemInventory(data.redItemList);
           }
 
-          // 게임정보 받기
-          if (data.gameType && data.gameType === "COOPERATION") {
-            setGameData(data);
-            return;
-          }
-
-          if (data.message && data.message === "LOCKED") {
+          if (data.message && data.message === "LOCKED" && data.senderId !== getSender()) {
             const { targets } = data;
             const targetList = JSON.parse(targets);
             targetList.forEach(({ x, y, index }) => lockPuzzle(x, y, index));
             return;
           }
 
-          if (data.message && data.message === "MOVE") {
+          if (data.message && data.message === "MOVE" && data.senderId !== getSender()) {
             const { targets } = data;
             const targetList = JSON.parse(targets);
             targetList.forEach(({ x, y, index }) => movePuzzle(x, y, index));
             return;
           }
 
-          if (data.message && data.message === "UNLOCKED") {
+          if (data.message && data.message === "UNLOCKED" && data.senderId !== getSender()) {
             const { targets } = data;
             const targetList = JSON.parse(targets);
             targetList.forEach(({ x, y, index }) => unLockPuzzle(x, y, index));
@@ -119,62 +122,20 @@ export default function CooperationGameIngamePage() {
           }
 
           if (data.message && data.message === "ADD_PIECE") {
-            const { targets, combo, comboCnt } = data;
+            const { targets, combo, comboCnt: comboCount } = data;
             const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
             addPiece({ fromIndex, toIndex });
             cleanHint({ fromIndex, toIndex });
-
             if (combo) {
-              console.log("콤보 효과 발동 !! : ", combo);
-              combo.forEach(([toIndex, fromIndex, direction]) =>
-                addCombo(fromIndex, toIndex, direction),
-              );
-
-              if (comboCnt) {
-                console.log(`${comboCnt} 콤보문구 생성`);
-                const comboText = document.createElement("h2");
-                const canvasContainer = document.getElementById("canvasContainer");
-                comboText.textContent = `${comboCnt}COMBO!!`;
-
-                comboText.style.zIndex = 100;
-                comboText.style.position = "fixed";
-                comboText.style.left = "50%";
-                comboText.style.top = "40px";
-                comboText.style.transform = "translate(-50%, 0)";
-                comboText.style.fontSize = "30px";
-
-                canvasContainer.appendChild(comboText);
-
-                console.log(comboText);
-                setTimeout(() => {
-                  console.log("콤보 문구 삭제");
-                  console.log(comboText);
-                  console.log(comboText.parentNode);
-                  console.log(comboText.parentElement);
-                  comboText.parentNode.removeChild(comboText);
-                }, 2000);
-              }
-
-              const audio = new Audio(comboAudioPath);
-              audio.loop = false;
-              audio.crossOrigin = "anonymous";
-              // audio.volume = 0.5;
-              audio.load();
-              try {
-                audio.play();
-              } catch (err) {
-                console.log(err);
-              }
+              effectCombo({ combo, comboCount });
             }
             return;
           }
 
           // "FRAME(액자)" 아이템 사용
           if (data.message && data.message === "FRAME") {
-            console.log("액자 사용한다~~!!!");
             const { targetList } = data;
-            console.log(targetList);
-            // targetList에 나온 index를 다 맞춰버린다.
+            // usingItemFrame(targetList)
             return;
           }
 
@@ -187,13 +148,24 @@ export default function CooperationGameIngamePage() {
 
           // "MAGNET(자석)" 아이템 사용
           if (data.message && data.message === "MAGNET") {
-            console.log("자석 사용한다~~!!!");
             const { targetList } = data;
-            console.log(targetList);
+            usingItemMagnet(targetList);
             return;
           }
 
-          // if ()
+          // 매번 게임이 끝났는지 체크
+          // TODO: 콤보로 인해 마지막 퍼즐조각이 클라이언트에서 맞춰지지 않았는데 게임종료가 되고 있음.. 이 현상 개선해야함.
+          if (Boolean(data.finished)) {
+            disconnect();
+            setIsOpenedToast(true);
+            return;
+          }
+
+          // 게임정보 받기
+          if (data.gameType && data.gameType === "COOPERATION") {
+            setGameData(data);
+            return;
+          }
         });
 
         // 서버로 메시지 전송
@@ -236,9 +208,15 @@ export default function CooperationGameIngamePage() {
 
   return (
     <>
-      <button onClick={frameTest}>frame test</button>
-      <button onClick={() => getGameInfo()}>게임 정보좀요</button>
-      <Toast open={isOpenedToast} onClose={handleCloseGame} message="게임 끝!!!" />
+      <button onClick={frameTest}>액자 아이템 테스트</button>
+      <button onClick={getGameInfo}>게임 정보좀요</button>
+      <button onClick={magnetExceptionTest1}>자석테스트1</button>
+      <button onClick={magnetExceptionTest2}>자석테스트2</button>
+      <Toast
+        open={isOpenedToast}
+        onClose={handleCloseGame}
+        message="게임 끝! 아무대나 클릭하면 게임이 종료됩니다."
+      />
       <h1>CooperationGameIngamePage : {roomId}</h1>
       <PlayPuzzle
         category="cooperation"
@@ -262,3 +240,49 @@ export default function CooperationGameIngamePage() {
     </>
   );
 }
+
+const effectCombo = ({ combo, comboCount }) => {
+  combo.forEach(([toIndex, fromIndex, direction]) => addCombo(fromIndex, toIndex, direction));
+  if (comboCount) {
+    renderComboAlert(comboCount);
+  }
+  onComboSound();
+};
+
+const renderComboAlert = (comboCnt) => {
+  console.log(`${comboCnt} 콤보문구 생성`);
+  const comboText = document.createElement("h2");
+  const canvasContainer = document.getElementById("canvasContainer");
+  comboText.textContent = `${comboCnt}COMBO!!`;
+
+  comboText.style.zIndex = 100;
+  comboText.style.position = "fixed";
+  comboText.style.left = "50%";
+  comboText.style.top = "40px";
+  comboText.style.transform = "translate(-50%, 0)";
+  comboText.style.fontSize = "30px";
+
+  canvasContainer.appendChild(comboText);
+
+  console.log(comboText);
+  setTimeout(() => {
+    console.log("콤보 문구 삭제");
+    console.log(comboText);
+    console.log(comboText.parentNode);
+    console.log(comboText.parentElement);
+    comboText.parentNode.removeChild(comboText);
+  }, 2000);
+};
+
+const onComboSound = () => {
+  const audio = new Audio(comboAudioPath);
+  audio.loop = false;
+  audio.crossOrigin = "anonymous";
+  // audio.volume = 0.5;
+  audio.load();
+  try {
+    audio.play();
+  } catch (err) {
+    console.log(err);
+  }
+};

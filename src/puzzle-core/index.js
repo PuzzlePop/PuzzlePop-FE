@@ -62,22 +62,6 @@ const createPuzzleConfig = () => {
   };
 
   const addCombo = (fromIndex, toIndex, direction) => {
-    let dir = -1;
-    switch (direction) {
-      case 0:
-        dir = 3;
-        break;
-      case 1:
-        dir = 0;
-        break;
-      case 2:
-        dir = 2;
-        break;
-      case 3:
-        dir = 1;
-        break;
-    }
-
     // console.log("addCombo 함수 실행 :", fromIndex, toIndex, direction, dir);
     // console.log(config);
 
@@ -87,7 +71,7 @@ const createPuzzleConfig = () => {
       preIndex: toIndex,
       isSender: false,
       isCombo: true,
-      direction: dir,
+      direction: switchDirection(direction),
     });
 
     config = nextConfig;
@@ -154,9 +138,44 @@ const createPuzzleConfig = () => {
     });
   };
 
-  const usingItemFrame = (puzzleIndexList) => {
-    console.log(puzzleIndexList);
+  const usingItemFrame = (targetList) => {
+    console.log(targetList);
+
     console.log(getConfig());
+  };
+
+  const usingItemMagnet = (targetList) => {
+    console.log(targetList);
+    const config = getConfig();
+
+    const [targetPuzzleIndex, ...aroundPuzzleIndexList] = targetList;
+    try {
+      for (let direction = 0; direction < 4; direction += 1) {
+        const puzzleIndex = aroundPuzzleIndexList[direction];
+        if (puzzleIndex === -1) {
+          continue;
+        }
+
+        uniteTiles({
+          config,
+          nowIndex: targetPuzzleIndex,
+          preIndex: puzzleIndex,
+          direction: switchDirection(direction),
+          isCombo: true,
+          isSender: false,
+        });
+      }
+
+      // TODO: 새롭게 그룹화된 녀석들을 붙여줘야함.
+      // 이미 "그룹" 인데 거리가 떨어져있다면 강제로 붙인다 ?
+      // 그룹을 해제할 수는 없음 (서버에서 이미 그룹으로 묶어놓았기 때문에...)
+      // 클라이언트에서 한번 그룹을 순회하면서 붙여버리기 ?
+      // 그룹과 그룹을 붙이는 함수 개발 ?
+
+      console.log(config);
+    } catch (error) {
+      console.log("자석 아이템을 사용할 퍼즐이 없어요.");
+    }
   };
 
   return {
@@ -172,7 +191,27 @@ const createPuzzleConfig = () => {
     usingItemRocket,
     usingItemEarthquake,
     usingItemFrame,
+    usingItemMagnet,
   };
 };
 
 export const configStore = createPuzzleConfig();
+
+const switchDirection = (direction) => {
+  let dir = -1;
+  switch (direction) {
+    case 0:
+      dir = 3;
+      break;
+    case 1:
+      dir = 0;
+      break;
+    case 2:
+      dir = 2;
+      break;
+    case 3:
+      dir = 1;
+      break;
+  }
+  return dir;
+};
