@@ -12,7 +12,7 @@ import { getSender, getRoomId, setTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { request } from "@/apis/requestBuilder";
 
-import backgroundPath from "@/assets/background.gif";
+import backgroundPath from "@/assets/battleBackground.gif";
 
 const { connect, send, subscribe } = socket;
 
@@ -44,9 +44,8 @@ export default function BattleGameWaitingPage() {
 
         // 1. 게임이 시작되면 인게임 화면으로 보낸다.
         if (data.gameId && Boolean(data.started) && !Boolean(data.finished)) {
-          navigate(`/game/battle/ingame/${data.gameId}`, {
-            replace: true,
-          });
+          window.location.href = `/game/battle/ingame/${data.gameId}`;
+          return;
         }
         setGameData(data);
       });
@@ -97,20 +96,20 @@ export default function BattleGameWaitingPage() {
     // eslint-disable-next-line
   }, []);
 
-  if (isLoading) {
-    return <Loading message="방 정보 불러오는 중..." />;
-  }
-
   return (
     <Wrapper>
       <Header />
-      <GameWaitingBoard
-        player={getSender()}
-        data={gameData}
-        allowedPiece={allowedPiece}
-        category="battle"
-        chatHistory={chatHistory}
-      />
+      {isLoading ? (
+        <Loading message="방 정보 불러오는 중..." />
+      ) : (
+        <GameWaitingBoard
+          player={getSender()}
+          data={gameData}
+          allowedPiece={allowedPiece}
+          category="battle"
+          chatHistory={chatHistory}
+        />
+      )}
       <Footer />
     </Wrapper>
   );
