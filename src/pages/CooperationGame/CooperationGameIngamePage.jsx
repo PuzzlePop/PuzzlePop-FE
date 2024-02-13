@@ -82,8 +82,12 @@ export default function CooperationGameIngamePage() {
           // 매번 게임이 끝났는지 체크
           if (Boolean(data.finished)) {
             disconnect();
-            setIsOpenedToast(true);
-            return;
+            console.log("게임 끝남 !");
+            // TODO : 게임 끝났을 때 effect
+            setTimeout(() => {
+              setIsOpenedToast(true);
+            }, 1000);
+            // return;
           }
 
           // 매번 보유아이템배열을 업데이트
@@ -97,21 +101,21 @@ export default function CooperationGameIngamePage() {
             return;
           }
 
-          if (data.message && data.message === "LOCKED") {
+          if (data.message && (data.message === "LOCKED") !== getSender()) {
             const { targets } = data;
             const targetList = JSON.parse(targets);
             targetList.forEach(({ x, y, index }) => lockPuzzle(x, y, index));
             return;
           }
 
-          if (data.message && data.message === "MOVE") {
+          if (data.message && (data.message === "MOVE") !== getSender()) {
             const { targets } = data;
             const targetList = JSON.parse(targets);
             targetList.forEach(({ x, y, index }) => movePuzzle(x, y, index));
             return;
           }
 
-          if (data.message && data.message === "UNLOCKED") {
+          if (data.message && (data.message === "UNLOCKED") !== getSender()) {
             const { targets } = data;
             const targetList = JSON.parse(targets);
             targetList.forEach(({ x, y, index }) => unLockPuzzle(x, y, index));

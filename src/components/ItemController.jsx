@@ -38,7 +38,7 @@ export default function ItemController({ itemInventory, onSendUseItemMessage }) 
   }, [handleKeyDownItem]);
 
   return (
-    <Draggable defaultPosition={{ x: 1000, y: -200 }}>
+    <Draggable defaultPosition={{ x: 20, y: -800 }}>
       <Container>
         <h3>인벤토리</h3>
         <ItemSpaces>

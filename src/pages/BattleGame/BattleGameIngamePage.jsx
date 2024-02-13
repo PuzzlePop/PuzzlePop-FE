@@ -19,10 +19,11 @@ import redTeamBackgroundPath from "@/assets/redTeamBackground.gif";
 import blueTeamBackgroundPath from "@/assets/blueTeamBackground.gif";
 import dropRandomItemPath from "@/assets/dropRandomItem.gif";
 
-import { Box } from "@mui/material";
-import { red, blue } from "@mui/material/colors";
+import { Box, Dialog, DialogTitle } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { red, blue, deepPurple } from "@mui/material/colors";
 
-const { connect, send, subscribe } = socket;
+const { connect, send, subscribe, disconnect } = socket;
 const {
   getConfig,
   lockPuzzle,
@@ -40,6 +41,8 @@ export default function BattleGameIngamePage() {
   const { roomId } = useParams();
   const [loading, setLoading] = useState(true);
   const [gameData, setGameData] = useState(null);
+  const [isOpenedDialog, setIsOpenedDialog] = useState(false);
+
   const [time, setTime] = useState(0);
   const [ourPercent, setOurPercent] = useState(0);
   const [enemyPercent, setEnemyPercent] = useState(0);
@@ -50,12 +53,11 @@ export default function BattleGameIngamePage() {
   // const bundles = useRef([]);
   const dropRandomItem = useRef(null);
 
-  const finishGame = (data) => {
-    if (data.finished === true) {
-      window.alert("게임이 종료되었습니다.");
-      window.location.href = `/game/battle/waiting/${roomId}`;
-      return;
-    }
+  const handleCloseGame = () => {
+    setIsOpenedDialog(false);
+    navigate(`/game/battle`, {
+      replace: true,
+    });
   };
 
   const initializeGame = (data) => {
@@ -85,6 +87,17 @@ export default function BattleGameIngamePage() {
         subscribe(`/topic/game/room/${roomId}`, (message) => {
           const data = JSON.parse(message.body);
           console.log(data);
+
+          // 매번 게임이 끝났는지 체크
+          if (Boolean(data.finished)) {
+            disconnect();
+            console.log("게임 끝남 !");
+            // TODO : 게임 끝났을 때 effect
+            setTimeout(() => {
+              setIsOpenedDialog(true);
+            }, 1000);
+            // return;
+          }
 
           // timer 설정
           if (!data.gameType && data.time) {
@@ -186,7 +199,6 @@ export default function BattleGameIngamePage() {
                 }
               }
 
-              finishGame(data);
               return;
             }
           }
@@ -408,6 +420,12 @@ export default function BattleGameIngamePage() {
     }
   }, [gameData]);
 
+  const theme = createTheme({
+    typography: {
+      fontFamily: "'Galmuri11', sans-serif",
+    },
+  });
+
   return (
     <Wrapper>
       {/* <h1>BattleGameIngamePage : {roomId}</h1> */}
@@ -456,6 +474,12 @@ export default function BattleGameIngamePage() {
               itemInventory={itemInventory}
               onSendUseItemMessage={handleSendUseItemMessage}
             />
+
+            <ThemeProvider theme={theme}>
+              <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
+                <DialogTitle>게임 결과</DialogTitle>
+              </Dialog>
+            </ThemeProvider>
           </div>
         )
       )}
