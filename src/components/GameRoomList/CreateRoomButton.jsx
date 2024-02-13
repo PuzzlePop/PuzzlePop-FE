@@ -47,11 +47,15 @@ export default function CreateRoomButton({ category }) {
     if (!roomTitle) {
       return;
     }
-
-    const sender = window.prompt("닉네임을 입력해주세요");
+    
+    let sender = getCookie("userId"); // 쿠키에서 userId 가져오기
     if (!sender) {
-      return;
+      sender = window.prompt("닉네임을 입력해주세요");
+      if (!sender) {
+        return;
+      }
     }
+    
     setSender(sender);
     setTeam("red");
 
