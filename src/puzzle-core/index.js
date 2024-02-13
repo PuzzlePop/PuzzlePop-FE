@@ -3,7 +3,8 @@ import { Point } from "paper/dist/paper-core";
 import { initializeConfig } from "./initializeConfig";
 import { removeItemStyleToPiece, searchItemList, setItemStyleToAllPiece } from "./item";
 import { setMoveEvent } from "./setMoveEvent";
-import { uniteTiles } from "./uniteTiles";
+import { uniteTiles, uniteTiles2 } from "./uniteTiles";
+import { cleanBorderStyle, updateGroupByBundles } from "./utils";
 
 const createPuzzleConfig = () => {
   let config = {};
@@ -47,7 +48,7 @@ const createPuzzleConfig = () => {
     // TODO: 여기서 Lock에 대한 UI처리를 해제한다.
   };
 
-  const addPiece = ({ fromIndex, toIndex }) => {
+  const addPiece = ({ fromIndex, toIndex }, bundles = []) => {
     const afterUnitedConfig = uniteTiles({
       config,
       preIndex: fromIndex,
@@ -58,10 +59,11 @@ const createPuzzleConfig = () => {
       fromIndex,
       toIndex,
     });
-    config = afterCheckItemConfig;
+    const updatedConfig = updateGroupByBundles({ config: afterCheckItemConfig, bundles });
+    config = cleanBorderStyle({ config: updatedConfig });
   };
 
-  const addCombo = (fromIndex, toIndex, direction) => {
+  const addCombo = (fromIndex, toIndex, direction, bundles = []) => {
     // console.log("addCombo 함수 실행 :", fromIndex, toIndex, direction, dir);
     // console.log(config);
 
@@ -74,7 +76,8 @@ const createPuzzleConfig = () => {
       direction: switchDirection(direction),
     });
 
-    config = nextConfig;
+    const updatedConfig = updateGroupByBundles({ config: nextConfig, bundles });
+    config = cleanBorderStyle({ config: updatedConfig });
   };
 
   // 공격형 아이템 fire
@@ -140,39 +143,29 @@ const createPuzzleConfig = () => {
 
   const usingItemFrame = (targetList) => {
     console.log(targetList);
-
     console.log(getConfig());
   };
 
-  const usingItemMagnet = (targetList) => {
-    console.log(targetList);
-    const config = getConfig();
-
+  const usingItemMagnet = (targetList, bundles = []) => {
     const [targetPuzzleIndex, ...aroundPuzzleIndexList] = targetList;
     try {
       for (let direction = 0; direction < 4; direction += 1) {
+        const prevConfig = getConfig();
         const puzzleIndex = aroundPuzzleIndexList[direction];
         if (puzzleIndex === -1) {
           continue;
         }
 
-        uniteTiles({
-          config,
+        const unitedConfig = uniteTiles2({
+          config: prevConfig,
           nowIndex: targetPuzzleIndex,
           preIndex: puzzleIndex,
           direction: switchDirection(direction),
-          isCombo: true,
-          isSender: false,
         });
+
+        const updatedConfig = updateGroupByBundles({ config: unitedConfig, bundles });
+        config = cleanBorderStyle({ config: updatedConfig });
       }
-
-      // TODO: 새롭게 그룹화된 녀석들을 붙여줘야함.
-      // 이미 "그룹" 인데 거리가 떨어져있다면 강제로 붙인다 ?
-      // 그룹을 해제할 수는 없음 (서버에서 이미 그룹으로 묶어놓았기 때문에...)
-      // 클라이언트에서 한번 그룹을 순회하면서 붙여버리기 ?
-      // 그룹과 그룹을 붙이는 함수 개발 ?
-
-      console.log(config);
     } catch (error) {
       console.log("자석 아이템을 사용할 퍼즐이 없어요.");
     }

@@ -66,14 +66,6 @@ export default function CooperationGameIngamePage() {
     usingItemFrame(sortedTargetList);
   };
 
-  const magnetExceptionTest1 = () => {
-    usingItemMagnet([0, -1, 1, 10, -1]);
-  };
-
-  const magnetExceptionTest2 = () => {
-    usingItemMagnet([2, -1, 3, 12, -1]);
-  };
-
   const getGameInfo = () => {
     send(
       "/app/game/message",
@@ -122,12 +114,12 @@ export default function CooperationGameIngamePage() {
           }
 
           if (data.message && data.message === "ADD_PIECE") {
-            const { targets, combo, comboCnt: comboCount } = data;
+            const { targets, combo, comboCnt: comboCount, redBundles } = data;
             const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
-            addPiece({ fromIndex, toIndex });
+            addPiece({ fromIndex, toIndex }, redBundles);
             cleanHint({ fromIndex, toIndex });
             if (combo) {
-              effectCombo({ combo, comboCount });
+              effectCombo({ combo, comboCount }, redBundles);
             }
             return;
           }
@@ -148,8 +140,8 @@ export default function CooperationGameIngamePage() {
 
           // "MAGNET(자석)" 아이템 사용
           if (data.message && data.message === "MAGNET") {
-            const { targetList } = data;
-            usingItemMagnet(targetList);
+            const { targetList, redBundles } = data;
+            usingItemMagnet(targetList, redBundles);
             return;
           }
 
@@ -210,8 +202,6 @@ export default function CooperationGameIngamePage() {
     <>
       <button onClick={frameTest}>액자 아이템 테스트</button>
       <button onClick={getGameInfo}>게임 정보좀요</button>
-      <button onClick={magnetExceptionTest1}>자석테스트1</button>
-      <button onClick={magnetExceptionTest2}>자석테스트2</button>
       <Toast
         open={isOpenedToast}
         onClose={handleCloseGame}
@@ -241,8 +231,10 @@ export default function CooperationGameIngamePage() {
   );
 }
 
-const effectCombo = ({ combo, comboCount }) => {
-  combo.forEach(([toIndex, fromIndex, direction]) => addCombo(fromIndex, toIndex, direction));
+const effectCombo = ({ combo, comboCount }, bundles) => {
+  combo.forEach(([toIndex, fromIndex, direction]) =>
+    addCombo(fromIndex, toIndex, direction, bundles),
+  );
   if (comboCount) {
     renderComboAlert(comboCount);
   }
