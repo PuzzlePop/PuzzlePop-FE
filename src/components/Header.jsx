@@ -10,6 +10,7 @@ import { AppBar, Toolbar, Button } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 import GamePageNavigation from "@/components/GamePageNavigation";
+import { request } from '../apis/requestBuilder';
 
 export default function Header() {
   const navigate = useNavigate();
@@ -54,14 +55,16 @@ export default function Header() {
   };
 
   const moveLogin = async () => {
-    const SERVER_URL = "https://i10a304.p.ssafy.io:8080"
+    const SERVER_URL = "https://i10a304.p.ssafy.io/api"
 
     if (isLoggedIn) {
       // 로그인 상태이면 로그아웃 처리
-      window.location.href = `${SERVER_URL}/logout`;
+      // window.location.href = `${SERVER_URL}/logout`;
+      request.get(`${SERVER_URL}/logout`)
     } else {
       // 로그아웃 상태이면 로그인 처리
-      window.location.href = `${SERVER_URL}/login`;
+      // window.location.href = `${SERVER_URL}/login`;
+      request.get(`${SERVER_URL}/login`)
     }
   }
 
