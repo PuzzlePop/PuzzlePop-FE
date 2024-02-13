@@ -18,6 +18,7 @@ import comboAudioPath from "@/assets/audio/combo.mp3";
 import redTeamBackgroundPath from "@/assets/redTeamBackground.gif";
 import blueTeamBackgroundPath from "@/assets/blueTeamBackground.gif";
 import dropRandomItemPath from "@/assets/dropRandomItem.gif";
+import rocketPath from "@/assets/rocket.gif";
 
 import { Box, Dialog, DialogTitle } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -109,8 +110,7 @@ export default function BattleGameIngamePage() {
           // 매번 게임이 끝났는지 체크
           if (Boolean(data.finished)) {
             // disconnect();
-            console.log("게임 끝남 !");
-            // TODO : 게임 끝났을 때 effect
+            console.log("게임 끝남 !"); // TODO : 게임 끝났을 때 effect
             setTimeout(() => {
               setIsOpenedDialog(true);
             }, 1000);
@@ -269,18 +269,6 @@ export default function BattleGameIngamePage() {
 
             const { targets, targetList, deleted, randomItem, redBundles, blueBundles } = data;
 
-            // console.log("나 게임 인포 보낸다?");
-            // send(
-            //   "/app/game/message",
-            //   {},
-            //   JSON.stringify({
-            //     type: "GAME",
-            //     message: "GAME_INFO",
-            //     roomId: getRoomId(),
-            //     sender: getSender(),
-            //   }),
-            // );
-
             if (randomItem.name === "FIRE") {
               console.log("랜덤 아이템 fire 였어!");
 
@@ -305,11 +293,11 @@ export default function BattleGameIngamePage() {
             if (randomItem.name === "ROCKET") {
               console.log("랜덤 아이템 rocket 였어!");
 
-              // // rocket 당하는 팀의 효과
+              // rocket 당하는 팀의 효과
               // if (targets === getTeam().toUpperCase()) {
 
-              // } else { // rocket 발동하는 팀의 효과
-
+              // } else {
+              //   // rocket 발동하는 팀의 효과
               // }
 
               setTimeout(() => {
@@ -347,13 +335,11 @@ export default function BattleGameIngamePage() {
           if (data.message && data.message === "SHIELD") {
             console.log("공격메세지 : 쉴드", data);
             // dropRandomItem 삭제
-            dropRandomItem.current.parentNode.removeChild(dropRandomItem.current);
+            dropRandomItem.current?.parentNode.removeChild(dropRandomItem.current);
           }
 
           if (data.message && data.message === "MIRROR") {
             console.log("공격메세지 : 거울", data);
-            // dropRandomItem 삭제
-            dropRandomItem.current.parentNode.removeChild(dropRandomItem.current);
           }
 
           // drop random Item 생성
@@ -475,75 +461,77 @@ export default function BattleGameIngamePage() {
     },
   });
 
-  if (!isLoaded) {
-    return <Loading message="게임 정보 받아오는 중..." />;
-  }
-
   return (
     <Wrapper>
-      <Board>
-        <PlayPuzzle
-          category="battle"
-          shapes={parsePuzzleShapes(
-            gameData[`${getTeam()}Puzzle`].board,
-            gameData.picture.widthPieceCnt,
-            gameData.picture.lengthPieceCnt,
-          )}
-          board={gameData[`${getTeam()}Puzzle`].board}
-          picture={gameData.picture}
-        />
-        <Row>
-          <ProgressWrapper>
-            <PrograssBar percent={ourPercent} isEnemy={false} />
-          </ProgressWrapper>
-          <ProgressWrapper>
-            <PrograssBar percent={enemyPercent} isEnemy={true} />
-          </ProgressWrapper>
-        </Row>
-
-        <Col>
-          <Timer num={time} />
-          <h3>이 그림을 맞춰주세요!</h3>
-          <img
-            src={pictureSrc}
-            alt="퍼즐 그림"
-            style={{ width: "100%", borderRadius: "10px", margin: "5px" }}
-          />
-          <Chatting chatHistory={chatHistory} isIngame={true} isBattle={true} />
-        </Col>
-      </Board>
-
-      {getTeam() === "red" ? (
-        <>
-          <ItemController
-            itemInventory={redItemInventory}
-            onSendUseItemMessage={handleSendUseItemMessage}
-          />
-          {document.querySelector("#canvasContainer") &&
-            createPortal(
-              <Hint hintList={redHintList} onClose={redCloseHint} />,
-              document.querySelector("#canvasContainer"),
-            )}
-        </>
+      {!isLoaded ? (
+        <Loading message="게임 정보 받아오는 중..." />
       ) : (
         <>
-          <ItemController
-            itemInventory={blueItemInventory}
-            onSendUseItemMessage={handleSendUseItemMessage}
-          />
-          {document.querySelector("#canvasContainer") &&
-            createPortal(
-              <Hint hintList={blueHintList} onClose={blueCloseHint} />,
-              document.querySelector("#canvasContainer"),
-            )}
+          <Board>
+            <PlayPuzzle
+              category="battle"
+              shapes={parsePuzzleShapes(
+                gameData[`${getTeam()}Puzzle`].board,
+                gameData.picture.widthPieceCnt,
+                gameData.picture.lengthPieceCnt,
+              )}
+              board={gameData[`${getTeam()}Puzzle`].board}
+              picture={gameData.picture}
+            />
+            <Row>
+              <ProgressWrapper>
+                <PrograssBar percent={ourPercent} isEnemy={false} />
+              </ProgressWrapper>
+              <ProgressWrapper>
+                <PrograssBar percent={enemyPercent} isEnemy={true} />
+              </ProgressWrapper>
+            </Row>
+
+            <Col>
+              <Timer num={time} />
+              <h3>이 그림을 맞춰주세요!</h3>
+              <img
+                src={pictureSrc}
+                alt="퍼즐 그림"
+                style={{ width: "100%", borderRadius: "10px", margin: "5px" }}
+              />
+              <Chatting chatHistory={chatHistory} isIngame={true} isBattle={true} />
+            </Col>
+          </Board>
+
+          {getTeam() === "red" ? (
+            <>
+              <ItemController
+                itemInventory={redItemInventory}
+                onSendUseItemMessage={handleSendUseItemMessage}
+              />
+              {document.querySelector("#canvasContainer") &&
+                createPortal(
+                  <Hint hintList={redHintList} onClose={redCloseHint} />,
+                  document.querySelector("#canvasContainer"),
+                )}
+            </>
+          ) : (
+            <>
+              <ItemController
+                itemInventory={blueItemInventory}
+                onSendUseItemMessage={handleSendUseItemMessage}
+              />
+              {document.querySelector("#canvasContainer") &&
+                createPortal(
+                  <Hint hintList={blueHintList} onClose={blueCloseHint} />,
+                  document.querySelector("#canvasContainer"),
+                )}
+            </>
+          )}
+
+          <ThemeProvider theme={theme}>
+            <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
+              <DialogTitle>게임 결과</DialogTitle>
+            </Dialog>
+          </ThemeProvider>
         </>
       )}
-
-      <ThemeProvider theme={theme}>
-        <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
-          <DialogTitle>게임 결과</DialogTitle>
-        </Dialog>
-      </ThemeProvider>
     </Wrapper>
   );
 }
