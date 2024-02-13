@@ -79,6 +79,11 @@ export default function Chatting({ chatHistory, isbattleingame = false }) {
   });
 
   const currentTheme = !isbattleingame ? "purple" : getTeam() === "red" ? "redTeam" : "blueTeam";
+  const currentScrollbarTheme = !isbattleingame
+    ? deepPurple[300]
+    : getTeam() === "red"
+      ? red[300]
+      : blue[300];
 
   return (
     <ThemeProvider theme={theme}>
@@ -90,7 +95,7 @@ export default function Chatting({ chatHistory, isbattleingame = false }) {
               flexGrow: 1,
               margin: "10px",
               overflowY: "scroll",
-              scrollbarColor: "#9575cd rgba(255, 255, 255, 0)",
+              scrollbarColor: `${currentScrollbarTheme} rgba(255, 255, 255, 0)`,
             }}
           >
             {/* 채팅 기록을 화면에 출력 */}
