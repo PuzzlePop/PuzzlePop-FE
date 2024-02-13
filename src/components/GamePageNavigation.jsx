@@ -1,11 +1,12 @@
 import { useState } from "react";
 import styled from "styled-components";
 import { Link, useLocation } from "react-router-dom";
-import { Box, Tabs, Tab, createTheme, ThemeProvider } from "@mui/material";
+import { Box, Tabs, Tab } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 
 export default function GamePageNavigation() {
-  const url = useLocation().pathname.split("/")[2] || "single";
+  const url = useLocation().pathname.split("/")[2] || "cooperation";
   const isGame = useLocation().pathname.split("/")[1] === "game" ? true : false;
   const [value, setValue] = useState(url);
 
@@ -45,14 +46,20 @@ export default function GamePageNavigation() {
       <ThemeProvider theme={theme}>
         {isGame && (
           <Tabs value={value}>
-            <Tab
+            {/* <Tab
               label="싱글"
               value="single"
               component={Link}
               to="/game/single"
               sx={{ marginLeft: "10%" }}
+            /> */}
+            <Tab
+              label="협동"
+              value="cooperation"
+              component={Link}
+              to="/game/cooperation"
+              sx={{ marginLeft: "10%" }}
             />
-            <Tab label="협동" value="cooperation" component={Link} to="/game/cooperation" />
             <Tab label="배틀" value="battle" component={Link} to="/game/battle" />
           </Tabs>
         )}

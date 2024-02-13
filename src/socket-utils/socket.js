@@ -10,16 +10,10 @@ const SOCKET_END_POINT = `${SERVER_END_POINT}/game`;
 const createSocket = () => {
   let sock;
   let stomp;
-  const subscriptions = new Set();
 
   const connect = (onConnectCallback, onError) => {
-    if (!sock) {
-      sock = new SockJS(SOCKET_END_POINT);
-    }
-
-    if (!stomp) {
-      stomp = StompJS.over(sock);
-    }
+    sock = new SockJS(SOCKET_END_POINT);
+    stomp = StompJS.over(sock);
 
     stomp.connect({}, onConnectCallback, onError);
   };
@@ -28,6 +22,7 @@ const createSocket = () => {
     if (!stomp) {
       return;
     }
+
     stomp.send(destination, obj, message);
   };
 
@@ -35,19 +30,11 @@ const createSocket = () => {
     if (!stomp) {
       return;
     }
-    const subscription = stomp.subscribe(destination, onMessageReceiverCallback);
-    subscriptions.add(subscription);
-    return subscription;
-  };
 
-  const unsubscribe = (subscription) => {
-    subscription.unsubscribe();
-    subscriptions.delete(subscription);
+    stomp.subscribe(destination, onMessageReceiverCallback);
   };
 
   const disconnect = () => {
-    subscriptions.forEach((sub) => sub.unsubscribe());
-
     if (!stomp) {
       return;
     }
@@ -59,7 +46,6 @@ const createSocket = () => {
     connect,
     send,
     subscribe,
-    unsubscribe,
     disconnect,
   };
 };

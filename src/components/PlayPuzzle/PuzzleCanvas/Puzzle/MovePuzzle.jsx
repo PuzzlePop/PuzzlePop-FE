@@ -9,7 +9,7 @@ import comboEffectPath from "@/assets/comboEffect.gif";
 
 const { send } = socket;
 
-export let config;
+let config;
 
 const getPuzzleGroup = (paperEvent) => {
   const puzzleUniqueId = paperEvent.target.id;
@@ -353,25 +353,27 @@ const fitTiles = (
 
   if (isCombo) {
     console.log(`${nowTile.position._x}, ${nowTile.position._y}에 img 생성!`);
-    const comboEffect = document.createElement("img");
     const canvasContainer = document.getElementById("canvasContainer");
-    comboEffect.src = comboEffectPath;
+    if (canvasContainer) {
+      const comboEffect = document.createElement("img");
 
-    comboEffect.style.zIndex = 100;
-    comboEffect.style.position = "absolute";
-    comboEffect.style.left = `${nowTile.position._x}px`;
-    comboEffect.style.top = `${nowTile.position._y}px`;
+      comboEffect.src = comboEffectPath;
+      comboEffect.style.zIndex = 100;
+      comboEffect.style.position = "absolute";
+      comboEffect.style.left = `${nowTile.position._x}px`;
+      comboEffect.style.top = `${nowTile.position._y}px`;
 
-    canvasContainer.appendChild(comboEffect);
+      canvasContainer && canvasContainer.appendChild(comboEffect);
 
-    console.log(comboEffect);
-    setTimeout(() => {
-      console.log("effect 삭제");
       console.log(comboEffect);
-      console.log(comboEffect.parentNode);
-      console.log(comboEffect.parentElement);
-      comboEffect.parentNode.removeChild(comboEffect);
-    }, 500);
+      setTimeout(() => {
+        console.log("effect 삭제");
+        console.log(comboEffect);
+        console.log(comboEffect.parentNode);
+        console.log(comboEffect.parentElement);
+        comboEffect.parentNode.removeChild(comboEffect);
+      }, 500);
+    }
   }
 
   // console.log("flag && uniteFlag: ", flag && uniteFlag);

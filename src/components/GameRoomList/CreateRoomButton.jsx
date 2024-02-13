@@ -12,10 +12,8 @@ import {
   FormControlLabel,
   RadioGroup,
   Radio,
-  createTheme,
-  ThemeProvider,
-  deprecatedPropType,
 } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 import { request } from "@/apis/requestBuilder";
 import { setRoomId, setSender, setTeam } from "@/socket-utils/storage";
@@ -30,6 +28,12 @@ export default function CreateRoomButton({ category }) {
     setRoomTitle("");
     setRoomSize(2);
     setIsOpenedModal(false);
+  };
+
+  const handleKeyUp = (e) => {
+    if (e.keyCode === 13) {
+      createRoom();
+    }
   };
 
   const handleRoomSize = (e) => {
@@ -170,6 +174,7 @@ export default function CreateRoomButton({ category }) {
                 label="방 제목"
                 value={roomTitle}
                 onChange={(e) => setRoomTitle(e.target.value)}
+                onKeyUp={handleKeyUp}
                 sx={{ width: "100%" }}
               />
             </Grid>

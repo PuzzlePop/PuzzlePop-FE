@@ -1,26 +1,20 @@
 import { useCallback, useEffect } from "react";
-import { getRoomId, getSender } from "../socket-utils/storage";
-import { socket } from "../socket-utils/socket";
+import styled from "styled-components";
+import Draggable from "react-draggable";
 
-const { send } = socket;
+export default function ItemController({ itemInventory, onSendUseItemMessage }) {
+  const _useItem = useCallback(
+    (keyNumber) => {
+      console.log(`<ItemController /> : ${keyNumber} 키 누름!!!`);
 
-export default function ItemController() {
-  const _useItem = useCallback((keyNumber) => {
-    console.log(keyNumber);
+      if (itemInventory[keyNumber - 1] && onSendUseItemMessage) {
+        onSendUseItemMessage(keyNumber);
+      }
+    },
+    [onSendUseItemMessage, itemInventory],
+  );
 
-    send(
-      "/app/game/message",
-      {},
-      JSON.stringify({
-        type: "GAME",
-        roomId: getRoomId(),
-        sender: getSender(),
-        message: "USE_ITEM",
-        targets: keyNumber,
-      }),
-    );
-  }, []);
-
+  // 1, 2, 3, 4, 5 키에 아이템사용
   const handleKeyDownItem = useCallback(
     (event) => {
       if (!event.code) {
@@ -44,12 +38,82 @@ export default function ItemController() {
   }, [handleKeyDownItem]);
 
   return (
-    <>
-      <button onClick={() => _useItem(1)}>1</button>
-      <button onClick={() => _useItem(2)}>2</button>
-      <button onClick={() => _useItem(3)}>3</button>
-      <button onClick={() => _useItem(4)}>4</button>
-      <button onClick={() => _useItem(5)}>5</button>
-    </>
+    <Draggable defaultPosition={{ x: 1000, y: -200 }}>
+      <Container>
+        <h3>인벤토리</h3>
+        <ItemSpaces>
+          {itemInventory.map((item, index) => (
+            <ItemSpace key={index}>
+              <ItemButton onClick={() => _useItem(index + 1)}>
+                <div>{item ? matchItemNameToKorean(item.name) : "비어있음"}</div>
+              </ItemButton>
+              <div>{index + 1}</div>
+            </ItemSpace>
+          ))}
+        </ItemSpaces>
+      </Container>
+    </Draggable>
   );
 }
+
+/************************ utils ************************/
+const itemNameToKoreanMatcher = {
+  MAGNET: "자석",
+  HINT: "힌트",
+  FRAME: "액자",
+};
+
+const match = (matcher) => (key) => {
+  const value = matcher[key];
+  if (value === undefined) {
+    throw new Error("matcher value is undefined");
+  }
+  return matcher[key];
+};
+
+const matchItemNameToKorean = match(itemNameToKoreanMatcher);
+
+/************************ styled ************************/
+const Container = styled.div`
+  max-width: 300px;
+  z-index: 9999;
+  background-color: #b67352;
+  padding: 10px;
+  border: 3px solid #965e43;
+  border-radius: 10px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  text-align: center;
+  font-weight: 800;
+
+  color: white;
+
+  cursor: grab;
+
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+`;
+
+const ItemSpaces = styled.ul`
+  display: flex;
+`;
+
+const ItemSpace = styled.div`
+  flex: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  font-size: 18px;
+  font-weight: 800;
+`;
+
+const ItemButton = styled.button`
+  width: 100%;
+  cursor: pointer;
+
+  font-size: 18px; // TODO: 여기에 Text 대신 이미지를 넣자
+`;

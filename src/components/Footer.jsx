@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { Box, AppBar, Button, Typography, Drawer, createTheme, ThemeProvider } from "@mui/material";
+import { Box, AppBar, Button, Typography, Drawer } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 
 export default function Footer() {
@@ -54,7 +55,7 @@ const FooterBar = styled(AppBar)`
   position: fixed;
   top: auto;
   bottom: 0;
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.5);
   border-top: 1px solid ${deepPurple[100]};
   padding: 3px 10px;
 `;
