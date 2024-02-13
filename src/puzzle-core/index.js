@@ -62,22 +62,6 @@ const createPuzzleConfig = () => {
   };
 
   const addCombo = (fromIndex, toIndex, direction) => {
-    let dir = -1;
-    switch (direction) {
-      case 0:
-        dir = 3;
-        break;
-      case 1:
-        dir = 0;
-        break;
-      case 2:
-        dir = 2;
-        break;
-      case 3:
-        dir = 1;
-        break;
-    }
-
     // console.log("addCombo 함수 실행 :", fromIndex, toIndex, direction, dir);
     // console.log(config);
 
@@ -87,7 +71,7 @@ const createPuzzleConfig = () => {
       preIndex: toIndex,
       isSender: false,
       isCombo: true,
-      direction: dir,
+      direction: switchDirection(direction),
     });
 
     config = nextConfig;
@@ -128,10 +112,10 @@ const createPuzzleConfig = () => {
     console.log(getConfig());
   };
 
-  // 왜 자꾸 퍼즐 하나가 안붙냐...
   const usingItemMagnet = (targetList) => {
     console.log(targetList);
     const config = getConfig();
+
     const [targetPuzzleIndex, ...aroundPuzzleIndexList] = targetList;
     try {
       for (let direction = 0; direction < 4; direction += 1) {
@@ -139,12 +123,13 @@ const createPuzzleConfig = () => {
         if (puzzleIndex === -1) {
           continue;
         }
+
         uniteTiles({
           config,
           nowIndex: targetPuzzleIndex,
           preIndex: puzzleIndex,
-          direction,
-          isCombo: false,
+          direction: switchDirection(direction),
+          isCombo: true,
           isSender: false,
         });
       }
@@ -177,3 +162,22 @@ const createPuzzleConfig = () => {
 };
 
 export const configStore = createPuzzleConfig();
+
+const switchDirection = (direction) => {
+  let dir = -1;
+  switch (direction) {
+    case 0:
+      dir = 3;
+      break;
+    case 1:
+      dir = 0;
+      break;
+    case 2:
+      dir = 2;
+      break;
+    case 3:
+      dir = 1;
+      break;
+  }
+  return dir;
+};

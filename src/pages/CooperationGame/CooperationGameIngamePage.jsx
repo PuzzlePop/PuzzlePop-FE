@@ -66,11 +66,12 @@ export default function CooperationGameIngamePage() {
     usingItemFrame(sortedTargetList);
   };
 
-  const magnetTest = () => {
-    // const targetList = [32, -1, -1, -1, -1]; // 상 우 하 좌
-    // const targetList = [0, -1, 1, 10, -1];
-    const targetList = [11, 1, 12, 21, 10];
-    usingItemMagnet(targetList);
+  const magnetExceptionTest1 = () => {
+    usingItemMagnet([0, -1, 1, 10, -1]);
+  };
+
+  const magnetExceptionTest2 = () => {
+    usingItemMagnet([2, -1, 3, 12, -1]);
   };
 
   const getGameInfo = () => {
@@ -148,7 +149,7 @@ export default function CooperationGameIngamePage() {
           // "MAGNET(자석)" 아이템 사용
           if (data.message && data.message === "MAGNET") {
             const { targetList } = data;
-            // usingItemMagnet(targetList)
+            usingItemMagnet(targetList);
             return;
           }
 
@@ -208,8 +209,9 @@ export default function CooperationGameIngamePage() {
   return (
     <>
       <button onClick={frameTest}>액자 아이템 테스트</button>
-      <button onClick={magnetTest}>자석 아이템 테스트</button>
-      <button onClick={() => getGameInfo()}>게임 정보좀요</button>
+      <button onClick={getGameInfo}>게임 정보좀요</button>
+      <button onClick={magnetExceptionTest1}>자석테스트1</button>
+      <button onClick={magnetExceptionTest2}>자석테스트2</button>
       <Toast
         open={isOpenedToast}
         onClose={handleCloseGame}
