@@ -123,8 +123,8 @@ const createPuzzleConfig = () => {
       if (targetList.includes(gtile[2])) {
         gtile[1] = undefined;
 
-        const randomX = Math.random() * 1000;
-        const randomY = Math.random() * 750;
+        const randomX = Math.random() * 960 + 20;
+        const randomY = Math.random() * 710 + 20;
         config.tiles[gtile[2]].position = new Point(randomX, randomY);
       }
     });

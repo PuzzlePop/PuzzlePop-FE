@@ -13,18 +13,18 @@ import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import { configStore } from "@/puzzle-core";
+import { attackRocket } from "@/puzzle-core/attackItem";
 
 import comboAudioPath from "@/assets/audio/combo.mp3";
 import redTeamBackgroundPath from "@/assets/redTeamBackground.gif";
 import blueTeamBackgroundPath from "@/assets/blueTeamBackground.gif";
 import dropRandomItemPath from "@/assets/dropRandomItem.gif";
-import rocketPath from "@/assets/rocket.gif";
 
 import { Box, Dialog, DialogTitle } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
-import { useHint } from "../../hooks/useHint";
-import Hint from "../../components/GameItemEffects/Hint";
+import { useHint } from "@/hooks/useHint";
+import Hint from "@/components/GameItemEffects/Hint";
 import { createPortal } from "react-dom";
 
 const { connect, send, subscribe, disconnect } = socket;
@@ -99,6 +99,16 @@ export default function BattleGameIngamePage() {
     );
   }, []);
 
+  const changePercent = (data) => {
+    if (getTeam() === "red") {
+      setOurPercent(data.redProgressPercent);
+      setEnemyPercent(data.blueProgressPercent);
+    } else {
+      setOurPercent(data.blueProgressPercent);
+      setEnemyPercent(data.redProgressPercent);
+    }
+  };
+
   const connectSocket = async () => {
     connect(
       () => {
@@ -137,30 +147,21 @@ export default function BattleGameIngamePage() {
           }
 
           // 진행도
-          // TODO : ATTACK일때 시간 초 늦게 반영되는 효과
+          // ATTACK일때 2초 뒤(효과 지속 시간과 동일) 반영
+          // MIRROR일때 3초 뒤(효과 지속 시간과 동일) 반영
           if (data.redProgressPercent >= 0 && data.blueProgressPercent >= 0) {
             console.log("진행도?", data.redProgressPercent, data.blueProgressPercent);
-            if (getTeam() === "red") {
-              setOurPercent(data.redProgressPercent);
-              setEnemyPercent(data.blueProgressPercent);
+            if (data.message && data.message === "ATTACK") {
+              setTimeout(() => {
+                changePercent(data);
+              }, 2000);
+            } else if (data.message && data.message === "MIRROR") {
+              setTimeout(() => {
+                changePercent(data);
+              }, 3000);
             } else {
-              setOurPercent(data.blueProgressPercent);
-              setEnemyPercent(data.redProgressPercent);
+              changePercent(data);
             }
-          }
-
-          // "MAGNET(자석)" 아이템 사용
-          if (data.message && data.message === "MAGNET") {
-            const { targetList, redBundles, blueBundles, targets } = data;
-            if (targets === getTeam().toUpperCase()) {
-              const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
-              usingItemMagnet(targetList, targetBundles);
-            }
-
-            // if (targets === "BLUE") {
-            //   usingItemMagnet(targetList, blueBundles);
-            // }
-            return;
           }
 
           // 우리팀 event
@@ -260,6 +261,17 @@ export default function BattleGameIngamePage() {
             return;
           }
 
+          // "MAGNET(자석)" 아이템 사용
+          if (data.message && data.message === "MAGNET") {
+            const { targetList, redBundles, blueBundles, targets } = data;
+            if (targets === getTeam().toUpperCase()) {
+              const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
+              usingItemMagnet(targetList, targetBundles);
+            }
+            return;
+          }
+
+          // 공격형 아이템 공격 성공
           if (data.message && data.message === "ATTACK") {
             console.log("공격메세지", data);
             // dropRandomItem 삭제
@@ -292,43 +304,7 @@ export default function BattleGameIngamePage() {
 
             if (randomItem.name === "ROCKET") {
               console.log("랜덤 아이템 rocket 였어!");
-
-              // rocket 당하는 팀의 효과
-              if (targets === getTeam().toUpperCase()) {
-                console.log("rocket 맞을거임");
-              } else {
-                // rocket 발동하는 팀의 효과
-                console.log("rocket 보낼거임");
-
-                const rocketImg = document.createElement("img");
-                const canvasContainer = document.getElementById("canvasContainer");
-                rocketImg.src = rocketPath;
-
-                rocketImg.style.zIndex = 100;
-                rocketImg.style.position = "absolute";
-                rocketImg.style.left = "1000px";
-                rocketImg.style.top = "240px";
-                rocketImg.style.transform = "translate(-50%, -50%)";
-
-                canvasContainer.appendChild(rocketImg);
-
-                console.log(rocketImg);
-                setTimeout(() => {
-                  console.log("로켓 효과 삭제");
-                  if (rocketImg.parentNode) {
-                    rocketImg.parentNode.removeChild(rocketImg);
-                  }
-                }, 2000);
-              }
-
-              setTimeout(() => {
-                // console.log("레드팀 번들", redBundles);
-                // console.log("블루팀 번들", blueBundles);
-                if (targetList && targets === getTeam().toUpperCase()) {
-                  console.log("rocket 발동 !!");
-                  usingItemRocket(targetList);
-                }
-              }, 2000);
+              attackRocket(targets, targetList, deleted);
             }
 
             if (randomItem.name === "EARTHQUAKE") {
@@ -381,6 +357,7 @@ export default function BattleGameIngamePage() {
             dropRandomItemImg.style.left = data.randomItem.position_x + "px";
             dropRandomItemImg.style.top = data.randomItem.position_y + "px";
             dropRandomItemImg.style.transform = "translate(-50%, -50%)";
+            dropRandomItemImg.style.cursor = "pointer";
 
             dropRandomItemImg.onclick = function () {
               // 부모 요소로부터 버튼 제거
