@@ -3,27 +3,42 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { request } from "../../apis/requestBuilder";
 import IconButton from "@mui/material/IconButton";
-import ChatIcon from "@mui/icons-material/Chat";
 import ContactEmergencyIcon from "@mui/icons-material/ContactEmergency";
+import TaskAltIcon from "@mui/icons-material/TaskAlt";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 
-export default function FriendList() {
+export default function FriendRequests() {
   const navigate = useNavigate();
-  // const request_status = "accepted";
-  const [friendList, setFriendList] = useState([]);
+//   const request_status = "requested";
+  const [friendRequestList, setFriendRequestList] = useState([]);
 
-  const fetchFriendList = async () => {
-    const response = await request.post(`/friend/list/accepted`, { id: 1 }); // TODO: 현재 로그인 중인 사용자 ID로 교체할 것
-    const { data: friendList } = response;
+  const fetchFriendRequestList = async () => {
+    const response = await request.post(`/friend/list/requested`, { id: 1 }); // TODO: 현재 로그인 중인 사용자 ID로 교체할 것
+    const { data: friendRequestList } = response;
 
-    console.log(friendList);
-    setFriendList(friendList);
+    console.log(friendRequestList);
+    setFriendRequestList(friendRequestList);
+  };
+
+  const updateRequestStatus = async ({ item, status }) => {
+    const response = await request.post(`/friend/respond`, {
+      friend_id: item.friend_id,
+      respond_status: status,
+    });
+    const { data: updatedData } = response;
+
+    if (updatedData) {
+      console.log(updatedData);
+    }
+
+    fetchFriendRequestList();
   };
 
   useEffect(() => {
-    fetchFriendList();
+    fetchFriendRequestList();
   }, []);
 
-  const FriendCard = ({ item }) => {
+  const FriendRequestCard = ({ item }) => {
     return (
       <StyledFriendCard>
         <ProfileImage imgPath={item.friend_user_info.img_path} />
@@ -33,15 +48,25 @@ export default function FriendList() {
             {item.friend_user_info.given_name}
           </div>
         </UserInfo>
+
         <IconWrapper>
-          <IconButton aria-label="dmBtn" onClick={() => navigate(`/dm/${item.friend_id}`)}>
-            <ChatIcon />
-          </IconButton>
           <IconButton
             aria-label="profileBtn"
             onClick={() => navigate(`/user/${item.friend_user_info.id}`)}
           >
             <ContactEmergencyIcon />
+          </IconButton>
+          <IconButton
+            aria-label="acceptBtn"
+            onClick={() => updateRequestStatus({ item, status: "accepted" })}
+          >
+            <TaskAltIcon color="success" />
+          </IconButton>
+          <IconButton
+            aria-label="refuseBtn"
+            onClick={() => updateRequestStatus({ item, status: "refused" })}
+          >
+            <HighlightOffIcon />
           </IconButton>
         </IconWrapper>
       </StyledFriendCard>
@@ -50,8 +75,8 @@ export default function FriendList() {
 
   return (
     <>
-      {friendList.map((friend) => (
-        <FriendCard key={friend.friend_id} item={friend} />
+      {friendRequestList.map((friend) => (
+        <FriendRequestCard key={friend.friend_id} item={friend} />
       ))}
     </>
   );
