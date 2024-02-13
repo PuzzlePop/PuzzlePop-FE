@@ -1,24 +1,31 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
-import { getSender, getRoomId, setTeam } from "@/socket-utils/storage";
-import { socket } from "@/socket-utils/socket";
+import { isAxiosError } from "axios";
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import GameWaitingBoard from "@/components/GameWaiting/GameWaitingBoard";
 import Loading from "@/components/Loading";
+
+import { getSender, getRoomId, setTeam } from "@/socket-utils/storage";
+import { socket } from "@/socket-utils/socket";
 import { request } from "@/apis/requestBuilder";
-import { isAxiosError } from "axios";
+
 import backgroundPath from "@/assets/background.gif";
 
 const { connect, send, subscribe } = socket;
 
 export default function BattleGameWaitingPage() {
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [gameData, setGameData] = useState(null);
   const [chatHistory, setChatHistory] = useState([]); // 채팅 기록을 저장하는 상태 추가
+
+  const isLoading = useMemo(() => {
+    return gameData === null;
+  }, [gameData]);
 
   const connectSocket = async () => {
     // websocket 연결 시도
@@ -36,9 +43,10 @@ export default function BattleGameWaitingPage() {
         });
 
         // 1. 게임이 시작되면 인게임 화면으로 보낸다.
-        if (data.gameId && data.started && data.started === true) {
-          window.location.href = `/game/battle/ingame/${data.gameId}`;
-          return;
+        if (data.gameId && Boolean(data.started) && !Boolean(data.finished)) {
+          navigate(`/game/battle/ingame/${data.gameId}`, {
+            replace: true,
+          });
         }
         setGameData(data);
       });
@@ -86,36 +94,23 @@ export default function BattleGameWaitingPage() {
 
     initialize();
 
-    return () => {
-      // disconnect();
-      // console.log("WebSocket 연결 종료");
-    };
-
     // eslint-disable-next-line
   }, []);
 
-  useEffect(() => {
-    if (gameData) {
-      setLoading(false);
-    }
-  }, [gameData]);
+  if (isLoading) {
+    return <Loading message="방 정보 불러오는 중..." />;
+  }
 
   return (
     <Wrapper>
       <Header />
-      {loading ? (
-        <Loading message="방 정보 불러오는 중..." />
-      ) : (
-        <>
-          <GameWaitingBoard
-            player={getSender()}
-            data={gameData}
-            allowedPiece={allowedPiece}
-            category="battle"
-            chatHistory={chatHistory}
-          />
-        </>
-      )}
+      <GameWaitingBoard
+        player={getSender()}
+        data={gameData}
+        allowedPiece={allowedPiece}
+        category="battle"
+        chatHistory={chatHistory}
+      />
       <Footer />
     </Wrapper>
   );
