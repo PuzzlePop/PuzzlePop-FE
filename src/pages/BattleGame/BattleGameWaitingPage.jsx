@@ -35,12 +35,14 @@ export default function BattleGameWaitingPage() {
       subscribe(`/topic/game/room/${roomId}`, (message) => {
         const data = JSON.parse(message.body);
 
-        data.blueTeam.players.forEach((player) => {
-          console.log(player);
-          if (player.id === getSender()) {
-            setTeam("blue");
-          }
-        });
+        if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
+          data.blueTeam.players.forEach((player) => {
+            console.log(player);
+            if (player.id === getSender()) {
+              setTeam("blue");
+            }
+          });
+        }
 
         // 1. 게임이 시작되면 인게임 화면으로 보낸다.
         if (data.gameId && Boolean(data.started) && !Boolean(data.finished)) {

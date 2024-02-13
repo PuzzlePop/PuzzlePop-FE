@@ -22,10 +22,12 @@ import dropRandomItemPath from "@/assets/dropRandomItem.gif";
 import { Box, Dialog, DialogTitle } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
+import { useHint } from "../../hooks/useHint";
+import Hint from "../../components/GameItemEffects/Hint";
+import { createPortal } from "react-dom";
 
 const { connect, send, subscribe, disconnect } = socket;
 const {
-  getConfig,
   lockPuzzle,
   movePuzzle,
   unLockPuzzle,
@@ -34,6 +36,8 @@ const {
   usingItemFire,
   usingItemRocket,
   usingItemEarthquake,
+  usingItemFrame,
+  usingItemMagnet,
 } = configStore;
 
 export default function BattleGameIngamePage() {
@@ -48,7 +52,20 @@ export default function BattleGameIngamePage() {
   const [enemyPercent, setEnemyPercent] = useState(0);
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
-  const [itemInventory, setItemInventory] = useState([null, null, null, null, null]);
+  const [redItemInventory, setRedItemInventory] = useState([null, null, null, null, null]);
+  const [blueItemInventory, setBlueItemInventory] = useState([null, null, null, null, null]);
+  const {
+    hintList: redHintList,
+    addHint: redAddHint,
+    closeHint: redCloseHint,
+    cleanHint: redCleanHint,
+  } = useHint();
+  const {
+    hintList: blueHintList,
+    addHint: blueAddHint,
+    closeHint: blueCloseHint,
+    cleanHint: blueCleanHint,
+  } = useHint();
 
   const dropRandomItem = useRef(null);
 
@@ -108,7 +125,10 @@ export default function BattleGameIngamePage() {
 
           // 매번 보유아이템배열을 업데이트
           if (data.redItemList) {
-            setItemInventory(data.redItemList);
+            setRedItemInventory(data.redItemList);
+          }
+          if (data.blueItemList) {
+            setBlueItemInventory(data.blueItemList);
           }
 
           // 게임정보 받기
@@ -128,6 +148,20 @@ export default function BattleGameIngamePage() {
               setOurPercent(data.blueProgressPercent);
               setEnemyPercent(data.redProgressPercent);
             }
+          }
+
+          // "MAGNET(자석)" 아이템 사용
+          if (data.message && data.message === "MAGNET") {
+            const { targetList, redBundles, blueBundles, targets } = data;
+            if (targets === getTeam().toUpperCase()) {
+              const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
+              usingItemMagnet(targetList, targetBundles);
+            }
+
+            // if (targets === "BLUE") {
+            //   usingItemMagnet(targetList, blueBundles);
+            // }
+            return;
           }
 
           // 우리팀 event
@@ -154,9 +188,17 @@ export default function BattleGameIngamePage() {
             }
 
             if (data.message && data.message === "ADD_PIECE") {
-              const { targets, combo, comboCnt } = data;
+              const { targets, combo, comboCnt, team } = data;
               const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
               addPiece({ fromIndex, toIndex });
+
+              if (team === "RED") {
+                redCleanHint({ fromIndex, toIndex });
+              }
+
+              if (team === "BLUE") {
+                blueCleanHint({ fromIndex, toIndex });
+              }
 
               if (combo) {
                 console.log("콤보 효과 발동 !! : ", combo);
@@ -203,6 +245,20 @@ export default function BattleGameIngamePage() {
 
               return;
             }
+          }
+
+          // "HINT(힌트)" 아이템 사용
+          if (data.message && data.message === "HINT") {
+            const { targetList, targets } = data;
+            if (targets === "RED") {
+              redAddHint(...targetList);
+            }
+
+            if (targets === "BLUE") {
+              blueAddHint(...targetList);
+            }
+
+            return;
           }
 
           if (data.message && data.message === "ATTACK") {
@@ -458,10 +514,31 @@ export default function BattleGameIngamePage() {
         </Col>
       </Board>
 
-      <ItemController
-        itemInventory={itemInventory}
-        onSendUseItemMessage={handleSendUseItemMessage}
-      />
+      {getTeam() === "red" ? (
+        <>
+          <ItemController
+            itemInventory={redItemInventory}
+            onSendUseItemMessage={handleSendUseItemMessage}
+          />
+          {document.querySelector("#canvasContainer") &&
+            createPortal(
+              <Hint hintList={redHintList} onClose={redCloseHint} />,
+              document.querySelector("#canvasContainer"),
+            )}
+        </>
+      ) : (
+        <>
+          <ItemController
+            itemInventory={blueItemInventory}
+            onSendUseItemMessage={handleSendUseItemMessage}
+          />
+          {document.querySelector("#canvasContainer") &&
+            createPortal(
+              <Hint hintList={blueHintList} onClose={blueCloseHint} />,
+              document.querySelector("#canvasContainer"),
+            )}
+        </>
+      )}
 
       <ThemeProvider theme={theme}>
         <Dialog open={isOpenedDialog} onClose={handleCloseGame}>

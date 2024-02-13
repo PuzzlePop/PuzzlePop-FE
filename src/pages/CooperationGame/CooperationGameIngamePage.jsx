@@ -137,7 +137,7 @@ export default function CooperationGameIngamePage() {
             setOurPercent(data.redProgressPercent);
           }
 
-          if (data.message && (data.message === "LOCKED") !== getSender()) {
+          if (data.message && data.message === "LOCKED" && data.senderId !== getSender()) {
             const { targets } = data;
             const targetList = JSON.parse(targets);
             targetList.forEach(({ x, y, index }) => lockPuzzle(x, y, index));

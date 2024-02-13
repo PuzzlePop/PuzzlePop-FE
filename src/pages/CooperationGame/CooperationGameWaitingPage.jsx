@@ -36,9 +36,7 @@ export default function CooperationGameWaitingPage() {
 
         // 1. 게임이 시작되면 인게임 화면으로 보낸다.
         if (data.gameId && Boolean(data.started) && !Boolean(data.finished)) {
-          navigate(`/game/cooperation/ingame/${data.gameId}`, {
-            replace: true,
-          });
+          window.location.replace(`/game/cooperation/ingame/${data.gameId}`);
           return;
         }
         setGameData(data);
