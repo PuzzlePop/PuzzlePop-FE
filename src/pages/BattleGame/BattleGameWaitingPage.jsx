@@ -46,7 +46,7 @@ export default function BattleGameWaitingPage() {
 
         // 1. 게임이 시작되면 인게임 화면으로 보낸다.
         if (data.gameId && Boolean(data.started) && !Boolean(data.finished)) {
-          window.location.href = `/game/battle/ingame/${data.gameId}`;
+          window.location.replace(`/game/battle/ingame/${data.gameId}`);
           return;
         }
         setGameData(data);

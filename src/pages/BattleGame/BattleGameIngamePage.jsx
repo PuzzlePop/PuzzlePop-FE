@@ -118,7 +118,11 @@ export default function BattleGameIngamePage() {
           console.log(data);
 
           // 매번 게임이 끝났는지 체크
-          if (Boolean(data.finished)) {
+          if (
+            Boolean(data.finished) ||
+            data.redProgressPercent === 100 ||
+            data.blueProgressPercent === 100
+          ) {
             // disconnect();
             console.log("게임 끝남 !"); // TODO : 게임 끝났을 때 effect
             setTimeout(() => {

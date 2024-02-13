@@ -36,7 +36,7 @@ export const setItemStyleToAllPiece = ({ config, itemList }) => {
 export const removeItemStyleToPiece = ({ config, fromIndex, toIndex }) => {
   config.tiles.forEach((tile, tileIndex) => {
     if (fromIndex === tileIndex || toIndex === tileIndex) {
-      tile.strokeColor = undefined;
+      tile.strokeColor = new Color("#ddd");
     }
   });
   return config;
