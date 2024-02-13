@@ -40,6 +40,14 @@ export default function GameCard({ room, category }) {
 
   const chipMessage = `${parseInt(roomSize / 2)} : ${parseInt(roomSize / 2)}`;
 
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+      return parts.pop().split(';').shift();
+    }
+  }
+  
   const enterRoom = async (roomId) => {
 
     let sender = getCookie("userId"); // 쿠키에서 userId 가져오기
@@ -49,7 +57,7 @@ export default function GameCard({ room, category }) {
         return;
       }
     }
-    
+
     setSender(sender);
     setRoomId(roomId);
     setTeam("red");
