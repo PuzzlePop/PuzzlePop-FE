@@ -59,8 +59,7 @@ const createPuzzleConfig = () => {
       fromIndex,
       toIndex,
     });
-    const updatedConfig = updateGroupByBundles({ config: afterCheckItemConfig, bundles });
-    config = cleanBorderStyle({ config: updatedConfig });
+    config = afterCheckItemConfig;
   };
 
   const addCombo = (fromIndex, toIndex, direction, bundles = []) => {
@@ -76,8 +75,10 @@ const createPuzzleConfig = () => {
       direction: switchDirection(direction),
     });
 
-    const updatedConfig = updateGroupByBundles({ config: nextConfig, bundles });
-    config = cleanBorderStyle({ config: updatedConfig });
+    config = cleanBorderStyle({ config: nextConfig });
+
+    // const updatedConfig = updateGroupByBundles({ config: nextConfig, bundles }); // 콤보랑 같이 쓰면 버그가..
+    // config = cleanBorderStyle({ config: updatedConfig });
   };
 
   // 공격형 아이템 fire
@@ -143,31 +144,29 @@ const createPuzzleConfig = () => {
 
   const usingItemFrame = (targetList) => {
     console.log(targetList);
-    console.log(getConfig());
+    console.log(config);
   };
 
   const usingItemMagnet = (targetList, bundles = []) => {
     const [targetPuzzleIndex, ...aroundPuzzleIndexList] = targetList;
-    try {
-      for (let direction = 0; direction < 4; direction += 1) {
-        const prevConfig = getConfig();
-        const puzzleIndex = aroundPuzzleIndexList[direction];
-        if (puzzleIndex === -1) {
-          continue;
-        }
 
-        const unitedConfig = uniteTiles2({
-          config: prevConfig,
-          nowIndex: targetPuzzleIndex,
-          preIndex: puzzleIndex,
-          direction: switchDirection(direction),
-        });
+    // TODO: 모두 -1이면 알림띄워주기 (자석을 사용할 곳이 없음..)
 
-        const updatedConfig = updateGroupByBundles({ config: unitedConfig, bundles });
-        config = cleanBorderStyle({ config: updatedConfig });
+    for (let direction = 0; direction < 4; direction += 1) {
+      const puzzleIndex = aroundPuzzleIndexList[direction];
+      if (puzzleIndex === -1) {
+        continue;
       }
-    } catch (error) {
-      console.log("자석 아이템을 사용할 퍼즐이 없어요.");
+
+      const unitedConfig = uniteTiles2({
+        config,
+        nowIndex: targetPuzzleIndex,
+        preIndex: puzzleIndex,
+        direction: switchDirection(direction),
+      });
+
+      const updatedConfig = updateGroupByBundles({ config: unitedConfig, bundles });
+      config = cleanBorderStyle({ config: updatedConfig });
     }
   };
 

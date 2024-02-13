@@ -92,6 +92,14 @@ export default function CooperationGameIngamePage() {
             setItemInventory(data.redItemList);
           }
 
+          // 매번 게임이 끝났는지 체크
+          // TODO: 콤보로 인해 마지막 퍼즐조각이 클라이언트에서 맞춰지지 않았는데 게임종료가 되고 있음.. 이 현상 개선해야함.
+          if (Boolean(data.finished)) {
+            // disconnect();
+            setIsOpenedToast(true);
+            return;
+          }
+
           if (data.message && data.message === "LOCKED" && data.senderId !== getSender()) {
             const { targets } = data;
             const targetList = JSON.parse(targets);
@@ -119,7 +127,7 @@ export default function CooperationGameIngamePage() {
             addPiece({ fromIndex, toIndex }, redBundles);
             cleanHint({ fromIndex, toIndex });
             if (combo) {
-              effectCombo({ combo, comboCount }, redBundles);
+              effectCombo({ combo, comboCount });
             }
             return;
           }
@@ -142,14 +150,6 @@ export default function CooperationGameIngamePage() {
           if (data.message && data.message === "MAGNET") {
             const { targetList, redBundles } = data;
             usingItemMagnet(targetList, redBundles);
-            return;
-          }
-
-          // 매번 게임이 끝났는지 체크
-          // TODO: 콤보로 인해 마지막 퍼즐조각이 클라이언트에서 맞춰지지 않았는데 게임종료가 되고 있음.. 이 현상 개선해야함.
-          if (Boolean(data.finished)) {
-            disconnect();
-            setIsOpenedToast(true);
             return;
           }
 
@@ -231,10 +231,8 @@ export default function CooperationGameIngamePage() {
   );
 }
 
-const effectCombo = ({ combo, comboCount }, bundles) => {
-  combo.forEach(([toIndex, fromIndex, direction]) =>
-    addCombo(fromIndex, toIndex, direction, bundles),
-  );
+const effectCombo = ({ combo, comboCount }) => {
+  combo.forEach(([toIndex, fromIndex, direction]) => addCombo(fromIndex, toIndex, direction));
   if (comboCount) {
     renderComboAlert(comboCount);
   }
