@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import ImageIcon from "./ImageIcon";
@@ -9,6 +10,7 @@ import { AppBar, Toolbar, Button } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 import GamePageNavigation from "@/components/GamePageNavigation";
+import { request } from '../apis/requestBuilder';
 
 export default function Header() {
   const navigate = useNavigate();
@@ -29,6 +31,43 @@ export default function Header() {
     },
   });
 
+  // 기본값은 로그아웃 상태
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
+
+  useEffect(() => {
+    const token = getCookie('accessToken');
+
+    if (token) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, []);
+
+  const getCookie = (name) => {
+    const cookies = document.cookie.split('; ');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.startsWith(name + '=')) {
+        return cookie.substring(name.length + 1);
+      }
+    }
+  };
+
+  const moveLogin = async () => {
+    const SERVER_URL = "https://i10a304.p.ssafy.io/api"
+
+    if (isLoggedIn) {
+      // 로그인 상태이면 로그아웃 처리
+      // window.location.href = `${SERVER_URL}/logout`;
+      request.get(`${SERVER_URL}/logout`)
+    } else {
+      // 로그아웃 상태이면 로그인 처리
+      // window.location.href = `${SERVER_URL}/login`;
+      request.get(`${SERVER_URL}/login`)
+    }
+  }
+
   return (
     <HeaderBar>
       <Toolbar sx={{ flexWrap: "wrap" }}>
@@ -40,8 +79,8 @@ export default function Header() {
           <ImageIcon imageSource={HeaderRankImage} size="md" onClick={() => navigate("/rank")} />
           {/* <ImageIcon imageSource={HeaderShopImage} size="md" onClick={() => navigate("/shop")} /> */}
           <ThemeProvider theme={theme}>
-            <Button href="#" variant="text" sx={{ px: 2.5 }} size="large">
-              Login
+          <Button variant="text" sx={{ px: 2.5 }} size="large" onClick={moveLogin}>
+              {isLoggedIn ? 'Log out' : 'Log in'}
             </Button>
           </ThemeProvider>
         </nav>
