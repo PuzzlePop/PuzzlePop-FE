@@ -67,7 +67,7 @@ export default function BattleGameWaitingPage() {
           type: "ENTER",
           roomId: getRoomId(),
           sender: getSender(),
-          isMember: getCookie("userId") ? true : false
+          member: getCookie("userId") ? true : false
         }),
       );
     });

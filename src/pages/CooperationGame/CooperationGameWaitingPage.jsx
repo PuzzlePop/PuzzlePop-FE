@@ -57,7 +57,7 @@ export default function CooperationGameWaitingPage() {
           type: "ENTER",
           roomId: getRoomId(),
           sender: getSender(),
-          isMember: getCookie("userId") ? true : false
+          member: getCookie("userId") ? true : false
         }),
       );
     });
