@@ -2,6 +2,7 @@ import { configStore } from "@/puzzle-core";
 import { getPuzzlePositionByIndex } from "@/puzzle-core/utils";
 import { getTeam } from "@/socket-utils/storage";
 
+import firePath from "@/assets/effects/fire.gif";
 import rocketPath from "@/assets/effects/rocket.gif";
 import explosionPath from "@/assets/effects/explosion.gif";
 
@@ -9,8 +10,61 @@ const { getConfig, usingItemFire, usingItemRocket, usingItemEarthquake } = confi
 
 // 불 지르기 맞는 or 보내는 효과 + usingItemFire 함수 호출
 export const attackFire = (targets, targetList, deleted, bundles) => {
-  if (targetList.length === 0) {
-    return;
+  const fireImg = document.createElement("img");
+  const canvasContainer = document.getElementById("canvasContainer");
+  fireImg.src = firePath;
+
+  fireImg.style.zIndex = 100;
+  fireImg.style.position = "absolute";
+  fireImg.style.width = "100px";
+  fireImg.style.height = "150px";
+  fireImg.style.transform = "translate(-50%, -90%)";
+
+  // fire 당하는 팀의 효과
+  if (targets === getTeam().toUpperCase()) {
+    if (targetList.length === 0) {
+      return;
+    }
+    console.log("fire 맞을거임");
+
+    for (let i = 0; i < targetList.length; i++) {
+      const currentTargetIdx = targetList[i];
+      const [x, y] = getPuzzlePositionByIndex({
+        config: getConfig(),
+        puzzleIndex: currentTargetIdx,
+      });
+
+      console.log("x, y", x, y);
+
+      const fireImgCopy = fireImg.cloneNode();
+
+      fireImgCopy.style.left = `${x}px`;
+      fireImgCopy.style.top = `${y}px`;
+
+      canvasContainer.appendChild(fireImgCopy);
+
+      setTimeout(() => {
+        if (fireImgCopy.parentNode) {
+          console.log("불 효과 삭제");
+          fireImgCopy.parentNode.removeChild(fireImgCopy);
+        }
+      }, 2000);
+    }
+  } else {
+    // fire 발동하는 팀의 효과
+    console.log("fire 보낼거임");
+
+    fireImg.style.left = "1040px";
+    fireImg.style.top = "750px";
+
+    canvasContainer.appendChild(fireImg);
+
+    setTimeout(() => {
+      console.log("불 효과 삭제");
+      if (fireImg.parentNode) {
+        fireImg.parentNode.removeChild(fireImg);
+      }
+    }, 2000);
   }
 
   setTimeout(() => {
@@ -23,9 +77,6 @@ export const attackFire = (targets, targetList, deleted, bundles) => {
 
 // 로켓 맞는 or 보내는 효과 + usingItemRocket 함수 호출
 export const attackRocket = (targets, targetList, deleted) => {
-  if (targetList.length === 0) {
-    return;
-  }
   const rocketImg = document.createElement("img");
   const canvasContainer = document.getElementById("canvasContainer");
   rocketImg.src = rocketPath;
@@ -35,6 +86,9 @@ export const attackRocket = (targets, targetList, deleted) => {
 
   // rocket 당하는 팀의 효과
   if (targets === getTeam().toUpperCase()) {
+    if (targetList.length === 0) {
+      return;
+    }
     console.log("rocket 맞을거임");
 
     const centerIdx = targetList[parseInt(targetList.length / 2) + 1];
