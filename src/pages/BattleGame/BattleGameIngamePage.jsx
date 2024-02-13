@@ -294,11 +294,10 @@ export default function BattleGameIngamePage() {
               console.log("랜덤 아이템 rocket 였어!");
 
               // rocket 당하는 팀의 효과
-              // if (targets === getTeam().toUpperCase()) {
-
-              // } else {
-              //   // rocket 발동하는 팀의 효과
-              // }
+              if (targets === getTeam().toUpperCase()) {
+              } else {
+                // rocket 발동하는 팀의 효과
+              }
 
               setTimeout(() => {
                 // console.log("레드팀 번들", redBundles);
@@ -335,11 +334,17 @@ export default function BattleGameIngamePage() {
           if (data.message && data.message === "SHIELD") {
             console.log("공격메세지 : 쉴드", data);
             // dropRandomItem 삭제
-            dropRandomItem.current?.parentNode.removeChild(dropRandomItem.current);
+            if (dropRandomItem.current.parentNode) {
+              dropRandomItem.current.parentNode.removeChild(dropRandomItem.current);
+            }
           }
 
           if (data.message && data.message === "MIRROR") {
             console.log("공격메세지 : 거울", data);
+            // dropRandomItem 삭제
+            if (dropRandomItem.current.parentNode) {
+              dropRandomItem.current.parentNode.removeChild(dropRandomItem.current);
+            }
           }
 
           // drop random Item 생성
