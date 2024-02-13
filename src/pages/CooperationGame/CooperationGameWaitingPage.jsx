@@ -57,10 +57,20 @@ export default function CooperationGameWaitingPage() {
           type: "ENTER",
           roomId: getRoomId(),
           sender: getSender(),
+          isMember: getCookie("userId") ? true : false
         }),
       );
     });
   };
+
+  //쿠키 확인
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+      return parts.pop().split(';').shift();
+    }
+  }
 
   const initialize = async () => {
     try {
