@@ -39,6 +39,7 @@ export default function BattleGameListPage() {
         <IconButton aria-label="refresh" onClick={refetchAllRoom} sx={{ marginRight: "auto" }}>
           <RefreshIcon />
         </IconButton>
+        <Button>빠른 1 VS 1 매칭</Button>
         <CreateRoomButton category="battle" />
       </div>
 
