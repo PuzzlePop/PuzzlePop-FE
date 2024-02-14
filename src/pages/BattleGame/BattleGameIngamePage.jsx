@@ -27,6 +27,7 @@ import { red, blue, deepPurple } from "@mui/material/colors";
 import { useHint } from "@/hooks/useHint";
 import Hint from "@/components/GameItemEffects/Hint";
 import { createPortal } from "react-dom";
+import { useSnackbar } from "../../hooks/useSnackbar";
 
 const { connect, send, subscribe, disconnect } = socket;
 const {
@@ -48,8 +49,6 @@ export default function BattleGameIngamePage() {
   const { roomId } = useParams();
   const [gameData, setGameData] = useState(null);
   const [isOpenedDialog, setIsOpenedDialog] = useState(false);
-  const [snackOpen, setSnackOpen] = useState(false);
-  const [snackMessage, setSnackMessage] = useState("");
 
   const [time, setTime] = useState(0);
   const [ourPercent, setOurPercent] = useState(0);
@@ -58,6 +57,7 @@ export default function BattleGameIngamePage() {
   const [pictureSrc, setPictureSrc] = useState("");
   const [redItemInventory, setRedItemInventory] = useState([null, null, null, null, null]);
   const [blueItemInventory, setBlueItemInventory] = useState([null, null, null, null, null]);
+  const { isShowSnackbar, setIsShowSnackbar, snackMessage, setSnackMessage } = useSnackbar();
   const {
     hintList: redHintList,
     addHint: redAddHint,
@@ -86,7 +86,7 @@ export default function BattleGameIngamePage() {
   };
 
   const handleSnackClose = () => {
-    setSnackOpen(false);
+    setIsShowSnackbar(false);
   };
 
   const initializeGame = (data) => {
@@ -332,13 +332,13 @@ export default function BattleGameIngamePage() {
                 deleted,
                 attackedTeamBundles,
                 setSnackMessage,
-                setSnackOpen,
+                setIsShowSnackbar,
               );
             }
 
             if (randomItem.name === "ROCKET") {
               console.log("랜덤 아이템 rocket 였어!");
-              attackRocket(targets, targetList, deleted, setSnackMessage, setSnackOpen);
+              attackRocket(targets, targetList, deleted, setSnackMessage, setIsShowSnackbar);
             }
 
             if (randomItem.name === "EARTHQUAKE") {
@@ -346,7 +346,7 @@ export default function BattleGameIngamePage() {
 
               console.log("지진 발동", data);
 
-              attackEarthquake(targets, targetList, deleted, setSnackMessage, setSnackOpen);
+              attackEarthquake(targets, targetList, deleted, setSnackMessage, setIsShowSnackbar);
             }
           }
 
@@ -380,7 +380,7 @@ export default function BattleGameIngamePage() {
             } else if (currentDropRandomItem.current === "EARTHQUAKE") {
               console.log("거울로 지진을 맞았어!!!");
 
-              attackEarthquake(targets, targetList, deleted, setSnackMessage, setSnackOpen);
+              attackEarthquake(targets, targetList, deleted, setSnackMessage, setIsShowSnackbar);
             }
           }
 
@@ -573,7 +573,7 @@ export default function BattleGameIngamePage() {
 
           <Snackbar
             anchorOrigin={{ vertical: "top", horizontal: "center" }}
-            open={snackOpen}
+            open={isShowSnackbar}
             autoHideDuration={3000}
             onClose={handleSnackClose}
             message={snackMessage}
