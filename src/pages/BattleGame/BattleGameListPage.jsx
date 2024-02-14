@@ -10,7 +10,7 @@ import { request } from "@/apis/requestBuilder";
 import { getSender } from "@/socket-utils/storage";
 import backgroundPath from "@/assets/backgrounds/battleBackground.gif";
 import { socket } from "../../socket-utils/socket2";
-import { setRoomId, setSender } from "../../socket-utils/storage";
+import { setRoomId, setSender, setTeam } from "../../socket-utils/storage";
 
 const { connect, send, subscribe, disconnect } = socket;
 
