@@ -11,7 +11,7 @@ import { getSender } from "@/socket-utils/storage";
 import backgroundPath from "@/assets/backgrounds/battleBackground.gif";
 import { socket } from "../../socket-utils/socket";
 
-const {send, subscribe} = socket;
+const { connect, send, subscribe, disconnect } = socket;
 
 export default function BattleGameListPage() {
   const [roomList, setRoomList] = useState([]);
@@ -41,26 +41,33 @@ export default function BattleGameListPage() {
 
 
   const quickMatching = () => {
-    alert("hi")
-    send(
-      "/app/game/message",
-      {},
-      JSON.stringify({
-        type: "QUICK",
-        sender: getSender(),
-        member: getCookie("userId") ? true : false
-      }),
-    );
+    connect(() => {
+      //랜덤 매칭 큐 소켓
+      subscribe(`/topic/game/room/quick/${getSender()}`, (message) => {
+        const data = JSON.parse(message.body);
+        if (data.message === "WAITING") {
+          alert("waiting");
+        } else if (data.message === "GAME_START") {
+          alert(data.targets);
+        }
+      });
+      
+      //대기 큐 입장했다고 보내기
+      send(
+        "/app/game/message",
+        {},
+        JSON.stringify({
+          type: "QUICK",
+          sender: getSender(),
+          member: getCookie("userId") ? true : false
+        }),
+      );
 
-    //게임 결과
-    subscribe(`/topic/game/room/quick/${getSender()}`, (message) => {
-      const data = JSON.parse(message.body);
-      if (data === "WAITING") {
-        alert("waiting")
-      } else {
-        console.log(data);
-      }
-    });
+      //응답 메시지 파싱
+    })
+    
+
+    
 
   }
   return (
