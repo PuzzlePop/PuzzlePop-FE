@@ -86,9 +86,9 @@ export default function Header() {
           <ImageIcon imageSource={HeaderRankImage} size="md" onClick={() => navigate("/rank")} />
           {/* <ImageIcon imageSource={HeaderShopImage} size="md" onClick={() => navigate("/shop")} /> */}
           <ThemeProvider theme={theme}>
-            {getCookie("userId") ? <Button variant="text" sx={{ px: 2.5 }} size="large" onClick={moveProfile}>
-              Profile
-            </Button> : <div></div>}
+            <Button variant="text" sx={{ px: 2.5 }} size="large" onClick={moveProfile}>
+              User
+            </Button>
             
             <Button variant="text" sx={{ px: 2.5 }} size="large" onClick={moveLogin}>
               {isLoggedIn ? "Log out" : "Log in"}
