@@ -1,4 +1,4 @@
-import { socket } from "../socket-utils/socket2";
+import { socket } from "../socket-utils/socket";
 import { getRoomId, getSender } from "../socket-utils/storage";
 import { fitTiles } from "./findNearTileGroup";
 

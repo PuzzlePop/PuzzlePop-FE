@@ -9,7 +9,7 @@ import GameRoomListBoard from "@/components/GameRoomList/GameRoomListBoard";
 import { request } from "@/apis/requestBuilder";
 import { getSender } from "@/socket-utils/storage";
 import backgroundPath from "@/assets/backgrounds/battleBackground.gif";
-import { socket } from "../../socket-utils/socket2";
+import { socket } from "../../socket-utils/socket";
 
 const { connect, send, subscribe, disconnect } = socket;
 
