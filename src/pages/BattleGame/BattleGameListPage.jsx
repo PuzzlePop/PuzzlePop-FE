@@ -41,9 +41,13 @@ export default function BattleGameListPage() {
 
 
   const quickMatching = () => {
+    let sender = getCookie("userId");
+    if (!sender) {
+      alert("로그인한 유저만 이용할 수 있는 기능입니다.");
+    }
     connect(() => {
       //랜덤 매칭 큐 소켓
-      subscribe(`/topic/game/room/quick/${getSender()}`, (message) => {
+      subscribe(`/topic/game/room/quick/${sender}`, (message) => {
         const data = JSON.parse(message.body);
         if (data.message === "WAITING") {
           alert("waiting");
