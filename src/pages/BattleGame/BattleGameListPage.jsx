@@ -28,6 +28,38 @@ export default function BattleGameListPage() {
     fetchAllRoom();
   }, []);
 
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+      return parts.pop().split(';').shift();
+    }
+  }
+
+
+  const quickMatching = () => {
+    send(
+      "/app/game/message",
+      {},
+      JSON.stringify({
+        type: "QUICK",
+        roomId: getRoomId(),
+        sender: getSender(),
+        member: getCookie("userId")
+      }),
+    );
+
+    //게임 결과
+    subscribe(`/topic/game/room/quick/${getSender}`, (message) => {
+      const data = JSON.parse(message.body);
+      if (data === "WAITING") {
+        alert("waiting")
+      } else {
+        console.log(data);
+      }
+    });
+
+  }
   return (
     <Wrapper>
       <Header />
@@ -39,7 +71,7 @@ export default function BattleGameListPage() {
         <IconButton aria-label="refresh" onClick={refetchAllRoom} sx={{ marginRight: "auto" }}>
           <RefreshIcon />
         </IconButton>
-        <Button>빠른 1 VS 1 매칭</Button>
+        <Button onClick={quickMatching}>빠른 1 VS 1 매칭</Button>
         <CreateRoomButton category="battle" />
       </div>
 
