@@ -12,7 +12,7 @@ import { getSender, getRoomId, setTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { request } from "@/apis/requestBuilder";
 
-import backgroundPath from "@/assets/battleBackground.gif";
+import backgroundPath from "@/assets/backgrounds/battleBackground.gif";
 
 const { connect, send, subscribe } = socket;
 
@@ -46,7 +46,7 @@ export default function BattleGameWaitingPage() {
 
         // 1. 게임이 시작되면 인게임 화면으로 보낸다.
         if (data.gameId && Boolean(data.started) && !Boolean(data.finished)) {
-          window.location.href = `/game/battle/ingame/${data.gameId}`;
+          window.location.replace(`/game/battle/ingame/${data.gameId}`);
           return;
         }
         setGameData(data);

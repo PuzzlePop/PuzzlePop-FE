@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Header from "@/components/Header";
-import imgPath from "@/assets/puzzle.gif";
+import imgPath from "@/assets/backgrounds/puzzle.gif";
 import logoPath from "@/assets/logo.png";
 
 export default function HomePage() {
