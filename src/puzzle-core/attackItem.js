@@ -5,11 +5,19 @@ import { getTeam } from "@/socket-utils/storage";
 import firePath from "@/assets/effects/fire.gif";
 import rocketPath from "@/assets/effects/rocket.gif";
 import explosionPath from "@/assets/effects/explosion.gif";
+import tornadoPath from "@/assets/effects/tornado.gif";
 
 const { getConfig, usingItemFire, usingItemRocket, usingItemEarthquake } = configStore;
 
 // 불 지르기 맞는 or 보내는 효과 + usingItemFire 함수 호출
-export const attackFire = (targets, targetList, deleted, bundles) => {
+export const attackFire = (
+  targets,
+  targetList,
+  deleted,
+  bundles,
+  setSnackMessage,
+  setSnackOpen,
+) => {
   const fireImg = document.createElement("img");
   const canvasContainer = document.getElementById("canvasContainer");
   fireImg.src = firePath;
@@ -24,6 +32,8 @@ export const attackFire = (targets, targetList, deleted, bundles) => {
   if (targets === getTeam().toUpperCase()) {
     if (targetList === null || targetList.length === 0) {
       // 해당되는 target이 없을 경우 알림 해야함
+      setSnackMessage("불 지르기가 왔는데 운 좋게도(?)... 불 지르기 당할 맞춰진 피스가 없군요.");
+      setSnackOpen(true);
       return;
     }
     console.log("fire 맞을거임");
@@ -77,7 +87,7 @@ export const attackFire = (targets, targetList, deleted, bundles) => {
 };
 
 // 로켓 맞는 or 보내는 효과 + usingItemRocket 함수 호출
-export const attackRocket = (targets, targetList, deleted) => {
+export const attackRocket = (targets, targetList, deleted, setSnackMessage, setSnackOpen) => {
   const rocketImg = document.createElement("img");
   const canvasContainer = document.getElementById("canvasContainer");
   rocketImg.src = rocketPath;
@@ -89,6 +99,8 @@ export const attackRocket = (targets, targetList, deleted) => {
   if (targets === getTeam().toUpperCase()) {
     if (targetList === null || targetList.length === 0) {
       // 해당되는 target이 없을 경우 알림 해야함
+      setSnackMessage("로켓이왔는데 운 좋게도(?)... 로켓을 맞을 맞춰진 피스가 없군요.");
+      setSnackOpen(true);
       return;
     }
     console.log("rocket 맞을거임");
@@ -159,20 +171,53 @@ export const attackRocket = (targets, targetList, deleted) => {
   }, 2000);
 };
 
-//
-export const attackEarthquake = (targets, targetList, deleted) => {
-  // // earthquake 당하는 팀의 효과
-  // if (targets === getTeam().toUpperCase()) {
+// 지진 맞는 or 보내는 효과 + usingItemEarthquake 함수 호출
+export const attackEarthquake = (targets, targetList, deleted, setSnackMessage, setSnackOpen) => {
+  const tornadoImg = document.createElement("img");
+  const canvasContainer = document.getElementById("canvasContainer");
+  tornadoImg.src = tornadoPath;
 
-  // } else { // earthquake 발동하는 팀의 효과
+  tornadoImg.style.zIndex = 100;
+  tornadoImg.style.position = "absolute";
+  tornadoImg.style.width = "200px";
+  tornadoImg.style.height = "225px";
+  tornadoImg.style.transform = "translate(-50%, -95%)";
 
-  // }
-
-  setTimeout(() => {
-    // console.log();
-    if (targetList && targets === getTeam().toUpperCase()) {
-      console.log("earthquake 발동 !!");
-      usingItemEarthquake(targetList, deleted);
+  // earthquake 당하는 팀의 효과
+  if (targets === getTeam().toUpperCase()) {
+    if (targetList === null || targetList.length === 0) {
+      // 해당되는 target이 없을 경우 알림 해야함
+      setSnackMessage("회오리가 왔는데 운 좋게도 흩어질 피스가 없군요!");
+      setSnackOpen(true);
+      return;
     }
-  }, 2000);
+
+    tornadoImg.style.left = "100px";
+    tornadoImg.style.top = "100px";
+    tornadoImg.style.animation = "tornado-animation 1.2s linear forwards";
+
+    canvasContainer.appendChild(tornadoImg);
+
+    setTimeout(() => {
+      console.log("earthquake 발동 !!");
+      if (tornadoImg.parentNode) {
+        tornadoImg.parentNode.removeChild(tornadoImg);
+      }
+      usingItemEarthquake(targetList, deleted);
+    }, 1200);
+  } else {
+    // earthquake 발동하는 팀의 효과
+    tornadoImg.style.left = "1000px";
+    tornadoImg.style.top = "230px";
+    tornadoImg.style.animation = "tornado-send-animation 1.2s linear forwards";
+
+    canvasContainer.appendChild(tornadoImg);
+
+    setTimeout(() => {
+      console.log("지진 효과 발동 !!");
+      if (tornadoImg.parentNode) {
+        tornadoImg.parentNode.removeChild(tornadoImg);
+      }
+    }, 1200);
+  }
 };

@@ -21,7 +21,7 @@ import redTeamBackgroundPath from "@/assets/backgrounds/redTeamBackground.gif";
 import blueTeamBackgroundPath from "@/assets/backgrounds/blueTeamBackground.gif";
 import dropRandomItemPath from "@/assets/effects/dropRandomItem.gif";
 
-import { Box, Dialog, DialogTitle } from "@mui/material";
+import { Box, Dialog, DialogTitle, Snackbar } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
 import { useHint } from "@/hooks/useHint";
@@ -48,6 +48,8 @@ export default function BattleGameIngamePage() {
   const { roomId } = useParams();
   const [gameData, setGameData] = useState(null);
   const [isOpenedDialog, setIsOpenedDialog] = useState(false);
+  const [snackOpen, setSnackOpen] = useState(false);
+  const [snackMessage, setSnackMessage] = useState("");
 
   const [time, setTime] = useState(0);
   const [ourPercent, setOurPercent] = useState(0);
@@ -81,6 +83,10 @@ export default function BattleGameIngamePage() {
     navigate(`/game/battle`, {
       replace: true,
     });
+  };
+
+  const handleSnackClose = () => {
+    setSnackOpen(false);
   };
 
   const initializeGame = (data) => {
@@ -300,12 +306,19 @@ export default function BattleGameIngamePage() {
               console.log("랜덤 아이템 fire 였어!");
 
               const attackedTeamBundles = targets === "RED" ? redBundles : blueBundles;
-              attackFire(targets, targetList, deleted, attackedTeamBundles);
+              attackFire(
+                targets,
+                targetList,
+                deleted,
+                attackedTeamBundles,
+                setSnackMessage,
+                setSnackOpen,
+              );
             }
 
             if (randomItem.name === "ROCKET") {
               console.log("랜덤 아이템 rocket 였어!");
-              attackRocket(targets, targetList, deleted);
+              attackRocket(targets, targetList, deleted, setSnackMessage, setSnackOpen);
             }
 
             if (randomItem.name === "EARTHQUAKE") {
@@ -313,20 +326,7 @@ export default function BattleGameIngamePage() {
 
               console.log("지진 발동", data);
 
-              // // earthquake 당하는 팀의 효과
-              // if (targets === getTeam().toUpperCase()) {
-
-              // } else { // earthquake 발동하는 팀의 효과
-
-              // }
-
-              setTimeout(() => {
-                // console.log();
-                if (targetList && targets === getTeam().toUpperCase()) {
-                  console.log("earthquake 발동 !!");
-                  usingItemEarthquake(targetList, deleted);
-                }
-              }, 2000);
+              attackEarthquake(targets, targetList, deleted, setSnackMessage, setSnackOpen);
             }
           }
 
@@ -360,7 +360,7 @@ export default function BattleGameIngamePage() {
             } else if (currentDropRandomItem.current === "EARTHQUAKE") {
               console.log("거울로 지진을 맞았어!!!");
 
-              attackEarthquake(targets, targetList, deleted);
+              attackEarthquake(targets, targetList, deleted, setSnackMessage, setSnackOpen);
             }
           }
 
@@ -493,7 +493,7 @@ export default function BattleGameIngamePage() {
         <Loading message="게임 정보 받아오는 중..." />
       ) : (
         <>
-          <Board>
+          <Board id="gameBoard">
             <PlayPuzzle
               category="battle"
               shapes={parsePuzzleShapes(
@@ -550,6 +550,14 @@ export default function BattleGameIngamePage() {
                 )}
             </>
           )}
+
+          <Snackbar
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            open={snackOpen}
+            autoHideDuration={3000}
+            onClose={handleSnackClose}
+            message={snackMessage}
+          />
 
           <ThemeProvider theme={theme}>
             <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
