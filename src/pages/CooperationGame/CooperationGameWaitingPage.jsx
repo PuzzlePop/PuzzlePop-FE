@@ -9,12 +9,14 @@ import GameWaitingBoard from "@/components/GameWaiting/GameWaitingBoard";
 import Loading from "@/components/Loading";
 
 import { getSender, getRoomId } from "@/socket-utils/storage";
-import { socket } from "@/socket-utils/socket";
+// import { socket } from "@/socket-utils/socket";
+import createSocket from "@/socket-utils/socket2";
+
 import { request } from "@/apis/requestBuilder";
 
 import backgroundPath from "@/assets/backgrounds/background.gif";
 
-const { connect, send, subscribe } = socket;
+// const { connect, send, subscribe } = socket;
 
 export default function CooperationGameWaitingPage() {
   const navigate = useNavigate();
@@ -27,6 +29,9 @@ export default function CooperationGameWaitingPage() {
   }, [gameData]);
 
   const connectSocket = async () => {
+    const socket = createSocket(roomId);
+    const {connect, send, subscribe} = socket;
+    
     // websocket 연결 시도
     connect(() => {
       console.log("@@@@@@@@@@@@@@@@ 대기실 소켓 연결 @@@@@@@@@@@@@@@@@@");

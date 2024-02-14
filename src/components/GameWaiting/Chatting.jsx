@@ -2,18 +2,22 @@ import { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
 import { getSender, getRoomId, getTeam } from "@/socket-utils/storage";
-import { socket } from "@/socket-utils/socket";
+// import { socket } from "@/socket-utils/socket";
+import createSocket from "@/socket-utils/socket2";
+
 import { TextField, Button } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
 
-const { send } = socket;
+// const { send } = socket;
 
 export default function Chatting({ chatHistory, isIngame = false, isBattle = false }) {
   const [message, setMessage] = useState("");
   const [lastHeight, setLastHeight] = useState(null);
   const chatElement = useRef();
-
+  const socket = createSocket();
+  const { send } = socket;
+  
   const handleMessageSend = (e) => {
     e.preventDefault();
     if (getSender() && message) {
