@@ -6,13 +6,13 @@ const SERVER_END_POINT = import.meta.env.DEV
   : "wss://i10a304.p.ssafy.io/api";
 const SOCKET_END_POINT = `${SERVER_END_POINT}/game`;
 
-export default function createSocket(roomId) {
+function createSocket() {
   let stomp = null;
 
   const connect = (onConnect) => {
     if (!stomp) {
       stomp = new StompJS.Client({
-        brokerURL: `${SOCKET_END_POINT}/${roomId}`,
+        brokerURL: SOCKET_END_POINT,
         onConnect,
         connectHeaders: {},
       });
@@ -56,3 +56,5 @@ export default function createSocket(roomId) {
     disconnect,
   };
 }
+
+export const socket = createSocket();

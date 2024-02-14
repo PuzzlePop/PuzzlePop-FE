@@ -12,9 +12,7 @@ import Timer from "@/components/GameIngame/Timer";
 import Chatting from "@/components/GameWaiting/Chatting";
 
 import { configStore } from "@/puzzle-core";
-// import { socket } from "@/socket-utils/socket";
-import createSocket from "@/socket-utils/socket2";
-
+import { socket } from "@/socket-utils/socket2";
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import { useHint } from "@/hooks/useHint";
@@ -26,7 +24,7 @@ import { Box, Dialog, DialogTitle } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 
-// const { connect, send, subscribe, disconnect } = socket;
+const { connect, send, subscribe, disconnect } = socket;
 const {
   lockPuzzle,
   movePuzzle,
@@ -60,9 +58,7 @@ export default function CooperationGameIngamePage() {
       replace: true,
     });
   };
-  const socket = createSocket(roomId);
-  const {connect, send, subscribe} = socket;
-  
+
   const handleSendUseItemMessage = useCallback((keyNumber) => {
     send(
       "/app/game/message",
