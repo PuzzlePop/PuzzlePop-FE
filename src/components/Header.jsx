@@ -70,6 +70,11 @@ export default function Header() {
     }
   };
 
+  const moveProfile = async () => {
+    const userId = getCookie("userId");
+    navigate(`/user/${userId}`)
+  }
+
   return (
     <HeaderBar>
       <Toolbar sx={{ flexWrap: "wrap" }}>
@@ -81,6 +86,9 @@ export default function Header() {
           <ImageIcon imageSource={HeaderRankImage} size="md" onClick={() => navigate("/rank")} />
           {/* <ImageIcon imageSource={HeaderShopImage} size="md" onClick={() => navigate("/shop")} /> */}
           <ThemeProvider theme={theme}>
+            <Button variant="text" sx={{ px: 2.5 }} size="large" onClick={moveProfile}>
+              Profile
+            </Button>
             <Button variant="text" sx={{ px: 2.5 }} size="large" onClick={moveLogin}>
               {isLoggedIn ? "Log out" : "Log in"}
             </Button>

@@ -159,7 +159,7 @@ export default function ProfilePage() {
             <div>닉네임 : {user.nickname}</div>
             <div>국적 : {user.locale}</div>
             <div>상태 : {user.online_status}</div>
-            <div>보유 골드 : {user.gold}</div>
+            {/* <div>보유 골드 : {user.gold}</div> */}
           </div>
         </div>
       </div>
