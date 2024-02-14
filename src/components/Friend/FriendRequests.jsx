@@ -33,10 +33,10 @@ export default function FriendRequests() {
     const { data: updatedData } = response;
 
     if (updatedData) {
-      console.log(updatedData);
+      alert("처리 완료!");
     }
 
-    fetchFriendRequestList();
+    fetchFriendRequestList(getCookie("userId"));
   };
 
   useEffect(() => {
