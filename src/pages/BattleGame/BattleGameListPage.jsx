@@ -65,7 +65,7 @@ export default function BattleGameListPage() {
         if (data.message === "WAITING") {
           alert("waiting");
         } else if (data.message === "GAME_START") {
-          alert(data.targets);
+          window.location.replace(`/game/battle/ingame/${data.targets}`);
         }
       });
       
