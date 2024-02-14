@@ -47,7 +47,7 @@ export default function CooperationGameIngamePage() {
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
 
-  const { itemInventory, setItemInventory } = useInventory();
+  const { prevItemInventory, itemInventory, updateInventory } = useInventory();
   const { hintList, addHint, closeHint, cleanHint } = useHint();
 
   const isLoaded = useMemo(() => {
@@ -94,7 +94,7 @@ export default function CooperationGameIngamePage() {
         console.log("@@@@@@@@@@@@@@@@ 인게임 소켓 연결 @@@@@@@@@@@@@@@@@@");
         subscribe(`/topic/game/room/${roomId}`, (message) => {
           const data = JSON.parse(message.body);
-          // console.log(data);
+          console.log(data);
 
           // 매번 게임이 끝났는지 체크
           if (Boolean(data.finished)) {
@@ -109,7 +109,7 @@ export default function CooperationGameIngamePage() {
 
           // 매번 보유아이템배열을 업데이트
           if (data.redItemList) {
-            setItemInventory(data.redItemList);
+            updateInventory(data.redItemList);
           }
 
           // timer 설정
@@ -287,7 +287,11 @@ export default function CooperationGameIngamePage() {
             </Col>
           </Board>
 
-          <ItemInventory itemInventory={itemInventory} onUseItem={handleUseItem} />
+          <ItemInventory
+            prevItemInventory={prevItemInventory}
+            itemInventory={itemInventory}
+            onUseItem={handleUseItem}
+          />
           {document.querySelector("#canvasContainer") &&
             createPortal(
               <Hint hintList={hintList} onClose={closeHint} />,

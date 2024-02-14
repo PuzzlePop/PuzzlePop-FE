@@ -57,9 +57,16 @@ export default function BattleGameIngamePage() {
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
 
-  const { itemInventory: redItemInventory, setItemInventory: setRedItemInventory } = useInventory();
-  const { itemInventory: blueItemInventory, setItemInventory: setBlueItemInventory } =
-    useInventory();
+  const {
+    prevItemInventory: prevRedItemInventory,
+    itemInventory: redItemInventory,
+    updateInventory: setRedItemInventory,
+  } = useInventory();
+  const {
+    prevItemInventory: prevBlueItemInventory,
+    itemInventory: blueItemInventory,
+    updateInventory: setBlueItemInventory,
+  } = useInventory();
 
   const { isShowSnackbar, setIsShowSnackbar, snackMessage, setSnackMessage } = useSnackbar();
 
@@ -552,7 +559,11 @@ export default function BattleGameIngamePage() {
 
           {getTeam() === "red" ? (
             <>
-              <ItemInventory itemInventory={redItemInventory} onUseItem={handleUseItem} />
+              <ItemInventory
+                prevItemInventory={prevRedItemInventory}
+                itemInventory={redItemInventory}
+                onUseItem={handleUseItem}
+              />
               {document.querySelector("#canvasContainer") &&
                 createPortal(
                   <Hint hintList={redHintList} onClose={redCloseHint} />,
@@ -561,7 +572,11 @@ export default function BattleGameIngamePage() {
             </>
           ) : (
             <>
-              <ItemInventory itemInventory={blueItemInventory} onUseItem={handleUseItem} />
+              <ItemInventory
+                prevItemInventory={prevBlueItemInventory}
+                itemInventory={blueItemInventory}
+                onUseItem={handleUseItem}
+              />
               {document.querySelector("#canvasContainer") &&
                 createPortal(
                   <Hint hintList={blueHintList} onClose={blueCloseHint} />,

@@ -1,8 +1,14 @@
 import { useCallback, useEffect } from "react";
 import styled from "styled-components";
 import Draggable from "react-draggable";
+import { match } from "../_lib/utils";
+import frameImage from "@/assets/inventory-items/item_frame.png";
+import hintImage from "@/assets/inventory-items/item_hint.png";
+import magnetImage from "@/assets/inventory-items/item_magnet.png";
+import mirrorImage from "@/assets/inventory-items/item_mirror.png";
+import shieldImage from "@/assets/inventory-items/item_shield.png";
 
-export default function ItemInventory({ itemInventory, onUseItem }) {
+export default function ItemInventory({ prevItemInventory, itemInventory, onUseItem }) {
   const _useItem = useCallback(
     (keyNumber) => {
       if (itemInventory[keyNumber - 1] && onUseItem) {
@@ -27,13 +33,22 @@ export default function ItemInventory({ itemInventory, onUseItem }) {
     [_useItem],
   );
 
+  // TODO: 이전에 있던 배열과 비교해서 새로운 아이템이 들어온 경우 이펙트를 줘야한다.
+  // 다른 인덱스..
+
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDownItem);
+
+    console.log("이벤트 어태치!");
 
     return () => {
       window.removeEventListener("keydown", handleKeyDownItem);
     };
   }, [handleKeyDownItem]);
+
+  useEffect(() => {
+    console.log(prevItemInventory, itemInventory);
+  }, [prevItemInventory, itemInventory]);
 
   return (
     <Draggable defaultPosition={{ x: 20, y: -800 }}>
@@ -42,9 +57,15 @@ export default function ItemInventory({ itemInventory, onUseItem }) {
         <ItemSpaces>
           {itemInventory.map((item, index) => (
             <ItemSpace key={index}>
-              <ItemButton onClick={() => _useItem(index + 1)}>
-                <div>{item ? matchItemNameToKorean(item.name) : "비어있음"}</div>
-              </ItemButton>
+              {item ? (
+                <Item
+                  onClick={() => _useItem(index + 1)}
+                  src={getImageSource(item.itemName)}
+                  alt={item.itemName}
+                />
+              ) : (
+                <EmptyItem alt="빈 아이템" />
+              )}
               <div>{index + 1}</div>
             </ItemSpace>
           ))}
@@ -54,26 +75,16 @@ export default function ItemInventory({ itemInventory, onUseItem }) {
   );
 }
 
-/************************ utils ************************/
-const itemNameToKoreanMatcher = {
-  MAGNET: "자석",
-  HINT: "힌트",
-  FRAME: "액자",
-  SHIELD: "쉴드",
-  MIRROR: "거울",
+const imageMatcher = {
+  FRAME: frameImage,
+  HINT: hintImage,
+  MAGNET: magnetImage,
+  MIRROR: mirrorImage,
+  SHIELD: shieldImage,
 };
 
-const match = (matcher) => (key) => {
-  const value = matcher[key];
-  if (value === undefined) {
-    throw new Error("matcher value is undefined");
-  }
-  return matcher[key];
-};
+const getImageSource = match(imageMatcher);
 
-const matchItemNameToKorean = match(itemNameToKoreanMatcher);
-
-/************************ styled ************************/
 const Container = styled.div`
   max-width: 300px;
   z-index: 9999;
@@ -98,12 +109,16 @@ const Container = styled.div`
 
 const ItemSpaces = styled.ul`
   display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const ItemSpace = styled.div`
   flex: 1;
   text-align: center;
   display: flex;
+  justify-content: center;
+  align-items: center;
   flex-direction: column;
   gap: 3px;
 
@@ -111,9 +126,20 @@ const ItemSpace = styled.div`
   font-weight: 800;
 `;
 
-const ItemButton = styled.button`
-  width: 100%;
+const Item = styled.img`
+  display: block;
+  width: 50px;
+  height: 50px;
   cursor: pointer;
+  object-fit: contain;
+`;
 
-  font-size: 18px; // TODO: 여기에 Text 대신 이미지를 넣자
+const EmptyItem = styled.div`
+  width: 50px;
+  height: 50px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f2f2f2;
+  opacity: 0.5;
+  pointer-events: none;
 `;
