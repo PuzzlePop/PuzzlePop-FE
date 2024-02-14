@@ -35,12 +35,13 @@ export default function BattleGameListPage() {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) {
-      return parts.pop().split(";").shift();
+      return parts.pop().split(';').shift();
     }
   }
 
+
   const quickMatching = () => {
-    const sender = getCookie("userId");
+    let sender = getCookie("userId");
     if (!sender) {
       alert("로그인한 유저만 이용할 수 있는 기능입니다.");
       return;
@@ -50,28 +51,35 @@ export default function BattleGameListPage() {
       //랜덤 매칭 큐 소켓
       subscribe(`/topic/game/room/quick/${sender}`, (message) => {
         const data = JSON.parse(message.body);
+        console.log(data);
+        
         if (data.message === "WAITING") {
           alert("waiting");
         } else if (data.message === "GAME_START") {
           alert(data.targets);
         }
-      });
 
-      //대기 큐 입장했다고 보내기
-      send(
-        "/app/game/message",
-        {},
-        JSON.stringify({
-          type: "QUICK",
-          sender: sender,
-          member: true,
-        }),
-      );
+        //대기 큐 입장했다고 보내기
+        send(
+          "/app/game/message",
+          {},
+          JSON.stringify({
+            type: "QUICK",
+            sender: sender,
+            member: true
+          }),
+        );
+      });
+      
+      
 
       //응답 메시지 파싱
-    });
-  };
+    })
+    
 
+    
+
+  }
   return (
     <Wrapper>
       <Header />
