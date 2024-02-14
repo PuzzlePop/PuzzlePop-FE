@@ -44,7 +44,9 @@ export default function BattleGameListPage() {
     let sender = getCookie("userId");
     if (!sender) {
       alert("로그인한 유저만 이용할 수 있는 기능입니다.");
+      return;
     }
+
     connect(() => {
       //랜덤 매칭 큐 소켓
       subscribe(`/topic/game/room/quick/${sender}`, (message) => {
@@ -62,8 +64,8 @@ export default function BattleGameListPage() {
         {},
         JSON.stringify({
           type: "QUICK",
-          sender: getSender(),
-          member: getCookie("userId") ? true : false
+          sender: sender,
+          member: true
         }),
       );
 
