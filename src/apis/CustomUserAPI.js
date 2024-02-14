@@ -10,7 +10,7 @@ export const UserAPI = axios.create({
 });
 
 export const fetchUser = async (id) => {
-    const response = await UserAPI.get(`/user?id=${id}`);
+    const response = await UserAPI.post(`/user`, {id : id});
     return response.data;
 };
 
