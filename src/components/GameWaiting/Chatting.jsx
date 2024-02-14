@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
+// import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
 import { getSender, getRoomId, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { TextField, Button } from "@mui/material";
@@ -119,7 +119,7 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
         )}
 
         <Form onSubmit={handleMessageSend}>
-          {isIngame ? (
+          {/* {isIngame ? (
             <GameOpenVidu
               gameId={`${getRoomId()}_${getTeam()}`}
               playerName={getSender()}
@@ -127,7 +127,7 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
             />
           ) : (
             <GameOpenVidu gameId={getRoomId()} playerName={getSender()} />
-          )}
+          )} */}
           <ChatInput
             type="text"
             placeholder="채팅"

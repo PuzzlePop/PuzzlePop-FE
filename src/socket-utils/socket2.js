@@ -35,4 +35,4 @@ socket2.onStompError = function (frame) {
   console.log("Additional details: " + frame.body);
 };
 
-socket2.activate();
+// socket2.activate();
