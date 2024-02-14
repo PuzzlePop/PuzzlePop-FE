@@ -123,6 +123,7 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
             placeholder="채팅"
             size="small"
             color={currentTheme}
+            autoComplete="off"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />

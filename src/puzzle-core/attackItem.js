@@ -1,5 +1,5 @@
 import { configStore } from "@/puzzle-core";
-import { getPuzzlePositionByIndex } from "@/puzzle-core/utils";
+import { getPuzzlePositionByIndex, updateGroupByBundles } from "@/puzzle-core/utils";
 import { getTeam } from "@/socket-utils/storage";
 
 import firePath from "@/assets/effects/fire.gif";
@@ -17,6 +17,7 @@ export const attackFire = (
   bundles,
   setSnackMessage,
   setSnackOpen,
+  isMirror,
 ) => {
   const fireImg = document.createElement("img");
   const canvasContainer = document.getElementById("canvasContainer");
@@ -31,11 +32,24 @@ export const attackFire = (
   // fire 당하는 팀의 효과
   if (targets === getTeam().toUpperCase()) {
     if (targetList === null || targetList.length === 0) {
+      if (isMirror) {
+        setSnackMessage(
+          "🔥불 지르기가 반사됐어요🔥 근데 운 좋게도(?)... 불 지르기 당할 맞춰진 피스가 없군요.",
+        );
+        setSnackOpen(true);
+        return;
+      }
       // 해당되는 target이 없을 경우 알림 해야함
       setSnackMessage("불 지르기가 왔는데 운 좋게도(?)... 불 지르기 당할 맞춰진 피스가 없군요.");
       setSnackOpen(true);
       return;
     }
+
+    if (isMirror) {
+      setSnackMessage("🔥불 지르기가 반사됐어요🔥");
+      setSnackOpen(true);
+    }
+
     console.log("fire 맞을거임");
 
     for (let i = 0; i < targetList.length; i++) {
@@ -87,7 +101,15 @@ export const attackFire = (
 };
 
 // 로켓 맞는 or 보내는 효과 + usingItemRocket 함수 호출
-export const attackRocket = (targets, targetList, deleted, setSnackMessage, setSnackOpen) => {
+export const attackRocket = (
+  targets,
+  targetList,
+  deleted,
+  bundles,
+  setSnackMessage,
+  setSnackOpen,
+  isMirror,
+) => {
   const rocketImg = document.createElement("img");
   const canvasContainer = document.getElementById("canvasContainer");
   rocketImg.src = rocketPath;
@@ -98,12 +120,24 @@ export const attackRocket = (targets, targetList, deleted, setSnackMessage, setS
   // rocket 당하는 팀의 효과
   if (targets === getTeam().toUpperCase()) {
     if (targetList === null || targetList.length === 0) {
+      if (isMirror) {
+        setSnackMessage(
+          "🚀로켓이 반사됐어요🚀 근데 운 좋게도(?)... 로켓을 맞을 맞춰진 피스가 없군요.",
+        );
+        setSnackOpen(true);
+        return;
+      }
       // 해당되는 target이 없을 경우 알림 해야함
       setSnackMessage("로켓이왔는데 운 좋게도(?)... 로켓을 맞을 맞춰진 피스가 없군요.");
       setSnackOpen(true);
       return;
     }
     console.log("rocket 맞을거임");
+
+    if (isMirror) {
+      setSnackMessage("🚀로켓이 반사됐어요🚀");
+      setSnackOpen(true);
+    }
 
     const centerIdx = targetList[parseInt(targetList.length / 2) + 1];
     const [position_x, position_y] = getPuzzlePositionByIndex({
@@ -167,12 +201,24 @@ export const attackRocket = (targets, targetList, deleted, setSnackMessage, setS
     if (targetList && targets === getTeam().toUpperCase()) {
       console.log("rocket 발동 !!");
       usingItemRocket(targetList);
+      updateGroupByBundles({
+        config: getConfig(),
+        bundles,
+      });
     }
   }, 2000);
 };
 
 // 지진 맞는 or 보내는 효과 + usingItemEarthquake 함수 호출
-export const attackEarthquake = (targets, targetList, deleted, setSnackMessage, setSnackOpen) => {
+export const attackEarthquake = (
+  targets,
+  targetList,
+  deleted,
+  bundles,
+  setSnackMessage,
+  setSnackOpen,
+  isMirror,
+) => {
   const tornadoImg = document.createElement("img");
   const canvasContainer = document.getElementById("canvasContainer");
   tornadoImg.src = tornadoPath;
@@ -186,10 +232,20 @@ export const attackEarthquake = (targets, targetList, deleted, setSnackMessage, 
   // earthquake 당하는 팀의 효과
   if (targets === getTeam().toUpperCase()) {
     if (targetList === null || targetList.length === 0) {
+      if (isMirror) {
+        setSnackMessage("🌪️회오리가 반사됐어요🌪️ 그런데 운 좋게도 흩어질 피스가 없군요!");
+        setSnackOpen(true);
+        return;
+      }
       // 해당되는 target이 없을 경우 알림 해야함
       setSnackMessage("회오리가 왔는데 운 좋게도 흩어질 피스가 없군요!");
       setSnackOpen(true);
       return;
+    }
+
+    if (isMirror) {
+      setSnackMessage("🌪️회오리가 반사됐어요🌪️");
+      setSnackOpen(true);
     }
 
     tornadoImg.style.left = "100px";
@@ -204,6 +260,10 @@ export const attackEarthquake = (targets, targetList, deleted, setSnackMessage, 
         tornadoImg.parentNode.removeChild(tornadoImg);
       }
       usingItemEarthquake(targetList, deleted);
+      updateGroupByBundles({
+        config: getConfig(),
+        bundles,
+      });
     }, 1200);
   } else {
     // earthquake 발동하는 팀의 효과
