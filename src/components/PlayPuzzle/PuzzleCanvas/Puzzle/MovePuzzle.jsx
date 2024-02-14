@@ -2,7 +2,7 @@ import { Point } from "paper/dist/paper-core";
 import Puzzle from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/index";
 import FindChange from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/FindChange";
 import { getRoomId, getSender } from "../../../../socket-utils/storage";
-import { socket } from "../../../../socket-utils/socket2";
+import { socket } from "../../../../socket-utils/socket";
 import comboEffectPath from "@/assets/comboEffect.gif";
 
 // let first = true;
