@@ -68,6 +68,11 @@ export default function BattleGameListPage() {
         } else if (data.message === "GAME_START") {
           setRoomId(data.targets);
           setSender(sender)
+          if (data.team === "RED") {
+            setTeam("red")
+          } else {
+            setTeam("blue")
+          }
           window.location.replace(`/game/battle/ingame/${data.targets}`);
         }
       });
