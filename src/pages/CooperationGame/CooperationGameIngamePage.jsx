@@ -12,7 +12,7 @@ import Timer from "@/components/GameIngame/Timer";
 import Chatting from "@/components/GameWaiting/Chatting";
 
 import { configStore } from "@/puzzle-core";
-import { socket } from "2";
+import { socket } from "@/socket-utils/socket2";
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import { useHint } from "@/hooks/useHint";
