@@ -156,10 +156,16 @@ export default function BattleGameIngamePage() {
               const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
               usingItemMagnet(targetList, targetBundles);
             }
+            return;
+          }
 
-            // if (targets === "BLUE") {
-            //   usingItemMagnet(targetList, blueBundles);
-            // }
+          // "FRAME(액자)" 아이템 사용
+          if (data.message && data.message === "FRAME") {
+            const { targetList, redBundles, blueBundles, targets } = data;
+            if (targets === getTeam().toUpperCase()) {
+              const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
+              usingItemFrame(targetList, targetBundles);
+            }
             return;
           }
 
