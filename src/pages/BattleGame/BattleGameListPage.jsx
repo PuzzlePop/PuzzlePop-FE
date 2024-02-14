@@ -52,7 +52,7 @@ export default function BattleGameListPage() {
     );
 
     //게임 결과
-    subscribe(`/topic/game/room/quick/${getSender}`, (message) => {
+    subscribe(`/topic/game/room/quick/${getSender()}`, (message) => {
       const data = JSON.parse(message.body);
       if (data === "WAITING") {
         alert("waiting")
