@@ -69,7 +69,7 @@ export default function GameCard({ room, category }) {
     } catch (e) {
       if (isAxiosError(e) && e.response.status === 400) {
         // window.alert("다른 닉네임을 사용해주세요.");
-        setSnackMessage("다른 닉네임을 사용해주세요!");
+        setSnackMessage(e.response.data);
         setSnackOpen(true);
       }
       if (isAxiosError(e) && e.response.status === 403) {
@@ -94,7 +94,7 @@ export default function GameCard({ room, category }) {
     try {
       enterRoom(event.currentTarget.id);
     } catch(e) {
-      setSnackOpen("들어갈 수 없는 방입니다!");
+      setSnackOpen(e.response.data);
       setSnackOpen(true);
     }
   };
