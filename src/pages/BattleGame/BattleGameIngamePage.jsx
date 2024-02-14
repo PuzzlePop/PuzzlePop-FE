@@ -27,7 +27,6 @@ import { red, blue, deepPurple } from "@mui/material/colors";
 import { useHint } from "@/hooks/useHint";
 import Hint from "@/components/GameItemEffects/Hint";
 import { createPortal } from "react-dom";
-import { socket2 } from "../../socket-utils/socket2";
 
 const { connect, send, subscribe, disconnect } = socket;
 const {
@@ -90,28 +89,17 @@ export default function BattleGameIngamePage() {
   };
 
   const handleSendUseItemMessage = useCallback((keyNumber) => {
-    socket2.publish({
-      destination: "/app/game/message",
-      body: JSON.stringify({
+    send(
+      "/app/game/message",
+      {},
+      JSON.stringify({
         type: "GAME",
         roomId: getRoomId(),
         sender: getSender(),
         message: "USE_ITEM",
         targets: keyNumber,
       }),
-    });
-
-    // send(
-    //   "/app/game/message",
-    //   {},
-    //   JSON.stringify({
-    //     type: "GAME",
-    //     roomId: getRoomId(),
-    //     sender: getSender(),
-    //     message: "USE_ITEM",
-    //     targets: keyNumber,
-    //   }),
-    // );
+    );
   }, []);
 
   const changePercent = (data) => {
@@ -125,741 +113,366 @@ export default function BattleGameIngamePage() {
   };
 
   const connectSocket = async () => {
-    socket2.onConnect = () => {
-      console.log("@@@@@@@@@@@@@@@@ 인게임 소켓 연결 @@@@@@@@@@@@@@@@@@");
+    connect(
+      () => {
+        console.log("@@@@@@@@@@@@@@@@ 인게임 소켓 연결 @@@@@@@@@@@@@@@@@@");
+        subscribe(`/topic/game/room/${roomId}`, (message) => {
+          const data = JSON.parse(message.body);
+          console.log(data);
 
-      socket2.subscribe(`/topic/game/room/${roomId}`, (message) => {
-        const data = JSON.parse(message.body);
-        console.log(data);
-
-        // 매번 게임이 끝났는지 체크
-        if (
-          Boolean(data.finished) ||
-          data.redProgressPercent === 100 ||
-          data.blueProgressPercent === 100
-        ) {
-          // disconnect();
-          console.log("게임 끝남 !"); // TODO : 게임 끝났을 때 effect
-          setTimeout(() => {
-            setIsOpenedDialog(true);
-          }, 1000);
-          // return;
-        }
-
-        // timer 설정
-        if (!data.gameType && data.time) {
-          setTime(data.time);
-        }
-
-        // 매번 보유아이템배열을 업데이트
-        if (data.redItemList) {
-          setRedItemInventory(data.redItemList);
-        }
-        if (data.blueItemList) {
-          setBlueItemInventory(data.blueItemList);
-        }
-
-        // 게임정보 받기
-        if (data.gameType && data.gameType === "BATTLE") {
-          initializeGame(data);
-          setTimeout(() => {
-            console.log("번들로 그룹화 해볼게", getConfig(), data[`${getTeam()}Puzzle`].bundles);
-            updateGroupByBundles({
-              config: getConfig(),
-              bundles: data[`${getTeam()}Puzzle`].bundles,
-            });
-          }, 400);
-
-          return;
-        }
-
-        // 진행도
-        // ATTACK일때 2초 뒤(효과 지속 시간과 동일) 반영
-        // MIRROR일때 3초 뒤(효과 지속 시간과 동일) 반영
-        if (data.redProgressPercent >= 0 && data.blueProgressPercent >= 0) {
-          console.log("진행도?", data.redProgressPercent, data.blueProgressPercent);
-          if (data.message && data.message === "ATTACK") {
+          // 매번 게임이 끝났는지 체크
+          if (
+            Boolean(data.finished) ||
+            data.redProgressPercent === 100 ||
+            data.blueProgressPercent === 100
+          ) {
+            // disconnect();
+            console.log("게임 끝남 !"); // TODO : 게임 끝났을 때 effect
             setTimeout(() => {
-              changePercent(data);
-            }, 2000);
-          } else if (data.message && data.message === "MIRROR") {
+              setIsOpenedDialog(true);
+            }, 1000);
+            // return;
+          }
+
+          // timer 설정
+          if (!data.gameType && data.time) {
+            setTime(data.time);
+          }
+
+          // 매번 보유아이템배열을 업데이트
+          if (data.redItemList) {
+            setRedItemInventory(data.redItemList);
+          }
+          if (data.blueItemList) {
+            setBlueItemInventory(data.blueItemList);
+          }
+
+          // 게임정보 받기
+          if (data.gameType && data.gameType === "BATTLE") {
+            initializeGame(data);
             setTimeout(() => {
+              console.log("번들로 그룹화 해볼게", getConfig(), data[`${getTeam()}Puzzle`].bundles);
+              updateGroupByBundles({
+                config: getConfig(),
+                bundles: data[`${getTeam()}Puzzle`].bundles,
+              });
+            }, 400);
+
+            return;
+          }
+
+          // 진행도
+          // ATTACK일때 2초 뒤(효과 지속 시간과 동일) 반영
+          // MIRROR일때 3초 뒤(효과 지속 시간과 동일) 반영
+          if (data.redProgressPercent >= 0 && data.blueProgressPercent >= 0) {
+            console.log("진행도?", data.redProgressPercent, data.blueProgressPercent);
+            if (data.message && data.message === "ATTACK") {
+              setTimeout(() => {
+                changePercent(data);
+              }, 2000);
+            } else if (data.message && data.message === "MIRROR") {
+              setTimeout(() => {
+                changePercent(data);
+              }, 3000);
+            } else {
               changePercent(data);
-            }, 3000);
-          } else {
-            changePercent(data);
+            }
           }
-        }
 
-        // "MAGNET(자석)" 아이템 사용
-        if (data.message && data.message === "MAGNET") {
-          const { targetList, redBundles, blueBundles, targets } = data;
-          if (targets === getTeam().toUpperCase()) {
-            const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
-            usingItemMagnet(targetList, targetBundles);
-          }
-          return;
-        }
-
-        // "FRAME(액자)" 아이템 사용
-        if (data.message && data.message === "FRAME") {
-          const { targetList, redBundles, blueBundles, targets } = data;
-          if (targets === getTeam().toUpperCase()) {
-            const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
-            usingItemFrame(targetList, targetBundles);
-          }
-          return;
-        }
-
-        // 우리팀 event
-        if (data.message && data.team === getTeam().toUpperCase()) {
-          if (data.message && data.message === "LOCKED" && data.senderId !== getSender()) {
-            const { targets } = data;
-            const targetList = JSON.parse(targets);
-            targetList.forEach(({ x, y, index }) => lockPuzzle(x, y, index));
+          // "MAGNET(자석)" 아이템 사용
+          if (data.message && data.message === "MAGNET") {
+            const { targetList, redBundles, blueBundles, targets } = data;
+            if (targets === getTeam().toUpperCase()) {
+              const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
+              usingItemMagnet(targetList, targetBundles);
+            }
             return;
           }
 
-          if (data.message && data.message === "MOVE" && data.senderId !== getSender()) {
-            const { targets } = data;
-            const targetList = JSON.parse(targets);
-            targetList.forEach(({ x, y, index }) => movePuzzle(x, y, index));
+          // "FRAME(액자)" 아이템 사용
+          if (data.message && data.message === "FRAME") {
+            const { targetList, redBundles, blueBundles, targets } = data;
+            if (targets === getTeam().toUpperCase()) {
+              const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
+              usingItemFrame(targetList, targetBundles);
+            }
             return;
           }
 
-          if (data.message && data.message === "UNLOCKED" && data.senderId !== getSender()) {
-            const { targets } = data;
-            const targetList = JSON.parse(targets);
-            targetList.forEach(({ x, y, index }) => unLockPuzzle(x, y, index));
-            return;
-          }
-
-          if (data.message && data.message === "ADD_PIECE") {
-            const { targets, combo, comboCnt, team } = data;
-            const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
-            addPiece({ fromIndex, toIndex });
-
-            if (team === "RED") {
-              redCleanHint({ fromIndex, toIndex });
+          // 우리팀 event
+          if (data.message && data.team === getTeam().toUpperCase()) {
+            if (data.message && data.message === "LOCKED" && data.senderId !== getSender()) {
+              const { targets } = data;
+              const targetList = JSON.parse(targets);
+              targetList.forEach(({ x, y, index }) => lockPuzzle(x, y, index));
+              return;
             }
 
-            if (team === "BLUE") {
-              blueCleanHint({ fromIndex, toIndex });
+            if (data.message && data.message === "MOVE" && data.senderId !== getSender()) {
+              const { targets } = data;
+              const targetList = JSON.parse(targets);
+              targetList.forEach(({ x, y, index }) => movePuzzle(x, y, index));
+              return;
             }
 
-            if (combo) {
-              console.log("콤보 효과 발동 !! : ", combo);
-              combo.forEach(([toIndex, fromIndex, direction]) =>
-                addCombo(fromIndex, toIndex, direction),
-              );
+            if (data.message && data.message === "UNLOCKED" && data.senderId !== getSender()) {
+              const { targets } = data;
+              const targetList = JSON.parse(targets);
+              targetList.forEach(({ x, y, index }) => unLockPuzzle(x, y, index));
+              return;
+            }
 
-              if (comboCnt) {
-                console.log(`${comboCnt} 콤보문구 생성`);
-                const comboText = document.createElement("h2");
-                const canvasContainer = document.getElementById("canvasContainer");
-                comboText.textContent = `${comboCnt}COMBO!!`;
+            if (data.message && data.message === "ADD_PIECE") {
+              const { targets, combo, comboCnt, team } = data;
+              const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
+              addPiece({ fromIndex, toIndex });
 
-                comboText.style.zIndex = 100;
-                comboText.style.position = "fixed";
-                comboText.style.left = "40%";
-                comboText.style.top = "100px";
-                comboText.style.transform = "translate(-50%, 0)";
-                comboText.style.fontSize = "30px";
+              if (team === "RED") {
+                redCleanHint({ fromIndex, toIndex });
+              }
 
-                canvasContainer.appendChild(comboText);
+              if (team === "BLUE") {
+                blueCleanHint({ fromIndex, toIndex });
+              }
 
-                console.log(comboText);
-                setTimeout(() => {
-                  console.log("콤보 문구 삭제");
+              if (combo) {
+                console.log("콤보 효과 발동 !! : ", combo);
+                combo.forEach(([toIndex, fromIndex, direction]) =>
+                  addCombo(fromIndex, toIndex, direction),
+                );
+
+                if (comboCnt) {
+                  console.log(`${comboCnt} 콤보문구 생성`);
+                  const comboText = document.createElement("h2");
+                  const canvasContainer = document.getElementById("canvasContainer");
+                  comboText.textContent = `${comboCnt}COMBO!!`;
+
+                  comboText.style.zIndex = 100;
+                  comboText.style.position = "fixed";
+                  comboText.style.left = "40%";
+                  comboText.style.top = "100px";
+                  comboText.style.transform = "translate(-50%, 0)";
+                  comboText.style.fontSize = "30px";
+
+                  canvasContainer.appendChild(comboText);
+
                   console.log(comboText);
-                  console.log(comboText.parentNode);
-                  console.log(comboText.parentElement);
-                  comboText.parentNode.removeChild(comboText);
-                }, 2000);
+                  setTimeout(() => {
+                    console.log("콤보 문구 삭제");
+                    console.log(comboText);
+                    console.log(comboText.parentNode);
+                    console.log(comboText.parentElement);
+                    comboText.parentNode.removeChild(comboText);
+                  }, 2000);
+                }
+
+                const audio = new Audio(comboAudioPath);
+                audio.loop = false;
+                audio.crossOrigin = "anonymous";
+                // audio.volume = 0.5;
+                audio.load();
+                try {
+                  audio.play();
+                } catch (err) {
+                  console.log(err);
+                }
               }
 
-              const audio = new Audio(comboAudioPath);
-              audio.loop = false;
-              audio.crossOrigin = "anonymous";
-              // audio.volume = 0.5;
-              audio.load();
-              try {
-                audio.play();
-              } catch (err) {
-                console.log(err);
-              }
+              return;
+            }
+          }
+
+          // "HINT(힌트)" 아이템 사용
+          if (data.message && data.message === "HINT") {
+            const { targetList, targets } = data;
+            if (targets === "RED") {
+              redAddHint(...targetList);
+            }
+
+            if (targets === "BLUE") {
+              blueAddHint(...targetList);
             }
 
             return;
           }
-        }
 
-        // "HINT(힌트)" 아이템 사용
-        if (data.message && data.message === "HINT") {
-          const { targetList, targets } = data;
-          if (targets === "RED") {
-            redAddHint(...targetList);
-          }
-
-          if (targets === "BLUE") {
-            blueAddHint(...targetList);
-          }
-
-          return;
-        }
-
-        // "MAGNET(자석)" 아이템 사용
-        if (data.message && data.message === "MAGNET") {
-          const { targetList, redBundles, blueBundles, targets } = data;
-          if (targets === getTeam().toUpperCase()) {
-            const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
-            usingItemMagnet(targetList, targetBundles);
-          }
-          return;
-        }
-
-        // 공격형 아이템 공격 성공
-        if (data.message && data.message === "ATTACK") {
-          console.log("공격메세지", data);
-          // dropRandomItem 삭제
-          if (dropRandomItemElement.current.parentNode) {
-            dropRandomItemElement.current.parentNode.removeChild(dropRandomItemElement.current);
-          }
-
-          const { targets, targetList, deleted, randomItem, redBundles, blueBundles } = data;
-
-          if (randomItem.name === "FIRE") {
-            console.log("랜덤 아이템 fire 였어!");
-
-            const attackedTeamBundles = getTeam() === "red" ? redBundles : blueBundles;
-            attackFire(targets, targetList, deleted, attackedTeamBundles);
-            // // fire 당하는 팀의 효과
-            // if (targets === getTeam().toUpperCase()) {
-
-            // } else { // fire 발동하는 팀의 효과
-
-            // }
-
-            // setTimeout(() => {
-            //   console.log("레드팀 번들", redBundles);
-            //   console.log("블루팀 번들", blueBundles);
-            //   if (targetList && targets === getTeam().toUpperCase()) {
-            //     console.log("fire 발동 !!");
-            //     const attackedTeamBundles = getTeam() === "red" ? redBundles : blueBundles;
-            //     usingItemFire(attackedTeamBundles, targetList);
-            //   }
-            // }, 2000);
-          }
-
-          if (randomItem.name === "ROCKET") {
-            console.log("랜덤 아이템 rocket 였어!");
-            attackRocket(targets, targetList, deleted);
-          }
-
-          if (randomItem.name === "EARTHQUAKE") {
-            console.log("랜덤 아이템 earthquake 였어!");
-
-            console.log("지진 발동", data);
-
-            // // earthquake 당하는 팀의 효과
-            // if (targets === getTeam().toUpperCase()) {
-
-            // } else { // earthquake 발동하는 팀의 효과
-
-            // }
-
-            setTimeout(() => {
-              // console.log();
-              if (targetList && targets === getTeam().toUpperCase()) {
-                console.log("earthquake 발동 !!");
-                usingItemEarthquake(targetList, deleted);
-              }
-            }, 2000);
-          }
-        }
-
-        if (data.message && data.message === "SHIELD") {
-          console.log("공격메세지 : 쉴드", data);
-          // dropRandomItem 삭제
-          if (dropRandomItemElement.current.parentNode) {
-            dropRandomItemElement.current.parentNode.removeChild(dropRandomItemElement.current);
-          }
-        }
-
-        if (data.message && data.message === "MIRROR") {
-          console.log("공격메세지 : 거울", data);
-          // dropRandomItem 삭제
-          if (dropRandomItemElement.current.parentNode) {
-            dropRandomItemElement.current.parentNode.removeChild(dropRandomItemElement.current);
-          }
-        }
-
-        // drop random Item 생성
-        if (data.message && data.message === "DROP_ITEM" && data.randomItem) {
-          // 버튼 생성
-          const canvasContainer = document.getElementById("canvasContainer");
-          const dropRandomItemImg = document.createElement("img");
-          dropRandomItemImg.src = dropRandomItemPath;
-
-          // 버튼의 위치 설정
-          dropRandomItemImg.style.position = "absolute";
-          dropRandomItemImg.style.left = data.randomItem.position_x + "px";
-          dropRandomItemImg.style.top = data.randomItem.position_y + "px";
-          dropRandomItemImg.style.transform = "translate(-50%, -50%)";
-          dropRandomItemImg.style.cursor = "pointer";
-
-          dropRandomItemImg.onclick = function () {
-            // 부모 요소로부터 버튼 제거
-            //근데 이거 다른 클라이언트들도 이 아이템 먹었다고 버튼 사라지는 이벤트 처리하든가 해야함.
-            console.log("item dropRandomItemImg 클릭됨");
-            canvasContainer.removeChild(dropRandomItemImg);
-
-            // 서버로 메시지 전송
-            socket2.publish({
-              destination: "/app/game/message",
-              body: JSON.stringify({
-                type: "GAME",
-                roomId: getRoomId(),
-                sender: getSender(),
-                message: "USE_RANDOM_ITEM",
-                targets: data.randomItem.uuid,
-              }),
-            });
-
-            // send(
-            //   "/app/game/message",
-            //   {},
-            //   JSON.stringify({
-            //     type: "GAME",
-            //     roomId: getRoomId(),
-            //     sender: getSender(),
-            //     message: "USE_RANDOM_ITEM",
-            //     targets: data.randomItem.uuid,
-            //   }),
-            // );
-          };
-
-          // 버튼을 canvasContainer에 추가
-          dropRandomItemElement.current = dropRandomItemImg;
-          canvasContainer.appendChild(dropRandomItemImg);
-
-          // 현재 아이템 저장 (MIRROR 효과를 위해)
-          currentDropRandomItem.current = data.randomItem.name;
-
-          // alert 대신 메시지를 콘솔에 출력
-          console.log(
-            data.randomItem.name +
-              " 을 " +
-              data.randomItem.position_x +
-              " " +
-              data.randomItem.position_y +
-              " 에 생성한다!",
-          );
-
-          // 3초 뒤 아이템 삭제
-          setTimeout(() => {
-            if (dropRandomItemImg.parentNode) {
-              console.log("3초 끝남! item dropRandomItemImg 삭제");
-              canvasContainer.removeChild(dropRandomItemImg);
+          // "MAGNET(자석)" 아이템 사용
+          if (data.message && data.message === "MAGNET") {
+            const { targetList, redBundles, blueBundles, targets } = data;
+            if (targets === getTeam().toUpperCase()) {
+              const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
+              usingItemMagnet(targetList, targetBundles);
             }
-          }, 3000);
-        }
-      });
+            return;
+          }
 
-      // 채팅
-      socket2.subscribe(`/topic/chat/room/${roomId}`, (message) => {
-        const data = JSON.parse(message.body);
-        console.log("채팅왔다", data);
-        const { userid, chatMessage, time, teamColor } = data;
-        if (teamColor === getTeam().toUpperCase()) {
-          const receivedMessage = { userid, chatMessage, time }; // 받은 채팅
-          setChatHistory((prevChat) => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
-        }
-      });
+          // 공격형 아이템 공격 성공
+          if (data.message && data.message === "ATTACK") {
+            console.log("공격메세지", data);
+            // dropRandomItem 삭제
+            if (dropRandomItemElement.current.parentNode) {
+              dropRandomItemElement.current.parentNode.removeChild(dropRandomItemElement.current);
+            }
 
-      // 서버로 메시지 전송
-      socket2.publish({
-        destination: "/app/game/message",
-        body: JSON.stringify({
-          type: "ENTER",
-          roomId: getRoomId(),
-          sender: getSender(),
-        }),
-      });
+            const { targets, targetList, deleted, randomItem, redBundles, blueBundles } = data;
 
-      // send(
-      //   "/app/game/message",
-      //   {},
-      //   JSON.stringify({
-      //     type: "ENTER",
-      //     roomId: getRoomId(),
-      //     sender: getSender(),
-      //   }),
-      // );
-    };
+            if (randomItem.name === "FIRE") {
+              console.log("랜덤 아이템 fire 였어!");
 
-    socket2.activate();
+              const attackedTeamBundles = getTeam() === "red" ? redBundles : blueBundles;
+              attackFire(targets, targetList, deleted, attackedTeamBundles);
+              // // fire 당하는 팀의 효과
+              // if (targets === getTeam().toUpperCase()) {
 
-    // connect(
-    //   () => {
-    //     console.log("@@@@@@@@@@@@@@@@ 인게임 소켓 연결 @@@@@@@@@@@@@@@@@@");
-    //     subscribe(`/topic/game/room/${roomId}`, (message) => {
-    //       const data = JSON.parse(message.body);
-    //       console.log(data);
+              // } else { // fire 발동하는 팀의 효과
 
-    //       // 매번 게임이 끝났는지 체크
-    //       if (
-    //         Boolean(data.finished) ||
-    //         data.redProgressPercent === 100 ||
-    //         data.blueProgressPercent === 100
-    //       ) {
-    //         // disconnect();
-    //         console.log("게임 끝남 !"); // TODO : 게임 끝났을 때 effect
-    //         setTimeout(() => {
-    //           setIsOpenedDialog(true);
-    //         }, 1000);
-    //         // return;
-    //       }
+              // }
 
-    //       // timer 설정
-    //       if (!data.gameType && data.time) {
-    //         setTime(data.time);
-    //       }
+              // setTimeout(() => {
+              //   console.log("레드팀 번들", redBundles);
+              //   console.log("블루팀 번들", blueBundles);
+              //   if (targetList && targets === getTeam().toUpperCase()) {
+              //     console.log("fire 발동 !!");
+              //     const attackedTeamBundles = getTeam() === "red" ? redBundles : blueBundles;
+              //     usingItemFire(attackedTeamBundles, targetList);
+              //   }
+              // }, 2000);
+            }
 
-    //       // 매번 보유아이템배열을 업데이트
-    //       if (data.redItemList) {
-    //         setRedItemInventory(data.redItemList);
-    //       }
-    //       if (data.blueItemList) {
-    //         setBlueItemInventory(data.blueItemList);
-    //       }
+            if (randomItem.name === "ROCKET") {
+              console.log("랜덤 아이템 rocket 였어!");
+              attackRocket(targets, targetList, deleted);
+            }
 
-    //       // 게임정보 받기
-    //       if (data.gameType && data.gameType === "BATTLE") {
-    //         initializeGame(data);
-    //         setTimeout(() => {
-    //           console.log("번들로 그룹화 해볼게", getConfig(), data[`${getTeam()}Puzzle`].bundles);
-    //           updateGroupByBundles({
-    //             config: getConfig(),
-    //             bundles: data[`${getTeam()}Puzzle`].bundles,
-    //           });
-    //         }, 400);
+            if (randomItem.name === "EARTHQUAKE") {
+              console.log("랜덤 아이템 earthquake 였어!");
 
-    //         return;
-    //       }
+              console.log("지진 발동", data);
 
-    //       // 진행도
-    //       // ATTACK일때 2초 뒤(효과 지속 시간과 동일) 반영
-    //       // MIRROR일때 3초 뒤(효과 지속 시간과 동일) 반영
-    //       if (data.redProgressPercent >= 0 && data.blueProgressPercent >= 0) {
-    //         console.log("진행도?", data.redProgressPercent, data.blueProgressPercent);
-    //         if (data.message && data.message === "ATTACK") {
-    //           setTimeout(() => {
-    //             changePercent(data);
-    //           }, 2000);
-    //         } else if (data.message && data.message === "MIRROR") {
-    //           setTimeout(() => {
-    //             changePercent(data);
-    //           }, 3000);
-    //         } else {
-    //           changePercent(data);
-    //         }
-    //       }
+              // // earthquake 당하는 팀의 효과
+              // if (targets === getTeam().toUpperCase()) {
 
-    //       // "MAGNET(자석)" 아이템 사용
-    //       if (data.message && data.message === "MAGNET") {
-    //         const { targetList, redBundles, blueBundles, targets } = data;
-    //         if (targets === getTeam().toUpperCase()) {
-    //           const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
-    //           usingItemMagnet(targetList, targetBundles);
-    //         }
-    //         return;
-    //       }
+              // } else { // earthquake 발동하는 팀의 효과
 
-    //       // "FRAME(액자)" 아이템 사용
-    //       if (data.message && data.message === "FRAME") {
-    //         const { targetList, redBundles, blueBundles, targets } = data;
-    //         if (targets === getTeam().toUpperCase()) {
-    //           const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
-    //           usingItemFrame(targetList, targetBundles);
-    //         }
-    //         return;
-    //       }
+              // }
 
-    //       // 우리팀 event
-    //       if (data.message && data.team === getTeam().toUpperCase()) {
-    //         if (data.message && data.message === "LOCKED" && data.senderId !== getSender()) {
-    //           const { targets } = data;
-    //           const targetList = JSON.parse(targets);
-    //           targetList.forEach(({ x, y, index }) => lockPuzzle(x, y, index));
-    //           return;
-    //         }
+              setTimeout(() => {
+                // console.log();
+                if (targetList && targets === getTeam().toUpperCase()) {
+                  console.log("earthquake 발동 !!");
+                  usingItemEarthquake(targetList, deleted);
+                }
+              }, 2000);
+            }
+          }
 
-    //         if (data.message && data.message === "MOVE" && data.senderId !== getSender()) {
-    //           const { targets } = data;
-    //           const targetList = JSON.parse(targets);
-    //           targetList.forEach(({ x, y, index }) => movePuzzle(x, y, index));
-    //           return;
-    //         }
+          if (data.message && data.message === "SHIELD") {
+            console.log("공격메세지 : 쉴드", data);
+            // dropRandomItem 삭제
+            if (dropRandomItemElement.current.parentNode) {
+              dropRandomItemElement.current.parentNode.removeChild(dropRandomItemElement.current);
+            }
+          }
 
-    //         if (data.message && data.message === "UNLOCKED" && data.senderId !== getSender()) {
-    //           const { targets } = data;
-    //           const targetList = JSON.parse(targets);
-    //           targetList.forEach(({ x, y, index }) => unLockPuzzle(x, y, index));
-    //           return;
-    //         }
+          if (data.message && data.message === "MIRROR") {
+            console.log("공격메세지 : 거울", data);
+            // dropRandomItem 삭제
+            if (dropRandomItemElement.current.parentNode) {
+              dropRandomItemElement.current.parentNode.removeChild(dropRandomItemElement.current);
+            }
+          }
 
-    //         if (data.message && data.message === "ADD_PIECE") {
-    //           const { targets, combo, comboCnt, team } = data;
-    //           const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
-    //           addPiece({ fromIndex, toIndex });
+          // drop random Item 생성
+          if (data.message && data.message === "DROP_ITEM" && data.randomItem) {
+            // 버튼 생성
+            const canvasContainer = document.getElementById("canvasContainer");
+            const dropRandomItemImg = document.createElement("img");
+            dropRandomItemImg.src = dropRandomItemPath;
 
-    //           if (team === "RED") {
-    //             redCleanHint({ fromIndex, toIndex });
-    //           }
+            // 버튼의 위치 설정
+            dropRandomItemImg.style.position = "absolute";
+            dropRandomItemImg.style.left = data.randomItem.position_x + "px";
+            dropRandomItemImg.style.top = data.randomItem.position_y + "px";
+            dropRandomItemImg.style.transform = "translate(-50%, -50%)";
+            dropRandomItemImg.style.cursor = "pointer";
 
-    //           if (team === "BLUE") {
-    //             blueCleanHint({ fromIndex, toIndex });
-    //           }
+            dropRandomItemImg.onclick = function () {
+              // 부모 요소로부터 버튼 제거
+              //근데 이거 다른 클라이언트들도 이 아이템 먹었다고 버튼 사라지는 이벤트 처리하든가 해야함.
+              console.log("item dropRandomItemImg 클릭됨");
+              canvasContainer.removeChild(dropRandomItemImg);
 
-    //           if (combo) {
-    //             console.log("콤보 효과 발동 !! : ", combo);
-    //             combo.forEach(([toIndex, fromIndex, direction]) =>
-    //               addCombo(fromIndex, toIndex, direction),
-    //             );
+              // 서버로 메시지 전송
+              send(
+                "/app/game/message",
+                {},
+                JSON.stringify({
+                  type: "GAME",
+                  roomId: getRoomId(),
+                  sender: getSender(),
+                  message: "USE_RANDOM_ITEM",
+                  targets: data.randomItem.uuid,
+                }),
+              );
+            };
 
-    //             if (comboCnt) {
-    //               console.log(`${comboCnt} 콤보문구 생성`);
-    //               const comboText = document.createElement("h2");
-    //               const canvasContainer = document.getElementById("canvasContainer");
-    //               comboText.textContent = `${comboCnt}COMBO!!`;
+            // 버튼을 canvasContainer에 추가
+            dropRandomItemElement.current = dropRandomItemImg;
+            canvasContainer.appendChild(dropRandomItemImg);
 
-    //               comboText.style.zIndex = 100;
-    //               comboText.style.position = "fixed";
-    //               comboText.style.left = "40%";
-    //               comboText.style.top = "100px";
-    //               comboText.style.transform = "translate(-50%, 0)";
-    //               comboText.style.fontSize = "30px";
+            // 현재 아이템 저장 (MIRROR 효과를 위해)
+            currentDropRandomItem.current = data.randomItem.name;
 
-    //               canvasContainer.appendChild(comboText);
+            // alert 대신 메시지를 콘솔에 출력
+            console.log(
+              data.randomItem.name +
+                " 을 " +
+                data.randomItem.position_x +
+                " " +
+                data.randomItem.position_y +
+                " 에 생성한다!",
+            );
 
-    //               console.log(comboText);
-    //               setTimeout(() => {
-    //                 console.log("콤보 문구 삭제");
-    //                 console.log(comboText);
-    //                 console.log(comboText.parentNode);
-    //                 console.log(comboText.parentElement);
-    //                 comboText.parentNode.removeChild(comboText);
-    //               }, 2000);
-    //             }
+            // 3초 뒤 아이템 삭제
+            setTimeout(() => {
+              if (dropRandomItemImg.parentNode) {
+                console.log("3초 끝남! item dropRandomItemImg 삭제");
+                canvasContainer.removeChild(dropRandomItemImg);
+              }
+            }, 3000);
+          }
+        });
 
-    //             const audio = new Audio(comboAudioPath);
-    //             audio.loop = false;
-    //             audio.crossOrigin = "anonymous";
-    //             // audio.volume = 0.5;
-    //             audio.load();
-    //             try {
-    //               audio.play();
-    //             } catch (err) {
-    //               console.log(err);
-    //             }
-    //           }
+        // 채팅
+        subscribe(`/topic/chat/room/${roomId}`, (message) => {
+          const data = JSON.parse(message.body);
+          console.log("채팅왔다", data);
+          const { userid, chatMessage, time, teamColor } = data;
+          if (teamColor === getTeam().toUpperCase()) {
+            const receivedMessage = { userid, chatMessage, time }; // 받은 채팅
+            setChatHistory((prevChat) => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
+          }
+        });
 
-    //           return;
-    //         }
-    //       }
-
-    //       // "HINT(힌트)" 아이템 사용
-    //       if (data.message && data.message === "HINT") {
-    //         const { targetList, targets } = data;
-    //         if (targets === "RED") {
-    //           redAddHint(...targetList);
-    //         }
-
-    //         if (targets === "BLUE") {
-    //           blueAddHint(...targetList);
-    //         }
-
-    //         return;
-    //       }
-
-    //       // "MAGNET(자석)" 아이템 사용
-    //       if (data.message && data.message === "MAGNET") {
-    //         const { targetList, redBundles, blueBundles, targets } = data;
-    //         if (targets === getTeam().toUpperCase()) {
-    //           const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
-    //           usingItemMagnet(targetList, targetBundles);
-    //         }
-    //         return;
-    //       }
-
-    //       // 공격형 아이템 공격 성공
-    //       if (data.message && data.message === "ATTACK") {
-    //         console.log("공격메세지", data);
-    //         // dropRandomItem 삭제
-    //         if (dropRandomItemElement.current.parentNode) {
-    //           dropRandomItemElement.current.parentNode.removeChild(dropRandomItemElement.current);
-    //         }
-
-    //         const { targets, targetList, deleted, randomItem, redBundles, blueBundles } = data;
-
-    //         if (randomItem.name === "FIRE") {
-    //           console.log("랜덤 아이템 fire 였어!");
-
-    //           const attackedTeamBundles = getTeam() === "red" ? redBundles : blueBundles;
-    //           attackFire(targets, targetList, deleted, attackedTeamBundles);
-    //           // // fire 당하는 팀의 효과
-    //           // if (targets === getTeam().toUpperCase()) {
-
-    //           // } else { // fire 발동하는 팀의 효과
-
-    //           // }
-
-    //           // setTimeout(() => {
-    //           //   console.log("레드팀 번들", redBundles);
-    //           //   console.log("블루팀 번들", blueBundles);
-    //           //   if (targetList && targets === getTeam().toUpperCase()) {
-    //           //     console.log("fire 발동 !!");
-    //           //     const attackedTeamBundles = getTeam() === "red" ? redBundles : blueBundles;
-    //           //     usingItemFire(attackedTeamBundles, targetList);
-    //           //   }
-    //           // }, 2000);
-    //         }
-
-    //         if (randomItem.name === "ROCKET") {
-    //           console.log("랜덤 아이템 rocket 였어!");
-    //           attackRocket(targets, targetList, deleted);
-    //         }
-
-    //         if (randomItem.name === "EARTHQUAKE") {
-    //           console.log("랜덤 아이템 earthquake 였어!");
-
-    //           console.log("지진 발동", data);
-
-    //           // // earthquake 당하는 팀의 효과
-    //           // if (targets === getTeam().toUpperCase()) {
-
-    //           // } else { // earthquake 발동하는 팀의 효과
-
-    //           // }
-
-    //           setTimeout(() => {
-    //             // console.log();
-    //             if (targetList && targets === getTeam().toUpperCase()) {
-    //               console.log("earthquake 발동 !!");
-    //               usingItemEarthquake(targetList, deleted);
-    //             }
-    //           }, 2000);
-    //         }
-    //       }
-
-    //       if (data.message && data.message === "SHIELD") {
-    //         console.log("공격메세지 : 쉴드", data);
-    //         // dropRandomItem 삭제
-    //         if (dropRandomItemElement.current.parentNode) {
-    //           dropRandomItemElement.current.parentNode.removeChild(dropRandomItemElement.current);
-    //         }
-    //       }
-
-    //       if (data.message && data.message === "MIRROR") {
-    //         console.log("공격메세지 : 거울", data);
-    //         // dropRandomItem 삭제
-    //         if (dropRandomItemElement.current.parentNode) {
-    //           dropRandomItemElement.current.parentNode.removeChild(dropRandomItemElement.current);
-    //         }
-    //       }
-
-    //       // drop random Item 생성
-    //       if (data.message && data.message === "DROP_ITEM" && data.randomItem) {
-    //         // 버튼 생성
-    //         const canvasContainer = document.getElementById("canvasContainer");
-    //         const dropRandomItemImg = document.createElement("img");
-    //         dropRandomItemImg.src = dropRandomItemPath;
-
-    //         // 버튼의 위치 설정
-    //         dropRandomItemImg.style.position = "absolute";
-    //         dropRandomItemImg.style.left = data.randomItem.position_x + "px";
-    //         dropRandomItemImg.style.top = data.randomItem.position_y + "px";
-    //         dropRandomItemImg.style.transform = "translate(-50%, -50%)";
-    //         dropRandomItemImg.style.cursor = "pointer";
-
-    //         dropRandomItemImg.onclick = function () {
-    //           // 부모 요소로부터 버튼 제거
-    //           //근데 이거 다른 클라이언트들도 이 아이템 먹었다고 버튼 사라지는 이벤트 처리하든가 해야함.
-    //           console.log("item dropRandomItemImg 클릭됨");
-    //           canvasContainer.removeChild(dropRandomItemImg);
-
-    //           // 서버로 메시지 전송
-    //           send(
-    //             "/app/game/message",
-    //             {},
-    //             JSON.stringify({
-    //               type: "GAME",
-    //               roomId: getRoomId(),
-    //               sender: getSender(),
-    //               message: "USE_RANDOM_ITEM",
-    //               targets: data.randomItem.uuid,
-    //             }),
-    //           );
-    //         };
-
-    //         // 버튼을 canvasContainer에 추가
-    //         dropRandomItemElement.current = dropRandomItemImg;
-    //         canvasContainer.appendChild(dropRandomItemImg);
-
-    //         // 현재 아이템 저장 (MIRROR 효과를 위해)
-    //         currentDropRandomItem.current = data.randomItem.name;
-
-    //         // alert 대신 메시지를 콘솔에 출력
-    //         console.log(
-    //           data.randomItem.name +
-    //             " 을 " +
-    //             data.randomItem.position_x +
-    //             " " +
-    //             data.randomItem.position_y +
-    //             " 에 생성한다!",
-    //         );
-
-    //         // 3초 뒤 아이템 삭제
-    //         setTimeout(() => {
-    //           if (dropRandomItemImg.parentNode) {
-    //             console.log("3초 끝남! item dropRandomItemImg 삭제");
-    //             canvasContainer.removeChild(dropRandomItemImg);
-    //           }
-    //         }, 3000);
-    //       }
-    //     });
-
-    //     // 채팅
-    //     subscribe(`/topic/chat/room/${roomId}`, (message) => {
-    //       const data = JSON.parse(message.body);
-    //       console.log("채팅왔다", data);
-    //       const { userid, chatMessage, time, teamColor } = data;
-    //       if (teamColor === getTeam().toUpperCase()) {
-    //         const receivedMessage = { userid, chatMessage, time }; // 받은 채팅
-    //         setChatHistory((prevChat) => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
-    //       }
-    //     });
-
-    //     // 서버로 메시지 전송
-    //     send(
-    //       "/app/game/message",
-    //       {},
-    //       JSON.stringify({
-    //         type: "ENTER",
-    //         roomId: getRoomId(),
-    //         sender: getSender(),
-    //       }),
-    //     );
-    //   },
-    //   () => {
-    //     console.log("@@@@@@@@@@@@@@@@@@@@@socket error 발생@@@@@@@@@@@@@@@@@@@@@");
-    //     // window.alert("게임이 종료되었거나 입장할 수 없습니다.");
-    //     // navigate(`/game/battle`, {
-    //     //   replace: true,
-    //     // });
-    //   },
-    // );
+        // 서버로 메시지 전송
+        send(
+          "/app/game/message",
+          {},
+          JSON.stringify({
+            type: "ENTER",
+            roomId: getRoomId(),
+            sender: getSender(),
+          }),
+        );
+      },
+      () => {
+        console.log("@@@@@@@@@@@@@@@@@@@@@socket error 발생@@@@@@@@@@@@@@@@@@@@@");
+        // window.alert("게임이 종료되었거나 입장할 수 없습니다.");
+        // navigate(`/game/battle`, {
+        //   replace: true,
+        // });
+      },
+    );
   };
 
   useEffect(() => {
