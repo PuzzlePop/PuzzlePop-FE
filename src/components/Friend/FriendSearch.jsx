@@ -36,9 +36,14 @@ export default function FriendSearch() {
   };
 
   const sendFriendRequest = async (toUser) => {
-    console.log(toUser);
+    const userId = getCookie("userId");
+
+    if(!userId) {
+      alert("로그인한 사용자만 이용할 수 있는 기능입니다.");
+    }
+
     const response = await request.post(`/friend`, {
-      from_user_id: getCookie("userId"),// 쿠키에서 꺼낸 userId
+      from_user_id: userId,// 쿠키에서 꺼낸 userId
       to_user_id: toUser.id, // 넘어온 userId
       request_status: "requested"
     });
