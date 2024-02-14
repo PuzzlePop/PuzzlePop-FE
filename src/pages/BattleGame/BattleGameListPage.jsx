@@ -11,7 +11,7 @@ import { getSender } from "@/socket-utils/storage";
 import backgroundPath from "@/assets/backgrounds/battleBackground.gif";
 import { socket } from "../../socket-utils/socket2";
 
-const { send, subscribe } = socket;
+const { connect, send, subscribe, disconnect } = socket;
 
 export default function BattleGameListPage() {
   const [roomList, setRoomList] = useState([]);
@@ -40,26 +40,38 @@ export default function BattleGameListPage() {
   }
 
   const quickMatching = () => {
-    send(
-      "/app/game/message",
-      {},
-      JSON.stringify({
-        type: "QUICK",
-        sender: getSender(),
-        member: getCookie("userId") ? true : false,
-      }),
-    );
+    const sender = getCookie("userId");
+    if (!sender) {
+      alert("로그인한 유저만 이용할 수 있는 기능입니다.");
+      return;
+    }
 
-    //게임 결과
-    subscribe(`/topic/game/room/quick/${getSender()}`, (message) => {
-      const data = JSON.parse(message.body);
-      if (data === "WAITING") {
-        alert("waiting");
-      } else {
-        console.log(data);
-      }
+    connect(() => {
+      //랜덤 매칭 큐 소켓
+      subscribe(`/topic/game/room/quick/${sender}`, (message) => {
+        const data = JSON.parse(message.body);
+        if (data.message === "WAITING") {
+          alert("waiting");
+        } else if (data.message === "GAME_START") {
+          alert(data.targets);
+        }
+      });
+
+      //대기 큐 입장했다고 보내기
+      send(
+        "/app/game/message",
+        {},
+        JSON.stringify({
+          type: "QUICK",
+          sender: sender,
+          member: true,
+        }),
+      );
+
+      //응답 메시지 파싱
     });
   };
+
   return (
     <Wrapper>
       <Header />
