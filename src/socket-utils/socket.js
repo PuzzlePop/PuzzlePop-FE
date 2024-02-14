@@ -2,9 +2,7 @@ import SockJS from "sockjs-client";
 import StompJS from "stompjs";
 
 const { VITE_SERVER_END_POINT, VITE_DEV_SERVER_END_POINT } = import.meta.env;
-
 const SERVER_END_POINT = import.meta.env.DEV ? VITE_DEV_SERVER_END_POINT : VITE_SERVER_END_POINT;
-
 const SOCKET_END_POINT = `${SERVER_END_POINT}/game`;
 
 const createSocket = () => {

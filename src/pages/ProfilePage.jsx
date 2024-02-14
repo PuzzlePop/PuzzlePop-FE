@@ -3,6 +3,8 @@ import Header from "../components/Header";
 import UserAPI from "../apis/CustomUserAPI";
 import RecordAPI from "../apis/CustomRecordAPI";
 import { useEffect, useState } from "react";
+import styled from "styled-components";
+import backgroundPath from "@/assets/backgrounds/background.gif";
 
 
 export default function ProfilePage() {
@@ -68,26 +70,105 @@ export default function ProfilePage() {
   }, [userId]);
 
   return (
-    <>
+    <Wrapper>
       <Header />
-      <h1>ProfilePage</h1>
+      <style>{`
+        .box {
+          width: 100%;
+          height: 150px;
+        }
+        .container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          padding: 20px;
+        }
+        .left-box {
+          width: 550px;
+          height: 50px;
+        }
+        .search-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-top: 30px;
+        }
+        .search-container input[type="text"] {
+          margin-right: 20px;
+          padding: 20px;
+          font-size: 20px;
+          border-radius: 10px;
+          border: 2px solid #ccc;
+        }
+        .search-container button {
+          padding: 20px 40px;
+          font-size: 20px;
+          border-radius: 10px;
+          border: none;
+          background-color: #007bff;
+          color: #fff;
+          cursor: pointer;
+        }
+        .user-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-top: 30px;
+        }
+        .user-container div {
+          margin: 20px;
+        }
+        .user-info {
+          background: white;
+          padding: 40px;
+          border: 2px solid #ccc;
+          border-radius: 20px;
+          box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.1);
+          height: 400px;
+          width : 500px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center; /* 수평 가운데 정렬 */
+          align-items: center; /* 수직 가운데 정렬 */
+          background: rgba(255, 255, 255, 0.7);
+          font-size: 24px;
+            font-weight: bold;
+        }
+        .user-info img {
+          width: 300px;
+          height: auto;
+        }
+      `}</style>
+      <div className="box"></div>
+      <div className="container">
+        
+        {/* <div className="search-container">
+        <div className="left-box"></div>
+          <input type="text" value={searchNickName} onChange={(e) => setSearchNickName(e.target.value)} />
+          <button onClick={searchUsersByNickName}>검색</button>
+        </div> */}
+        <div className="user-container">
+          <div className="user-info">
+            <img src={user.img_path} alt="User Image" />
+            <div>{user.family_name}{user.given_name}</div>
+            
+          </div>
+          <div className="user-info">
+            <div>email: {user.email}</div>
+            <div>닉네임 : {user.nickname}</div>
+            <div>국적 : {user.locale}</div>
+            <div>상태 : {user.online_status}</div>
+            {/* <div>보유 골드 : {user.gold}</div> */}
+          </div>
+        </div>
+      </div>
+
+
       
-      <hr />
-      <div>The UserId = {userId}</div>
 
-      <hr />
-      <h2>UserInfo by UserId = {userId}</h2>
-      <div>user.id: {user.id}</div>
-      <div>user.email: {user.email}</div>
-      <div>user.nickname: {user.nickname}</div>
-      <div>user.givenName: {user.given_name}</div>
-      <div>user.familyName: {user.family_name}</div>
-      <div>user.imgPath: {user.img_path}</div>
-      <div>user.locale: {user.locale}</div>
-      <div>user.onlineStatus: {user.online_status}</div>
-      <div>user.gold: {user.gold}</div>
-
-      <hr />
+      
+      {/* <hr />
       <h2>Search UserInfo by email = {searchEmail}</h2>
       검색할 이메일: 
       <input type="text" value={searchEmail} onChange={(e) => setSearchEmail(e.target.value)} />
@@ -106,10 +187,7 @@ export default function ProfilePage() {
       ))}
 
       <hr />
-      <h2>Search UserInfo by nickname = {searchNickName}</h2>
-      검색할 닉네임: 
-      <input type="text" value={searchNickName} onChange={(e) => setSearchNickName(e.target.value)} />
-      <button onClick={searchUsersByNickName}>검색</button>
+      
       {searchedUsersByNickName.map((user, index) => (
         <div key={index}>
           <div>user.id: {user.id}</div>
@@ -198,7 +276,12 @@ export default function ProfilePage() {
       <div>win_count: {recordInfo.win_count}</div>
       <div>total_matched_piece_count: {recordInfo.total_matched_piece_count}</div>
       <div>played_battle_game_count: {recordInfo.played_battle_game_count}</div>
-      <div>played_game_count: {recordInfo.played_game_count}</div>
-    </>
+      <div>played_game_count: {recordInfo.played_game_count}</div> */}
+    </Wrapper>
   );
 }
+
+const Wrapper = styled.div`
+  height: 1000px;
+  background-image: url(${backgroundPath});
+`;
