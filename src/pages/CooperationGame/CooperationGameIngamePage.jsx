@@ -5,7 +5,7 @@ import styled from "styled-components";
 
 import PlayPuzzle from "@/components/PlayPuzzle";
 import Loading from "@/components/Loading";
-import ItemController from "@/components/ItemController";
+import ItemInventory from "@/components/ItemInventory";
 import Hint from "@/components/GameItemEffects/Hint";
 import PrograssBar from "@/components/GameIngame/ProgressBar";
 import Timer from "@/components/GameIngame/Timer";
@@ -23,6 +23,7 @@ import cooperationBackgroundPath from "@/assets/backgrounds/cooperationBackgroun
 import { Box, Dialog, DialogTitle } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
+import { useInventory } from "../../hooks/useInventory";
 
 const { connect, send, subscribe, disconnect } = socket;
 const {
@@ -45,7 +46,8 @@ export default function CooperationGameIngamePage() {
   const [ourPercent, setOurPercent] = useState(0);
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
-  const [itemInventory, setItemInventory] = useState([null, null, null, null, null]);
+
+  const { itemInventory, setItemInventory } = useInventory();
   const { hintList, addHint, closeHint, cleanHint } = useHint();
 
   const isLoaded = useMemo(() => {
@@ -59,7 +61,7 @@ export default function CooperationGameIngamePage() {
     });
   };
 
-  const handleSendUseItemMessage = useCallback((keyNumber) => {
+  const handleUseItem = useCallback((keyNumber) => {
     send(
       "/app/game/message",
       {},
@@ -285,10 +287,7 @@ export default function CooperationGameIngamePage() {
             </Col>
           </Board>
 
-          <ItemController
-            itemInventory={itemInventory}
-            onSendUseItemMessage={handleSendUseItemMessage}
-          />
+          <ItemInventory itemInventory={itemInventory} onUseItem={handleUseItem} />
           {document.querySelector("#canvasContainer") &&
             createPortal(
               <Hint hintList={hintList} onClose={closeHint} />,

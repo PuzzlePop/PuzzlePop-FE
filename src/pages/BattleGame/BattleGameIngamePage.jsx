@@ -7,7 +7,7 @@ import Loading from "@/components/Loading";
 import Timer from "@/components/GameIngame/Timer";
 import PrograssBar from "@/components/GameIngame/ProgressBar";
 import Chatting from "@/components/GameWaiting/Chatting";
-import ItemController from "@/components/ItemController";
+import ItemInventory from "@/components/ItemInventory";
 
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket2";
@@ -28,6 +28,7 @@ import { useHint } from "@/hooks/useHint";
 import Hint from "@/components/GameItemEffects/Hint";
 import { createPortal } from "react-dom";
 import { useSnackbar } from "../../hooks/useSnackbar";
+import { useInventory } from "../../hooks/useInventory";
 
 const { connect, send, subscribe, disconnect } = socket;
 const {
@@ -55,9 +56,13 @@ export default function BattleGameIngamePage() {
   const [enemyPercent, setEnemyPercent] = useState(0);
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
-  const [redItemInventory, setRedItemInventory] = useState([null, null, null, null, null]);
-  const [blueItemInventory, setBlueItemInventory] = useState([null, null, null, null, null]);
+
+  const { itemInventory: redItemInventory, setItemInventory: setRedItemInventory } = useInventory();
+  const { itemInventory: blueItemInventory, setItemInventory: setBlueItemInventory } =
+    useInventory();
+
   const { isShowSnackbar, setIsShowSnackbar, snackMessage, setSnackMessage } = useSnackbar();
+
   const {
     hintList: redHintList,
     addHint: redAddHint,
@@ -94,7 +99,7 @@ export default function BattleGameIngamePage() {
     console.log("gamedata is here!", gameData, data);
   };
 
-  const handleSendUseItemMessage = useCallback((keyNumber) => {
+  const handleUseItem = useCallback((keyNumber) => {
     send(
       "/app/game/message",
       {},
@@ -547,10 +552,7 @@ export default function BattleGameIngamePage() {
 
           {getTeam() === "red" ? (
             <>
-              <ItemController
-                itemInventory={redItemInventory}
-                onSendUseItemMessage={handleSendUseItemMessage}
-              />
+              <ItemInventory itemInventory={redItemInventory} onUseItem={handleUseItem} />
               {document.querySelector("#canvasContainer") &&
                 createPortal(
                   <Hint hintList={redHintList} onClose={redCloseHint} />,
@@ -559,10 +561,7 @@ export default function BattleGameIngamePage() {
             </>
           ) : (
             <>
-              <ItemController
-                itemInventory={blueItemInventory}
-                onSendUseItemMessage={handleSendUseItemMessage}
-              />
+              <ItemInventory itemInventory={blueItemInventory} onUseItem={handleUseItem} />
               {document.querySelector("#canvasContainer") &&
                 createPortal(
                   <Hint hintList={blueHintList} onClose={blueCloseHint} />,

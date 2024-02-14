@@ -2,16 +2,14 @@ import { useCallback, useEffect } from "react";
 import styled from "styled-components";
 import Draggable from "react-draggable";
 
-export default function ItemController({ itemInventory, onSendUseItemMessage }) {
+export default function ItemInventory({ itemInventory, onUseItem }) {
   const _useItem = useCallback(
     (keyNumber) => {
-      console.log(`<ItemController /> : ${keyNumber} 키 누름!!!`);
-
-      if (itemInventory[keyNumber - 1] && onSendUseItemMessage) {
-        onSendUseItemMessage(keyNumber);
+      if (itemInventory[keyNumber - 1] && onUseItem) {
+        onUseItem(keyNumber);
       }
     },
-    [onSendUseItemMessage, itemInventory],
+    [onUseItem, itemInventory],
   );
 
   // 1, 2, 3, 4, 5 키에 아이템사용
