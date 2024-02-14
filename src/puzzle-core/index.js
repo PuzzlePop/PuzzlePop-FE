@@ -1,9 +1,16 @@
 import Paper from "paper";
 import { Point } from "paper/dist/paper-core";
 import { initializeConfig } from "./initializeConfig";
-import { removeItemStyleToPiece, searchItemList, setItemStyleToAllPiece } from "./item";
+import {
+  itemFrame,
+  itemMagnet,
+  removeItemStyleToPiece,
+  searchItemList,
+  setItemStyleToAllPiece,
+} from "./item";
 import { setMoveEvent } from "./setMoveEvent";
 import { uniteTiles } from "./uniteTiles";
+import { cleanBorderStyle, switchDirection } from "./utils";
 
 const createPuzzleConfig = () => {
   let config = {};
@@ -47,7 +54,7 @@ const createPuzzleConfig = () => {
     // TODO: 여기서 Lock에 대한 UI처리를 해제한다.
   };
 
-  const addPiece = ({ fromIndex, toIndex }) => {
+  const addPiece = ({ fromIndex, toIndex }, bundles = []) => {
     const afterUnitedConfig = uniteTiles({
       config,
       preIndex: fromIndex,
@@ -61,23 +68,7 @@ const createPuzzleConfig = () => {
     config = afterCheckItemConfig;
   };
 
-  const addCombo = (fromIndex, toIndex, direction) => {
-    let dir = -1;
-    switch (direction) {
-      case 0:
-        dir = 3;
-        break;
-      case 1:
-        dir = 0;
-        break;
-      case 2:
-        dir = 2;
-        break;
-      case 3:
-        dir = 1;
-        break;
-    }
-
+  const addCombo = (fromIndex, toIndex, direction, bundles = []) => {
     // console.log("addCombo 함수 실행 :", fromIndex, toIndex, direction, dir);
     // console.log(config);
 
@@ -87,10 +78,13 @@ const createPuzzleConfig = () => {
       preIndex: toIndex,
       isSender: false,
       isCombo: true,
-      direction: dir,
+      direction: switchDirection(direction),
     });
 
-    config = nextConfig;
+    config = cleanBorderStyle({ config: nextConfig });
+
+    // const updatedConfig = updateGroupByBundles({ config: nextConfig, bundles }); // 콤보랑 같이 쓰면 버그가..
+    // config = cleanBorderStyle({ config: updatedConfig });
   };
 
   // 공격형 아이템 fire
@@ -135,8 +129,8 @@ const createPuzzleConfig = () => {
       if (targetList.includes(gtile[2])) {
         gtile[1] = undefined;
 
-        const randomX = Math.random() * 1000;
-        const randomY = Math.random() * 750;
+        const randomX = Math.random() * 960 + 20;
+        const randomY = Math.random() * 710 + 20;
         config.tiles[gtile[2]].position = new Point(randomX, randomY);
       }
     });
@@ -154,9 +148,21 @@ const createPuzzleConfig = () => {
     });
   };
 
-  const usingItemFrame = (puzzleIndexList) => {
-    console.log(puzzleIndexList);
-    console.log(getConfig());
+  const usingItemFrame = (targetList, bundles = []) => {
+    // TODO: Toast를 통해 액자 아이템을 사용했다는 UI 보여주기
+    // TODO: 액자를 사용할 곳이 없다면 UI 보여주기
+    config = itemFrame({ config, targetList, bundles });
+  };
+
+  const usingItemMagnet = (targetList, bundles = []) => {
+    const result = itemMagnet({ config, targetList, bundles });
+
+    if (result === null) {
+      // TODO: Toast를 통해 자석을 사용할 곳이 없다면 UI 보여주기
+      return;
+    }
+
+    config = result;
   };
 
   return {
@@ -172,6 +178,7 @@ const createPuzzleConfig = () => {
     usingItemRocket,
     usingItemEarthquake,
     usingItemFrame,
+    usingItemMagnet,
   };
 };
 

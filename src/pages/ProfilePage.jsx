@@ -30,14 +30,14 @@ export default function ProfilePage() {
 
   useEffect(() => {
     // UserController 매개변수 변경 예정
-    // UserAPI.fetchUser(userId)
-    //   .then(response => setUser(response))
-    //   .catch(error => console.debug(error));
+    UserAPI.fetchUser(userId)
+      .then(response => setUser(response))
+      .catch(error => console.debug(error));
 
     // 302 FOUND 오류 추후 OK로 변경 예정
-    // UserAPI.fetchUsers()
-    //   .then(response => setUsers(response))
-    //   .catch(error => console.debug(error));
+    UserAPI.fetchUsers()
+      .then(response => setUsers(response))
+      .catch(error => console.debug(error));
   }, [userId]);
 
 
@@ -80,11 +80,12 @@ export default function ProfilePage() {
       <div>user.id: {user.id}</div>
       <div>user.email: {user.email}</div>
       <div>user.nickname: {user.nickname}</div>
-      <div>user.givenName: {user.givenName}</div>
-      <div>user.familyName: {user.familyName}</div>
-      <div>user.imgPath: {user.imgPath}</div>
+      <div>user.givenName: {user.given_name}</div>
+      <div>user.familyName: {user.family_name}</div>
+      <div>user.imgPath: {user.img_path}</div>
       <div>user.locale: {user.locale}</div>
-      <div>user.onlineStatus: {user.onlineStatus}</div>
+      <div>user.onlineStatus: {user.online_status}</div>
+      <div>user.gold: {user.gold}</div>
 
       <hr />
       <h2>Search UserInfo by email = {searchEmail}</h2>

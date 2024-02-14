@@ -26,17 +26,17 @@ export const uniteTiles = ({
       }),
     );
 
-    send(
-      "/app/game/message",
-      {},
-      JSON.stringify({
-        type: "GAME",
-        roomId: getRoomId(),
-        sender: getSender(),
-        message: "GAME_INFO",
-        targets: nowIndex.toString() + "," + preIndex.toString(),
-      }),
-    );
+    // send(
+    //   "/app/game/message",
+    //   {},
+    //   JSON.stringify({
+    //     type: "GAME",
+    //     roomId: getRoomId(),
+    //     sender: getSender(),
+    //     message: "GAME_INFO",
+    //     targets: nowIndex.toString() + "," + preIndex.toString(),
+    //   }),
+    // );
   }
 
   const nowGroup = config.groupTiles[nowIndex][1];
@@ -77,7 +77,56 @@ export const uniteTiles = ({
   return config;
 };
 
-const dismantling = ({ config, groupIndexNow }) => {
+export const uniteTiles2 = ({ config, nowIndex, preIndex, direction = -1 }) => {
+  const nowGroup = config.groupTiles[nowIndex][1];
+  const preGroup = config.groupTiles[preIndex][1];
+
+  if (nowGroup !== undefined && !Number.isNaN(nowGroup)) {
+    if (preGroup === undefined || Number.isNaN(preGroup)) {
+      config.groupTiles[preIndex][1] = nowGroup;
+    } else {
+      config.groupTiles.forEach((gtile) => {
+        if (gtile[1] === nowGroup) {
+          gtile[1] = preGroup;
+        }
+      });
+    }
+  } else {
+    if (preGroup !== undefined && !Number.isNaN(preGroup)) {
+      config.groupTiles[nowIndex][1] = preGroup;
+    } else {
+      config.groupTiles[nowIndex][1] = config.groupTileIndex;
+      config.groupTiles[preIndex][1] = config.groupTileIndex;
+      if (config.groupTileIndex !== null && !Number.isNaN(config.groupTileIndex)) {
+        config.groupTileIndex++;
+      }
+    }
+  }
+
+  // console.log(dismantling({ config, groupIndexNow: config.groupTiles[preIndex][1] }))
+  if (!dismantling({ config, groupIndexNow: config.groupTiles[preIndex][1] })) {
+    const nowTile = config.groupTiles[nowIndex][0];
+    const preTile = config.groupTiles[preIndex][0];
+
+    fitTiles({
+      config,
+      nowIndex: preIndex,
+      preIndex: nowIndex,
+      nowTile: preTile,
+      preTile: nowTile,
+      nowShape: config.shapes[preIndex],
+      preShape: config.shapes[nowIndex],
+      dir: direction,
+      flag: false,
+      width: nowTile.bounds.width,
+      isCombo: false,
+    });
+  }
+
+  return config;
+};
+
+export const dismantling = ({ config, groupIndexNow }) => {
   let count = 0;
   config.groupTiles.forEach((gtile) => {
     if (gtile[1] === groupIndexNow) {
@@ -95,7 +144,7 @@ const dismantling = ({ config, groupIndexNow }) => {
   return false;
 };
 
-const comboFit = ({ config, nowIndex, preIndex, direction }) => {
+export const comboFit = ({ config, nowIndex, preIndex, direction }) => {
   const nowTile = config.groupTiles[nowIndex][0];
   const preTile = config.groupTiles[preIndex][0];
 
@@ -114,7 +163,7 @@ const comboFit = ({ config, nowIndex, preIndex, direction }) => {
   });
 };
 
-const groupFit = ({ config, nowGroup, nowIdx }) => {
+export const groupFit = ({ config, nowGroup, nowIdx }) => {
   const xTileCount = config.tilesPerRow;
   const yTileCount = config.tilesPerColumn;
   const groupArr = [];

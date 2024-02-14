@@ -12,7 +12,7 @@ import { getSender, getRoomId, setTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { request } from "@/apis/requestBuilder";
 
-import backgroundPath from "@/assets/background.gif";
+import backgroundPath from "@/assets/backgrounds/battleBackground.gif";
 
 const { connect, send, subscribe } = socket;
 
@@ -35,18 +35,19 @@ export default function BattleGameWaitingPage() {
       subscribe(`/topic/game/room/${roomId}`, (message) => {
         const data = JSON.parse(message.body);
 
-        data.blueTeam.players.forEach((player) => {
-          console.log(player);
-          if (player.id === getSender()) {
-            setTeam("blue");
-          }
-        });
+        if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
+          data.blueTeam.players.forEach((player) => {
+            console.log(player);
+            if (player.id === getSender()) {
+              setTeam("blue");
+            }
+          });
+        }
 
         // 1. 게임이 시작되면 인게임 화면으로 보낸다.
         if (data.gameId && Boolean(data.started) && !Boolean(data.finished)) {
-          navigate(`/game/battle/ingame/${data.gameId}`, {
-            replace: true,
-          });
+          window.location.replace(`/game/battle/ingame/${data.gameId}`);
+          return;
         }
         setGameData(data);
       });
@@ -66,10 +67,20 @@ export default function BattleGameWaitingPage() {
           type: "ENTER",
           roomId: getRoomId(),
           sender: getSender(),
+          member: getCookie("userId") ? true : false
         }),
       );
     });
   };
+
+  //쿠키 확인
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+      return parts.pop().split(';').shift();
+    }
+  }
 
   const initialize = async () => {
     try {
@@ -97,20 +108,20 @@ export default function BattleGameWaitingPage() {
     // eslint-disable-next-line
   }, []);
 
-  if (isLoading) {
-    return <Loading message="방 정보 불러오는 중..." />;
-  }
-
   return (
     <Wrapper>
       <Header />
-      <GameWaitingBoard
-        player={getSender()}
-        data={gameData}
-        allowedPiece={allowedPiece}
-        category="battle"
-        chatHistory={chatHistory}
-      />
+      {isLoading ? (
+        <Loading message="방 정보 불러오는 중..." />
+      ) : (
+        <GameWaitingBoard
+          player={getSender()}
+          data={gameData}
+          allowedPiece={allowedPiece}
+          category="battle"
+          chatHistory={chatHistory}
+        />
+      )}
       <Footer />
     </Wrapper>
   );

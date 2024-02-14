@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import ImageIcon from "./ImageIcon";
@@ -10,7 +10,7 @@ import { AppBar, Toolbar, Button } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 import GamePageNavigation from "@/components/GamePageNavigation";
-import { request } from '../apis/requestBuilder';
+import { request } from "../apis/requestBuilder";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -32,10 +32,10 @@ export default function Header() {
   });
 
   // 기본값은 로그아웃 상태
-  const [isLoggedIn, setIsLoggedIn] = useState(false); 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const token = getCookie('accessToken');
+    const token = getCookie("accessToken");
 
     if (token) {
       setIsLoggedIn(true);
@@ -45,16 +45,17 @@ export default function Header() {
   }, []);
 
   const getCookie = (name) => {
-    const cookies = document.cookie.split('; ');
+    const cookies = document.cookie.split("; ");
     for (let i = 0; i < cookies.length; i++) {
       const cookie = cookies[i].trim();
-      if (cookie.startsWith(name + '=')) {
+      if (cookie.startsWith(name + "=")) {
         return cookie.substring(name.length + 1);
       }
     }
   };
 
   const moveLogin = async () => {
+    // window.alert("아직 개발 중인 기능이에요 😂");
     const SERVER_URL = "https://i10a304.p.ssafy.io/api"
 
     if (isLoggedIn) {
@@ -67,7 +68,7 @@ export default function Header() {
       // window.location.href = `${SERVER_URL}/oauth2/authorization/google`;
       // request.get(`${SERVER_URL}/login`)
     }
-  }
+  };
 
   return (
     <HeaderBar>
@@ -80,8 +81,8 @@ export default function Header() {
           <ImageIcon imageSource={HeaderRankImage} size="md" onClick={() => navigate("/rank")} />
           {/* <ImageIcon imageSource={HeaderShopImage} size="md" onClick={() => navigate("/shop")} /> */}
           <ThemeProvider theme={theme}>
-          <Button variant="text" sx={{ px: 2.5 }} size="large" onClick={moveLogin}>
-              {isLoggedIn ? 'Log out' : 'Log in'}
+            <Button variant="text" sx={{ px: 2.5 }} size="large" onClick={moveLogin}>
+              {isLoggedIn ? "Log out" : "Log in"}
             </Button>
           </ThemeProvider>
         </nav>

@@ -15,14 +15,13 @@ const GameOpenVidu = ({ gameId, playerName, color = "purple" }) => {
   const [mySessionId, setMySessionId] = useState(gameId);
   const [myUserName, setMyUserName] = useState(playerName);
   const [session, setSession] = useState(null);
-  const [mainStreamManager, setMainStreamManager] = useState(null);
   const publisher = useRef(null);
   const [subscribers, setSubscribers] = useState([]);
-  const [currentVideoDevice, setCurrentVideoDevice] = useState(null);
   const [isUnMuted, setIsUnMuted] = useState(true);
 
   useEffect(() => {
     joinSession();
+
     const onbeforeunload = (event) => {
       leaveSession();
     };
@@ -78,8 +77,6 @@ const GameOpenVidu = ({ gameId, playerName, color = "purple" }) => {
       });
 
       mySession.publish(publisherOV);
-
-      setMainStreamManager(publisherOV);
       publisher.current = publisherOV;
     } catch (error) {
       console.log("There was an error connecting to the session:", error.code, error.message);
@@ -95,8 +92,6 @@ const GameOpenVidu = ({ gameId, playerName, color = "purple" }) => {
 
     setSession(null);
     setSubscribers([]);
-    setMainStreamManager(null);
-    setCurrentVideoDevice(null);
   };
 
   const toggleMute = () => {
@@ -136,7 +131,6 @@ const GameOpenVidu = ({ gameId, playerName, color = "purple" }) => {
     return (
       <div id="session">
         <div id="session-header">
-          {/* <h1 id="session-title">{mySessionId}</h1> */}
           <ThemeProvider theme={theme}>
             <IconButton
               aria-label="mic"
@@ -147,29 +141,9 @@ const GameOpenVidu = ({ gameId, playerName, color = "purple" }) => {
               {isUnMuted ? <MicOffIcon fontSize="inherit" /> : <MicIcon fontSize="inherit" />}
             </IconButton>
           </ThemeProvider>
-          {/* <input
-            className="btn btn-large btn-danger"
-            type="button"
-            id="buttonLeaveSession"
-            onClick={leaveSession}
-            value="Leave session"
-          /> */}
         </div>
 
-        {/* {mainStreamManager && (
-          <div id="main-video" className="col-md-6">
-            <UserAudioComponent streamManager={mainStreamManager} />
-          </div>
-        )} */}
-
         <div id="video-container" className="col-md-6">
-          {/* {publisher.current && (
-            <div className="stream-container col-md-6 col-xs-6">
-              <p>publisher: </p>
-              <UserAudioComponent streamManager={publisher.current} />
-            </div>
-          )} */}
-
           {subscribers.map((sub, i) => (
             <div key={sub.id} className="stream-container col-md-6 col-xs-6">
               <span>{sub.id}</span>

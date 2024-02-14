@@ -43,15 +43,27 @@ export default function CreateRoomButton({ category }) {
     }
   };
 
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+      return parts.pop().split(';').shift();
+    }
+  }
+
   const createRoom = async () => {
     if (!roomTitle) {
       return;
     }
-
-    const sender = window.prompt("닉네임을 입력해주세요");
+    
+    let sender = getCookie("userId"); // 쿠키에서 userId 가져오기
     if (!sender) {
-      return;
+      sender = window.prompt("닉네임을 입력해주세요");
+      if (!sender) {
+        return;
+      }
     }
+
     setSender(sender);
     setTeam("red");
 

@@ -116,6 +116,10 @@ const initConfig = ({ config, board }) => {
 
       // 피스 생성
       const tile = new config.project.Group([mask, img, border]);
+      tile.shadowColor = new config.project.Color("#666");
+      tile.shadowBlur = 1;
+      tile.shadowOffset = new Point(-1, -1);
+
       tile.clipped = true;
       tile.opacity = constant.tileOpacity;
       tile.position = new Point(constant.orgTileLoc, constant.orgTileLoc);

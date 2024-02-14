@@ -18,14 +18,22 @@ import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import { useHint } from "@/hooks/useHint";
 
 import comboAudioPath from "@/assets/audio/combo.mp3";
-import cooperationBackgroundPath from "@/assets/cooperationBackground.gif";
+import cooperationBackgroundPath from "@/assets/backgrounds/cooperationBackground.gif";
 
 import { Box, Dialog, DialogTitle } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 
 const { connect, send, subscribe, disconnect } = socket;
-const { lockPuzzle, movePuzzle, unLockPuzzle, addPiece, addCombo, usingItemFrame } = configStore;
+const {
+  lockPuzzle,
+  movePuzzle,
+  unLockPuzzle,
+  addPiece,
+  addCombo,
+  usingItemFrame,
+  usingItemMagnet,
+} = configStore;
 
 export default function CooperationGameIngamePage() {
   const navigate = useNavigate();
@@ -65,15 +73,6 @@ export default function CooperationGameIngamePage() {
     );
   }, []);
 
-  const frameTest = () => {
-    const targetList = [
-      0, 11, 1, 2, 13, 3, 5, 6, 10, 21, 12, 23, 14, 25, 19, 30, 20, 22, 33, 24, 35, 32, 34, 45, 36,
-      44, 46, 54,
-    ];
-    const sortedTargetList = [...targetList].sort((a, b) => a - b);
-    usingItemFrame(sortedTargetList);
-  };
-
   const getGameInfo = () => {
     send(
       "/app/game/message",
@@ -93,11 +92,11 @@ export default function CooperationGameIngamePage() {
         console.log("@@@@@@@@@@@@@@@@ 인게임 소켓 연결 @@@@@@@@@@@@@@@@@@");
         subscribe(`/topic/game/room/${roomId}`, (message) => {
           const data = JSON.parse(message.body);
-          console.log(data);
+          // console.log(data);
 
           // 매번 게임이 끝났는지 체크
           if (Boolean(data.finished)) {
-            disconnect();
+            // disconnect();
             console.log("게임 끝남 !");
             // TODO : 게임 끝났을 때 effect
             setTimeout(() => {
@@ -129,21 +128,21 @@ export default function CooperationGameIngamePage() {
             setOurPercent(data.redProgressPercent);
           }
 
-          if (data.message && (data.message === "LOCKED") !== getSender()) {
+          if (data.message && data.message === "LOCKED" && data.senderId !== getSender()) {
             const { targets } = data;
             const targetList = JSON.parse(targets);
             targetList.forEach(({ x, y, index }) => lockPuzzle(x, y, index));
             return;
           }
 
-          if (data.message && (data.message === "MOVE") !== getSender()) {
+          if (data.message && data.message === "MOVE" && data.senderId !== getSender()) {
             const { targets } = data;
             const targetList = JSON.parse(targets);
             targetList.forEach(({ x, y, index }) => movePuzzle(x, y, index));
             return;
           }
 
-          if (data.message && (data.message === "UNLOCKED") !== getSender()) {
+          if (data.message && data.message === "UNLOCKED" && data.senderId !== getSender()) {
             const { targets } = data;
             const targetList = JSON.parse(targets);
             targetList.forEach(({ x, y, index }) => unLockPuzzle(x, y, index));
@@ -151,62 +150,20 @@ export default function CooperationGameIngamePage() {
           }
 
           if (data.message && data.message === "ADD_PIECE") {
-            const { targets, combo, comboCnt } = data;
+            const { targets, combo, comboCnt: comboCount, redBundles } = data;
             const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
-            addPiece({ fromIndex, toIndex });
+            addPiece({ fromIndex, toIndex }, redBundles);
             cleanHint({ fromIndex, toIndex });
-
             if (combo) {
-              console.log("콤보 효과 발동 !! : ", combo);
-              combo.forEach(([toIndex, fromIndex, direction]) =>
-                addCombo(fromIndex, toIndex, direction),
-              );
-
-              if (comboCnt) {
-                console.log(`${comboCnt} 콤보문구 생성`);
-                const comboText = document.createElement("h2");
-                const canvasContainer = document.getElementById("canvasContainer");
-                comboText.textContent = `${comboCnt}COMBO!!`;
-
-                comboText.style.zIndex = 100;
-                comboText.style.position = "fixed";
-                comboText.style.left = "50%";
-                comboText.style.top = "40px";
-                comboText.style.transform = "translate(-50%, 0)";
-                comboText.style.fontSize = "30px";
-
-                canvasContainer.appendChild(comboText);
-
-                console.log(comboText);
-                setTimeout(() => {
-                  console.log("콤보 문구 삭제");
-                  console.log(comboText);
-                  console.log(comboText.parentNode);
-                  console.log(comboText.parentElement);
-                  comboText.parentNode.removeChild(comboText);
-                }, 2000);
-              }
-
-              const audio = new Audio(comboAudioPath);
-              audio.loop = false;
-              audio.crossOrigin = "anonymous";
-              // audio.volume = 0.5;
-              audio.load();
-              try {
-                audio.play();
-              } catch (err) {
-                console.log(err);
-              }
+              effectCombo({ combo, comboCount });
             }
             return;
           }
 
           // "FRAME(액자)" 아이템 사용
           if (data.message && data.message === "FRAME") {
-            console.log("액자 사용한다~~!!!");
-            const { targetList } = data;
-            console.log(targetList);
-            // targetList에 나온 index를 다 맞춰버린다.
+            const { targetList, redBundles } = data;
+            usingItemFrame(targetList, redBundles);
             return;
           }
 
@@ -219,13 +176,16 @@ export default function CooperationGameIngamePage() {
 
           // "MAGNET(자석)" 아이템 사용
           if (data.message && data.message === "MAGNET") {
-            console.log("자석 사용한다~~!!!");
-            const { targetList } = data;
-            console.log(targetList);
+            const { targetList, redBundles } = data;
+            usingItemMagnet(targetList, redBundles);
             return;
           }
 
-          // if ()
+          // 게임정보 받기
+          if (data.gameType && data.gameType === "COOPERATION") {
+            setGameData(data);
+            return;
+          }
         });
 
         // 채팅
@@ -289,62 +249,108 @@ export default function CooperationGameIngamePage() {
     },
   });
 
-  if (!isLoaded) {
-    return <Loading message="게임 정보 받아오는 중..." />;
-  }
-
   return (
     <Wrapper>
-      <button onClick={frameTest}>frame test</button>
-      <button onClick={() => getGameInfo()}>게임 정보좀요</button>
-      <Board>
-        <PlayPuzzle
-          category="cooperation"
-          shapes={parsePuzzleShapes(
-            gameData[`${getTeam()}Puzzle`].board,
-            gameData.picture.widthPieceCnt,
-            gameData.picture.lengthPieceCnt,
-          )}
-          board={gameData[`${getTeam()}Puzzle`].board}
-          picture={gameData.picture}
-        />
-        <Row>
-          <ProgressWrapper>
-            <PrograssBar percent={ourPercent} isEnemy={false} />
-          </ProgressWrapper>
-        </Row>
+      {!isLoaded ? (
+        <Loading message="게임 정보 받아오는 중..." />
+      ) : (
+        <>
+          <button onClick={() => getGameInfo()}>게임 정보좀요</button>
+          <Board>
+            <PlayPuzzle
+              category="cooperation"
+              shapes={parsePuzzleShapes(
+                gameData[`${getTeam()}Puzzle`].board,
+                gameData.picture.widthPieceCnt,
+                gameData.picture.lengthPieceCnt,
+              )}
+              board={gameData[`${getTeam()}Puzzle`].board}
+              picture={gameData.picture}
+            />
+            <Row>
+              <ProgressWrapper>
+                <PrograssBar percent={ourPercent} isEnemy={false} />
+              </ProgressWrapper>
+            </Row>
 
-        <Col>
-          <Timer num={time} isCooperation="true" />
-          <h3>이 그림을 맞춰주세요!</h3>
-          <img
-            src={pictureSrc}
-            alt="퍼즐 그림"
-            style={{ width: "100%", borderRadius: "10px", margin: "5px" }}
+            <Col>
+              <Timer num={time} isCooperation="true" />
+              <h3>이 그림을 맞춰주세요!</h3>
+              <img
+                src={pictureSrc}
+                alt="퍼즐 그림"
+                style={{ width: "100%", borderRadius: "10px", margin: "5px" }}
+              />
+              <Chatting chatHistory={chatHistory} isIngame={true} isBattle={false} />
+            </Col>
+          </Board>
+
+          <ItemController
+            itemInventory={itemInventory}
+            onSendUseItemMessage={handleSendUseItemMessage}
           />
-          <Chatting chatHistory={chatHistory} isIngame={true} isBattle={false} />
-        </Col>
-      </Board>
+          {document.querySelector("#canvasContainer") &&
+            createPortal(
+              <Hint hintList={hintList} onClose={closeHint} />,
+              document.querySelector("#canvasContainer"),
+            )}
 
-      <ItemController
-        itemInventory={itemInventory}
-        onSendUseItemMessage={handleSendUseItemMessage}
-      />
-      {document.querySelector("#canvasContainer") &&
-        createPortal(
-          <Hint hintList={hintList} onClose={closeHint} />,
-          document.querySelector("#canvasContainer"),
-        )}
-
-      <ThemeProvider theme={theme}>
-        <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
-          <DialogTitle>게임 결과</DialogTitle>
-        </Dialog>
-      </ThemeProvider>
+          <ThemeProvider theme={theme}>
+            <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
+              <DialogTitle>게임 결과</DialogTitle>
+            </Dialog>
+          </ThemeProvider>
+        </>
+      )}
     </Wrapper>
   );
 }
 
+const effectCombo = ({ combo, comboCount }) => {
+  combo.forEach(([toIndex, fromIndex, direction]) => addCombo(fromIndex, toIndex, direction));
+  if (comboCount) {
+    renderComboAlert(comboCount);
+  }
+  onComboSound();
+};
+
+const renderComboAlert = (comboCnt) => {
+  console.log(`${comboCnt} 콤보문구 생성`);
+  const comboText = document.createElement("h2");
+  const canvasContainer = document.getElementById("canvasContainer");
+  comboText.textContent = `${comboCnt}COMBO!!`;
+
+  comboText.style.zIndex = 100;
+  comboText.style.position = "fixed";
+  comboText.style.left = "50%";
+  comboText.style.top = "40px";
+  comboText.style.transform = "translate(-50%, 0)";
+  comboText.style.fontSize = "30px";
+
+  canvasContainer.appendChild(comboText);
+
+  console.log(comboText);
+  setTimeout(() => {
+    console.log("콤보 문구 삭제");
+    console.log(comboText);
+    console.log(comboText.parentNode);
+    console.log(comboText.parentElement);
+    comboText.parentNode.removeChild(comboText);
+  }, 2000);
+};
+
+const onComboSound = () => {
+  const audio = new Audio(comboAudioPath);
+  audio.loop = false;
+  audio.crossOrigin = "anonymous";
+  // audio.volume = 0.5;
+  audio.load();
+  try {
+    audio.play();
+  } catch (err) {
+    console.log(err);
+  }
+};
 const Wrapper = styled.div`
   height: 100vh;
   min-height: 1000px;

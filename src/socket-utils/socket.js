@@ -34,19 +34,19 @@ const createSocket = () => {
     stomp.subscribe(destination, onMessageReceiverCallback);
   };
 
-  const disconnect = () => {
-    if (!stomp) {
-      return;
-    }
+  // const disconnect = () => {
+  //   if (!stomp) {
+  //     return;
+  //   }
 
-    stomp.disconnect();
-  };
+  //   stomp.disconnect();
+  // };
 
   return {
     connect,
     send,
     subscribe,
-    disconnect,
+    // disconnect,
   };
 };
 

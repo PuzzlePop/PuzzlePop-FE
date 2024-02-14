@@ -13,15 +13,20 @@ import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import { configStore } from "@/puzzle-core";
+import { attackFire, attackRocket } from "@/puzzle-core/attackItem";
+import { updateGroupByBundles } from "@/puzzle-core/utils";
 
 import comboAudioPath from "@/assets/audio/combo.mp3";
-import redTeamBackgroundPath from "@/assets/redTeamBackground.gif";
-import blueTeamBackgroundPath from "@/assets/blueTeamBackground.gif";
-import dropRandomItemPath from "@/assets/dropRandomItem.gif";
+import redTeamBackgroundPath from "@/assets/backgrounds/redTeamBackground.gif";
+import blueTeamBackgroundPath from "@/assets/backgrounds/blueTeamBackground.gif";
+import dropRandomItemPath from "@/assets/effects/dropRandomItem.gif";
 
 import { Box, Dialog, DialogTitle } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
+import { useHint } from "@/hooks/useHint";
+import Hint from "@/components/GameItemEffects/Hint";
+import { createPortal } from "react-dom";
 
 const { connect, send, subscribe, disconnect } = socket;
 const {
@@ -34,12 +39,13 @@ const {
   usingItemFire,
   usingItemRocket,
   usingItemEarthquake,
+  usingItemFrame,
+  usingItemMagnet,
 } = configStore;
 
 export default function BattleGameIngamePage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
-  // const [loading, setLoading] = useState(true);
   const [gameData, setGameData] = useState(null);
   const [isOpenedDialog, setIsOpenedDialog] = useState(false);
 
@@ -48,9 +54,23 @@ export default function BattleGameIngamePage() {
   const [enemyPercent, setEnemyPercent] = useState(0);
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
-  const [itemInventory, setItemInventory] = useState([null, null, null, null, null]);
+  const [redItemInventory, setRedItemInventory] = useState([null, null, null, null, null]);
+  const [blueItemInventory, setBlueItemInventory] = useState([null, null, null, null, null]);
+  const {
+    hintList: redHintList,
+    addHint: redAddHint,
+    closeHint: redCloseHint,
+    cleanHint: redCleanHint,
+  } = useHint();
+  const {
+    hintList: blueHintList,
+    addHint: blueAddHint,
+    closeHint: blueCloseHint,
+    cleanHint: blueCleanHint,
+  } = useHint();
 
-  const dropRandomItem = useRef(null);
+  const dropRandomItemElement = useRef(null);
+  const currentDropRandomItem = useRef(null);
 
   const isLoaded = useMemo(() => {
     return gameData && gameData[`${getTeam()}Puzzle`] && gameData[`${getTeam()}Puzzle`].board;
@@ -82,6 +102,16 @@ export default function BattleGameIngamePage() {
     );
   }, []);
 
+  const changePercent = (data) => {
+    if (getTeam() === "red") {
+      setOurPercent(data.redProgressPercent);
+      setEnemyPercent(data.blueProgressPercent);
+    } else {
+      setOurPercent(data.blueProgressPercent);
+      setEnemyPercent(data.redProgressPercent);
+    }
+  };
+
   const connectSocket = async () => {
     connect(
       () => {
@@ -91,10 +121,13 @@ export default function BattleGameIngamePage() {
           console.log(data);
 
           // 매번 게임이 끝났는지 체크
-          if (Boolean(data.finished)) {
-            disconnect();
-            console.log("게임 끝남 !");
-            // TODO : 게임 끝났을 때 effect
+          if (
+            Boolean(data.finished) ||
+            data.redProgressPercent === 100 ||
+            data.blueProgressPercent === 100
+          ) {
+            // disconnect();
+            console.log("게임 끝남 !"); // TODO : 게임 끝났을 때 effect
             setTimeout(() => {
               setIsOpenedDialog(true);
             }, 1000);
@@ -108,26 +141,62 @@ export default function BattleGameIngamePage() {
 
           // 매번 보유아이템배열을 업데이트
           if (data.redItemList) {
-            setItemInventory(data.redItemList);
+            setRedItemInventory(data.redItemList);
+          }
+          if (data.blueItemList) {
+            setBlueItemInventory(data.blueItemList);
           }
 
           // 게임정보 받기
           if (data.gameType && data.gameType === "BATTLE") {
             initializeGame(data);
+            setTimeout(() => {
+              console.log("번들로 그룹화 해볼게", getConfig(), data[`${getTeam()}Puzzle`].bundles);
+              updateGroupByBundles({
+                config: getConfig(),
+                bundles: data[`${getTeam()}Puzzle`].bundles,
+              });
+            }, 400);
+
             return;
           }
 
           // 진행도
-          // TODO : ATTACK일때 시간 초 늦게 반영되는 효과
+          // ATTACK일때 2초 뒤(효과 지속 시간과 동일) 반영
+          // MIRROR일때 3초 뒤(효과 지속 시간과 동일) 반영
           if (data.redProgressPercent >= 0 && data.blueProgressPercent >= 0) {
             console.log("진행도?", data.redProgressPercent, data.blueProgressPercent);
-            if (getTeam() === "red") {
-              setOurPercent(data.redProgressPercent);
-              setEnemyPercent(data.blueProgressPercent);
+            if (data.message && data.message === "ATTACK") {
+              setTimeout(() => {
+                changePercent(data);
+              }, 2000);
+            } else if (data.message && data.message === "MIRROR") {
+              setTimeout(() => {
+                changePercent(data);
+              }, 3000);
             } else {
-              setOurPercent(data.blueProgressPercent);
-              setEnemyPercent(data.redProgressPercent);
+              changePercent(data);
             }
+          }
+
+          // "MAGNET(자석)" 아이템 사용
+          if (data.message && data.message === "MAGNET") {
+            const { targetList, redBundles, blueBundles, targets } = data;
+            if (targets === getTeam().toUpperCase()) {
+              const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
+              usingItemMagnet(targetList, targetBundles);
+            }
+            return;
+          }
+
+          // "FRAME(액자)" 아이템 사용
+          if (data.message && data.message === "FRAME") {
+            const { targetList, redBundles, blueBundles, targets } = data;
+            if (targets === getTeam().toUpperCase()) {
+              const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
+              usingItemFrame(targetList, targetBundles);
+            }
+            return;
           }
 
           // 우리팀 event
@@ -154,9 +223,17 @@ export default function BattleGameIngamePage() {
             }
 
             if (data.message && data.message === "ADD_PIECE") {
-              const { targets, combo, comboCnt } = data;
+              const { targets, combo, comboCnt, team } = data;
               const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
               addPiece({ fromIndex, toIndex });
+
+              if (team === "RED") {
+                redCleanHint({ fromIndex, toIndex });
+              }
+
+              if (team === "BLUE") {
+                blueCleanHint({ fromIndex, toIndex });
+              }
 
               if (combo) {
                 console.log("콤보 효과 발동 !! : ", combo);
@@ -205,30 +282,45 @@ export default function BattleGameIngamePage() {
             }
           }
 
+          // "HINT(힌트)" 아이템 사용
+          if (data.message && data.message === "HINT") {
+            const { targetList, targets } = data;
+            if (targets === "RED") {
+              redAddHint(...targetList);
+            }
+
+            if (targets === "BLUE") {
+              blueAddHint(...targetList);
+            }
+
+            return;
+          }
+
+          // "MAGNET(자석)" 아이템 사용
+          if (data.message && data.message === "MAGNET") {
+            const { targetList, redBundles, blueBundles, targets } = data;
+            if (targets === getTeam().toUpperCase()) {
+              const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
+              usingItemMagnet(targetList, targetBundles);
+            }
+            return;
+          }
+
+          // 공격형 아이템 공격 성공
           if (data.message && data.message === "ATTACK") {
             console.log("공격메세지", data);
             // dropRandomItem 삭제
-            if (dropRandomItem.current.parentNode) {
-              dropRandomItem.current.parentNode.removeChild(dropRandomItem.current);
+            if (dropRandomItemElement.current.parentNode) {
+              dropRandomItemElement.current.parentNode.removeChild(dropRandomItemElement.current);
             }
 
             const { targets, targetList, deleted, randomItem, redBundles, blueBundles } = data;
 
-            // console.log("나 게임 인포 보낸다?");
-            // send(
-            //   "/app/game/message",
-            //   {},
-            //   JSON.stringify({
-            //     type: "GAME",
-            //     message: "GAME_INFO",
-            //     roomId: getRoomId(),
-            //     sender: getSender(),
-            //   }),
-            // );
-
             if (randomItem.name === "FIRE") {
               console.log("랜덤 아이템 fire 였어!");
 
+              const attackedTeamBundles = getTeam() === "red" ? redBundles : blueBundles;
+              attackFire(targets, targetList, deleted, attackedTeamBundles);
               // // fire 당하는 팀의 효과
               // if (targets === getTeam().toUpperCase()) {
 
@@ -236,35 +328,20 @@ export default function BattleGameIngamePage() {
 
               // }
 
-              setTimeout(() => {
-                console.log("레드팀 번들", redBundles);
-                console.log("블루팀 번들", blueBundles);
-                if (targetList && targets === getTeam().toUpperCase()) {
-                  console.log("fire 발동 !!");
-                  const attackedTeamBundles = getTeam() === "red" ? redBundles : blueBundles;
-                  usingItemFire(attackedTeamBundles, targetList);
-                }
-              }, 2000);
+              // setTimeout(() => {
+              //   console.log("레드팀 번들", redBundles);
+              //   console.log("블루팀 번들", blueBundles);
+              //   if (targetList && targets === getTeam().toUpperCase()) {
+              //     console.log("fire 발동 !!");
+              //     const attackedTeamBundles = getTeam() === "red" ? redBundles : blueBundles;
+              //     usingItemFire(attackedTeamBundles, targetList);
+              //   }
+              // }, 2000);
             }
 
             if (randomItem.name === "ROCKET") {
               console.log("랜덤 아이템 rocket 였어!");
-
-              // // rocket 당하는 팀의 효과
-              // if (targets === getTeam().toUpperCase()) {
-
-              // } else { // rocket 발동하는 팀의 효과
-
-              // }
-
-              setTimeout(() => {
-                // console.log("레드팀 번들", redBundles);
-                // console.log("블루팀 번들", blueBundles);
-                if (targetList && targets === getTeam().toUpperCase()) {
-                  console.log("rocket 발동 !!");
-                  usingItemRocket(targetList);
-                }
-              }, 2000);
+              attackRocket(targets, targetList, deleted);
             }
 
             if (randomItem.name === "EARTHQUAKE") {
@@ -292,13 +369,17 @@ export default function BattleGameIngamePage() {
           if (data.message && data.message === "SHIELD") {
             console.log("공격메세지 : 쉴드", data);
             // dropRandomItem 삭제
-            dropRandomItem.current.parentNode.removeChild(dropRandomItem.current);
+            if (dropRandomItemElement.current.parentNode) {
+              dropRandomItemElement.current.parentNode.removeChild(dropRandomItemElement.current);
+            }
           }
 
           if (data.message && data.message === "MIRROR") {
             console.log("공격메세지 : 거울", data);
             // dropRandomItem 삭제
-            dropRandomItem.current.parentNode.removeChild(dropRandomItem.current);
+            if (dropRandomItemElement.current.parentNode) {
+              dropRandomItemElement.current.parentNode.removeChild(dropRandomItemElement.current);
+            }
           }
 
           // drop random Item 생성
@@ -313,6 +394,7 @@ export default function BattleGameIngamePage() {
             dropRandomItemImg.style.left = data.randomItem.position_x + "px";
             dropRandomItemImg.style.top = data.randomItem.position_y + "px";
             dropRandomItemImg.style.transform = "translate(-50%, -50%)";
+            dropRandomItemImg.style.cursor = "pointer";
 
             dropRandomItemImg.onclick = function () {
               // 부모 요소로부터 버튼 제거
@@ -335,8 +417,11 @@ export default function BattleGameIngamePage() {
             };
 
             // 버튼을 canvasContainer에 추가
-            dropRandomItem.current = dropRandomItemImg;
+            dropRandomItemElement.current = dropRandomItemImg;
             canvasContainer.appendChild(dropRandomItemImg);
+
+            // 현재 아이템 저장 (MIRROR 효과를 위해)
+            currentDropRandomItem.current = data.randomItem.name;
 
             // alert 대신 메시지를 콘솔에 출력
             console.log(
@@ -420,54 +505,77 @@ export default function BattleGameIngamePage() {
     },
   });
 
-  if (!isLoaded) {
-    return <Loading message="게임 정보 받아오는 중..." />;
-  }
-
   return (
     <Wrapper>
-      <Board>
-        <PlayPuzzle
-          category="battle"
-          shapes={parsePuzzleShapes(
-            gameData[`${getTeam()}Puzzle`].board,
-            gameData.picture.widthPieceCnt,
-            gameData.picture.lengthPieceCnt,
+      {!isLoaded ? (
+        <Loading message="게임 정보 받아오는 중..." />
+      ) : (
+        <>
+          <Board>
+            <PlayPuzzle
+              category="battle"
+              shapes={parsePuzzleShapes(
+                gameData[`${getTeam()}Puzzle`].board,
+                gameData.picture.widthPieceCnt,
+                gameData.picture.lengthPieceCnt,
+              )}
+              board={gameData[`${getTeam()}Puzzle`].board}
+              picture={gameData.picture}
+            />
+            <Row>
+              <ProgressWrapper>
+                <PrograssBar percent={ourPercent} isEnemy={false} />
+              </ProgressWrapper>
+              <ProgressWrapper>
+                <PrograssBar percent={enemyPercent} isEnemy={true} />
+              </ProgressWrapper>
+            </Row>
+
+            <Col>
+              <Timer num={time} />
+              <h3>이 그림을 맞춰주세요!</h3>
+              <img
+                src={pictureSrc}
+                alt="퍼즐 그림"
+                style={{ width: "100%", borderRadius: "10px", margin: "5px" }}
+              />
+              <Chatting chatHistory={chatHistory} isIngame={true} isBattle={true} />
+            </Col>
+          </Board>
+
+          {getTeam() === "red" ? (
+            <>
+              <ItemController
+                itemInventory={redItemInventory}
+                onSendUseItemMessage={handleSendUseItemMessage}
+              />
+              {document.querySelector("#canvasContainer") &&
+                createPortal(
+                  <Hint hintList={redHintList} onClose={redCloseHint} />,
+                  document.querySelector("#canvasContainer"),
+                )}
+            </>
+          ) : (
+            <>
+              <ItemController
+                itemInventory={blueItemInventory}
+                onSendUseItemMessage={handleSendUseItemMessage}
+              />
+              {document.querySelector("#canvasContainer") &&
+                createPortal(
+                  <Hint hintList={blueHintList} onClose={blueCloseHint} />,
+                  document.querySelector("#canvasContainer"),
+                )}
+            </>
           )}
-          board={gameData[`${getTeam()}Puzzle`].board}
-          picture={gameData.picture}
-        />
-        <Row>
-          <ProgressWrapper>
-            <PrograssBar percent={ourPercent} isEnemy={false} />
-          </ProgressWrapper>
-          <ProgressWrapper>
-            <PrograssBar percent={enemyPercent} isEnemy={true} />
-          </ProgressWrapper>
-        </Row>
 
-        <Col>
-          <Timer num={time} />
-          <h3>이 그림을 맞춰주세요!</h3>
-          <img
-            src={pictureSrc}
-            alt="퍼즐 그림"
-            style={{ width: "100%", borderRadius: "10px", margin: "5px" }}
-          />
-          <Chatting chatHistory={chatHistory} isIngame={true} isBattle={true} />
-        </Col>
-      </Board>
-
-      <ItemController
-        itemInventory={itemInventory}
-        onSendUseItemMessage={handleSendUseItemMessage}
-      />
-
-      <ThemeProvider theme={theme}>
-        <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
-          <DialogTitle>게임 결과</DialogTitle>
-        </Dialog>
-      </ThemeProvider>
+          <ThemeProvider theme={theme}>
+            <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
+              <DialogTitle>게임 결과</DialogTitle>
+            </Dialog>
+          </ThemeProvider>
+        </>
+      )}
     </Wrapper>
   );
 }

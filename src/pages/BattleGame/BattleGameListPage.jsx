@@ -8,7 +8,7 @@ import CreateRoomButton from "@/components/GameRoomList/CreateRoomButton";
 import GameRoomListBoard from "@/components/GameRoomList/GameRoomListBoard";
 import { request } from "@/apis/requestBuilder";
 import { getSender } from "@/socket-utils/storage";
-import backgroundPath from "@/assets/background.gif";
+import backgroundPath from "@/assets/backgrounds/battleBackground.gif";
 
 export default function BattleGameListPage() {
   const [roomList, setRoomList] = useState([]);
