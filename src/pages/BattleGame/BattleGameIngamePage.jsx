@@ -10,7 +10,7 @@ import Chatting from "@/components/GameWaiting/Chatting";
 import ItemController from "@/components/ItemController";
 
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
-import { socket } from "@/socket-utils/socket";
+import { socket } from "@/socket-utils/socket2";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import { configStore } from "@/puzzle-core";
 import { attackFire, attackRocket, attackEarthquake } from "@/puzzle-core/attackItem";
