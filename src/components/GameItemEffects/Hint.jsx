@@ -5,6 +5,7 @@ import { configStore } from "../../puzzle-core";
 
 const { getConfig } = configStore;
 
+// TODO: 다른 사람 화면에는 힌트 위치가 다른 이슈가 있음..
 export default function Hint({ onClose, hintList }) {
   const handleClickHint = useCallback(
     (id) => {
