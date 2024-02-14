@@ -1,15 +1,12 @@
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
-import { WebSocket } from "ws";
-
-Object.assign(global, { WebSocket });
 
 const { VITE_SERVER_END_POINT, VITE_DEV_SERVER_END_POINT } = import.meta.env;
 const SERVER_END_POINT = import.meta.env.DEV ? VITE_DEV_SERVER_END_POINT : VITE_SERVER_END_POINT;
 const SOCKET_END_POINT = `${SERVER_END_POINT}/game`;
 
 export const socket2 = new Client({
-  brokerURL: "wss://i10a304.p.ssafy.io/api/game",
+  // brokerURL: "wss://i10a304.p.ssafy.io/api/game",
   connectHeaders: {},
   debug: function (str) {
     console.log(str);
@@ -19,15 +16,10 @@ export const socket2 = new Client({
   heartbeatOutgoing: 4000,
 });
 
-// Fallback code
-if (typeof WebSocket !== "function") {
-  // For SockJS you need to set a factory that creates a new SockJS instance
-  // to be used for each (re)connect
-  socket2.webSocketFactory = function () {
-    // Note that the URL is different from the WebSocket URL
-    return new SockJS(SOCKET_END_POINT);
-  };
-}
+socket2.webSocketFactory = function () {
+  // Note that the URL is different from the WebSocket URL
+  return new SockJS(SOCKET_END_POINT);
+};
 
 // client.onConnect = function (frame) {
 //   // Do something, all subscribes must be done is this callback
