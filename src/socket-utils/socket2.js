@@ -10,13 +10,18 @@ function createSocket() {
   let stomp = null;
 
   const connect = (onConnect) => {
-    if (!stomp) {
-      stomp = new StompJS.Client({
-        brokerURL: SOCKET_END_POINT,
-        onConnect,
-        connectHeaders: {},
-      });
+    if (stomp) {
+      stomp.deactivate();
     }
+
+    stomp = new StompJS.Client({
+      brokerURL: SOCKET_END_POINT,
+      onConnect,
+      connectHeaders: {},
+      reconnectDelay: 100,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+    });
 
     stomp.activate();
   };
@@ -45,7 +50,7 @@ function createSocket() {
       return;
     }
 
-    stomp;
+    stomp.deactivate();
   };
 
   return {
