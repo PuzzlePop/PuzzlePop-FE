@@ -11,9 +11,9 @@ export const socket2 = new Client({
   debug: function (str) {
     console.log(str);
   },
-  reconnectDelay: 300,
-  heartbeatIncoming: 4000,
-  heartbeatOutgoing: 4000,
+  reconnectDelay: 100,
+  heartbeatIncoming: 100,
+  heartbeatOutgoing: 100,
 });
 
 socket2.webSocketFactory = function () {
@@ -34,3 +34,5 @@ socket2.onStompError = function (frame) {
   console.log("Broker reported error: " + frame.headers["message"]);
   console.log("Additional details: " + frame.body);
 };
+
+socket2.activate();
