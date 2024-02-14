@@ -1,10 +1,16 @@
 import Paper from "paper";
 import { Point } from "paper/dist/paper-core";
 import { initializeConfig } from "./initializeConfig";
-import { itemFrame, removeItemStyleToPiece, searchItemList, setItemStyleToAllPiece } from "./item";
+import {
+  itemFrame,
+  itemMagnet,
+  removeItemStyleToPiece,
+  searchItemList,
+  setItemStyleToAllPiece,
+} from "./item";
 import { setMoveEvent } from "./setMoveEvent";
-import { uniteTiles, uniteTiles2 } from "./uniteTiles";
-import { cleanBorderStyle, updateGroupByBundles } from "./utils";
+import { uniteTiles } from "./uniteTiles";
+import { cleanBorderStyle, switchDirection } from "./utils";
 
 const createPuzzleConfig = () => {
   let config = {};
@@ -143,30 +149,20 @@ const createPuzzleConfig = () => {
   };
 
   const usingItemFrame = (targetList, bundles = []) => {
+    // TODO: Toast를 통해 액자 아이템을 사용했다는 UI 보여주기
+    // TODO: 액자를 사용할 곳이 없다면 UI 보여주기
     config = itemFrame({ config, targetList, bundles });
   };
 
   const usingItemMagnet = (targetList, bundles = []) => {
-    const [targetPuzzleIndex, ...aroundPuzzleIndexList] = targetList;
+    const result = itemMagnet({ config, targetList, bundles });
 
-    // TODO: 모두 -1이면 알림띄워주기 (자석을 사용할 곳이 없음..)
-
-    for (let direction = 0; direction < 4; direction += 1) {
-      const puzzleIndex = aroundPuzzleIndexList[direction];
-      if (puzzleIndex === -1) {
-        continue;
-      }
-
-      const unitedConfig = uniteTiles2({
-        config,
-        nowIndex: targetPuzzleIndex,
-        preIndex: puzzleIndex,
-        direction: switchDirection(direction),
-      });
-
-      const updatedConfig = updateGroupByBundles({ config: unitedConfig, bundles });
-      config = cleanBorderStyle({ config: updatedConfig });
+    if (result === null) {
+      // TODO: Toast를 통해 자석을 사용할 곳이 없다면 UI 보여주기
+      return;
     }
+
+    config = result;
   };
 
   return {
@@ -187,22 +183,3 @@ const createPuzzleConfig = () => {
 };
 
 export const configStore = createPuzzleConfig();
-
-const switchDirection = (direction) => {
-  let dir = -1;
-  switch (direction) {
-    case 0:
-      dir = 3;
-      break;
-    case 1:
-      dir = 0;
-      break;
-    case 2:
-      dir = 2;
-      break;
-    case 3:
-      dir = 1;
-      break;
-  }
-  return dir;
-};

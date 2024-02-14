@@ -44,6 +44,34 @@ export const removeItemStyleToPiece = ({ config, fromIndex, toIndex }) => {
   return config;
 };
 
+export const itemMagnet = ({ config, targetList, bundles = [] }) => {
+  const [targetPuzzleIndex, ...aroundPuzzleIndexList] = targetList;
+
+  // 자석을 사용할 곳이 없다면 null 반환
+  if (aroundPuzzleIndexList.every((index) => index === -1)) {
+    return null;
+  }
+
+  for (let direction = 0; direction < 4; direction += 1) {
+    const puzzleIndex = aroundPuzzleIndexList[direction];
+    if (puzzleIndex === -1) {
+      continue;
+    }
+
+    const unitedConfig = uniteTiles2({
+      config,
+      nowIndex: targetPuzzleIndex,
+      preIndex: puzzleIndex,
+      direction: switchDirection(direction),
+    });
+
+    const updatedConfig = updateGroupByBundles({ config: unitedConfig, bundles });
+    config = cleanBorderStyle({ config: updatedConfig });
+  }
+
+  return config;
+};
+
 export const itemFrame = ({ config, bundles, targetList }) => {
   const attach = ({ fromIndex, toIndex, direction }) => {
     const unitedConfig = uniteTiles2({

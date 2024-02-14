@@ -23,12 +23,9 @@ import cooperationBackgroundPath from "@/assets/cooperationBackground.gif";
 import { Box, Dialog, DialogTitle } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
-import * as testcases from "../../_lib/item-frame-testcases";
-import { randomSprinkle } from "../../puzzle-core/utils";
 
 const { connect, send, subscribe, disconnect } = socket;
 const {
-  getConfig,
   lockPuzzle,
   movePuzzle,
   unLockPuzzle,
@@ -75,30 +72,6 @@ export default function CooperationGameIngamePage() {
       }),
     );
   }, []);
-
-  const frameTest1 = () => {
-    const { targetList, bundles } = testcases.testcase1;
-    usingItemFrame(targetList, bundles);
-  };
-
-  const frameTest2 = () => {
-    const { targetList, bundles } = testcases.testcase2;
-    usingItemFrame(targetList, bundles);
-  };
-
-  const frameTest3 = () => {
-    const { targetList, bundles } = testcases.testcase3;
-    usingItemFrame(targetList, bundles);
-  };
-
-  const frameTest4 = () => {
-    const { targetList, bundles } = testcases.testcase4;
-    usingItemFrame(targetList, bundles);
-  };
-
-  const sprinkle = () => {
-    randomSprinkle({ config: getConfig() });
-  };
 
   const getGameInfo = () => {
     send(
@@ -283,11 +256,6 @@ export default function CooperationGameIngamePage() {
       ) : (
         <>
           <button onClick={() => getGameInfo()}>게임 정보좀요</button>
-          <button onClick={frameTest1}>frame test1</button>
-          <button onClick={frameTest2}>frame test2</button>
-          <button onClick={frameTest3}>frame test3</button>
-          <button onClick={frameTest4}>frame test4</button>
-          <button onClick={sprinkle}>랜덤 뿌리기</button>
           <Board>
             <PlayPuzzle
               category="cooperation"
