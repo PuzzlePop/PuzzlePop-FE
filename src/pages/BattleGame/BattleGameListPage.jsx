@@ -10,6 +10,7 @@ import { request } from "@/apis/requestBuilder";
 import { getSender } from "@/socket-utils/storage";
 import backgroundPath from "@/assets/backgrounds/battleBackground.gif";
 import { socket } from "../../socket-utils/socket2";
+import { setRoomId, setSender } from "../../socket-utils/storage";
 
 const { connect, send, subscribe, disconnect } = socket;
 
@@ -65,6 +66,8 @@ export default function BattleGameListPage() {
         if (data.message === "WAITING") {
           alert("waiting");
         } else if (data.message === "GAME_START") {
+          setRoomId(data.targets);
+          setSender(sender)
           window.location.replace(`/game/battle/ingame/${data.targets}`);
         }
       });
