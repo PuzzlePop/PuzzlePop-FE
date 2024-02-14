@@ -7,7 +7,7 @@ import { PlayerCard, EmptyPlayerCard, XPlayerCard } from "@/components/GameWaiti
 import SelectImgAndPiece from "@/components/GameWaiting/SelectImgAndPiece";
 import Chatting from "@/components/GameWaiting/Chatting";
 import { getSender, getTeam, setTeam, setTeamSocket } from "@/socket-utils/storage";
-import { socket } from "@/socket-utils/socket2";
+import { socket } from "@/socket-utils/socket";
 
 const { send } = socket;
 
