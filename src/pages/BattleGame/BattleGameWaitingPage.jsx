@@ -13,7 +13,6 @@ import { socket } from "@/socket-utils/socket";
 import { request } from "@/apis/requestBuilder";
 
 import backgroundPath from "@/assets/backgrounds/battleBackground.gif";
-import { socket2 } from "../../socket-utils/socket2";
 
 const { connect, send, subscribe } = socket;
 
@@ -30,10 +29,11 @@ export default function BattleGameWaitingPage() {
 
   const connectSocket = async () => {
     // websocket 연결 시도
-    socket2.onConnect = () => {
+
+    connect(() => {
       console.log("@@@@@@@@@@@@@@@@ 대기실 소켓 연결 @@@@@@@@@@@@@@@@@@");
 
-      socket2.subscribe(`/topic/game/room/${roomId}`, (message) => {
+      subscribe(`/topic/game/room/${roomId}`, (message) => {
         const data = JSON.parse(message.body);
 
         if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
@@ -53,7 +53,7 @@ export default function BattleGameWaitingPage() {
         setGameData(data);
       });
 
-      socket2.subscribe(`/topic/chat/room/${roomId}`, (message) => {
+      subscribe(`/topic/chat/room/${roomId}`, (message) => {
         const data = JSON.parse(message.body);
         const { userid, chatMessage, time } = data;
         const receivedMessage = { userid, chatMessage, time }; // 받은 채팅
@@ -61,72 +61,17 @@ export default function BattleGameWaitingPage() {
       });
 
       // 서버로 메시지 전송
-      socket2.publish({
-        destination: "/app/game/message",
-        body: JSON.stringify({
+      send(
+        "/app/game/message",
+        {},
+        JSON.stringify({
           type: "ENTER",
           roomId: getRoomId(),
           sender: getSender(),
           member: getCookie("userId") ? true : false,
         }),
-      });
-
-      // send(
-      //   "/app/game/message",
-      //   {},
-      //   JSON.stringify({
-      //     type: "ENTER",
-      //     roomId: getRoomId(),
-      //     sender: getSender(),
-      //     member: getCookie("userId") ? true : false
-      //   }),
-      // );
-    };
-
-    socket2.activate();
-
-    // connect(() => {
-    //   console.log("@@@@@@@@@@@@@@@@ 대기실 소켓 연결 @@@@@@@@@@@@@@@@@@");
-
-    //   subscribe(`/topic/game/room/${roomId}`, (message) => {
-    //     const data = JSON.parse(message.body);
-
-    //     if (data.blueTeam && data.blueTeam.players && Array.isArray(data.blueTeam.players)) {
-    //       data.blueTeam.players.forEach((player) => {
-    //         console.log(player);
-    //         if (player.id === getSender()) {
-    //           setTeam("blue");
-    //         }
-    //       });
-    //     }
-
-    //     // 1. 게임이 시작되면 인게임 화면으로 보낸다.
-    //     if (data.gameId && Boolean(data.started) && !Boolean(data.finished)) {
-    //       window.location.replace(`/game/battle/ingame/${data.gameId}`);
-    //       return;
-    //     }
-    //     setGameData(data);
-    //   });
-
-    //   subscribe(`/topic/chat/room/${roomId}`, (message) => {
-    //     const data = JSON.parse(message.body);
-    //     const { userid, chatMessage, time } = data;
-    //     const receivedMessage = { userid, chatMessage, time }; // 받은 채팅
-    //     setChatHistory((prevChat) => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
-    //   });
-
-    //   // 서버로 메시지 전송
-    //   send(
-    //     "/app/game/message",
-    //     {},
-    //     JSON.stringify({
-    //       type: "ENTER",
-    //       roomId: getRoomId(),
-    //       sender: getSender(),
-    //       member: getCookie("userId") ? true : false
-    //     }),
-    //   );
-    // });
+      );
+    });
   };
 
   //쿠키 확인

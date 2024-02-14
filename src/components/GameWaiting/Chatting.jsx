@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
-// import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
+import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
 import { getSender, getRoomId, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { TextField, Button } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
-import { socket2 } from "../../socket-utils/socket2";
 
 const { send } = socket;
 
@@ -18,26 +17,17 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
   const handleMessageSend = (e) => {
     e.preventDefault();
     if (getSender() && message) {
-      socket2.publish({
-        destination: `/app/game/message`,
-        body: JSON.stringify({
+      send(
+        `/app/game/message`,
+        {},
+        JSON.stringify({
           roomId: getRoomId(),
           sender: getSender(),
           message,
           type: "CHAT",
         }),
-      });
-      // send(
-      //   `/app/game/message`,
-      //   {},
-      //   JSON.stringify({
-      //     roomId: getRoomId(),
-      //     sender: getSender(),
-      //     message,
-      //     type: "CHAT",
-      //   }),
-      // );
-      // setMessage("");
+      );
+      setMessage("");
     }
   };
 
@@ -119,7 +109,7 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
         )}
 
         <Form onSubmit={handleMessageSend}>
-          {/* {isIngame ? (
+          {isIngame ? (
             <GameOpenVidu
               gameId={`${getRoomId()}_${getTeam()}`}
               playerName={getSender()}
@@ -127,7 +117,7 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
             />
           ) : (
             <GameOpenVidu gameId={getRoomId()} playerName={getSender()} />
-          )} */}
+          )}
           <ChatInput
             type="text"
             placeholder="채팅"

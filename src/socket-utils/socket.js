@@ -1,6 +1,5 @@
 import SockJS from "sockjs-client";
 import StompJS from "stompjs";
-import { socket2 } from "./socket2";
 
 const { VITE_SERVER_END_POINT, VITE_DEV_SERVER_END_POINT } = import.meta.env;
 const SERVER_END_POINT = import.meta.env.DEV ? VITE_DEV_SERVER_END_POINT : VITE_SERVER_END_POINT;
@@ -18,16 +17,11 @@ const createSocket = () => {
   };
 
   const send = (destination, obj, message) => {
-    // if (!stomp) {
-    //   return;
-    // }
+    if (!stomp) {
+      return;
+    }
 
-    socket2.publish({
-      destination,
-      body: message,
-    });
-
-    // stomp.send(destination, obj, message);
+    stomp.send(destination, obj, message);
   };
 
   const subscribe = (destination, onMessageReceiverCallback) => {

@@ -23,7 +23,6 @@ import cooperationBackgroundPath from "@/assets/backgrounds/cooperationBackgroun
 import { Box, Dialog, DialogTitle } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
-import { socket2 } from "../../socket-utils/socket2";
 
 const { connect, send, subscribe, disconnect } = socket;
 const {
@@ -61,316 +60,163 @@ export default function CooperationGameIngamePage() {
   };
 
   const handleSendUseItemMessage = useCallback((keyNumber) => {
-    socket2.publish({
-      destination: "/app/game/message",
-      body: JSON.stringify({
+    send(
+      "/app/game/message",
+      {},
+      JSON.stringify({
         type: "GAME",
         roomId: getRoomId(),
         sender: getSender(),
         message: "USE_ITEM",
         targets: keyNumber,
       }),
-    });
-
-    // send(
-    //   "/app/game/message",
-    //   {},
-    //   JSON.stringify({
-    //     type: "GAME",
-    //     roomId: getRoomId(),
-    //     sender: getSender(),
-    //     message: "USE_ITEM",
-    //     targets: keyNumber,
-    //   }),
-    // );
+    );
   }, []);
 
   const getGameInfo = () => {
-    socket2.publish({
-      destination: "/app/game/message",
-      body: JSON.stringify({
+    send(
+      "/app/game/message",
+      {},
+      JSON.stringify({
         type: "GAME",
         message: "GAME_INFO",
         roomId: getRoomId(),
         sender: getSender(),
       }),
-    });
-
-    // send(
-    //   "/app/game/message",
-    //   {},
-    //   JSON.stringify({
-    //     type: "GAME",
-    //     message: "GAME_INFO",
-    //     roomId: getRoomId(),
-    //     sender: getSender(),
-    //   }),
-    // );
+    );
   };
 
   const connectSocket = async () => {
-    (socket2.onConnect = () => {
-      console.log("@@@@@@@@@@@@@@@@ 인게임 소켓 연결 @@@@@@@@@@@@@@@@@@");
-      socket2.subscribe(`/topic/game/room/${roomId}`, (message) => {
-        const data = JSON.parse(message.body);
-        // console.log(data);
+    connect(
+      () => {
+        console.log("@@@@@@@@@@@@@@@@ 인게임 소켓 연결 @@@@@@@@@@@@@@@@@@");
+        subscribe(`/topic/game/room/${roomId}`, (message) => {
+          const data = JSON.parse(message.body);
+          // console.log(data);
 
-        // 매번 게임이 끝났는지 체크
-        if (Boolean(data.finished)) {
-          // disconnect();
-          console.log("게임 끝남 !");
-          // TODO : 게임 끝났을 때 effect
-          setTimeout(() => {
-            setIsOpenedDialog(true);
-          }, 1000);
-          // return;
-        }
-
-        // 매번 보유아이템배열을 업데이트
-        if (data.redItemList) {
-          setItemInventory(data.redItemList);
-        }
-
-        // timer 설정
-        if (!data.gameType && data.time) {
-          setTime(data.time);
-        }
-
-        // 게임정보 받기
-        if (data.gameType && data.gameType === "COOPERATION") {
-          setGameData(data);
-          return;
-        }
-
-        // 진행도
-        // TODO : ATTACK일때 시간 초 늦게 반영되는 효과
-        if (data.redProgressPercent >= 0) {
-          console.log("진행도?", data.redProgressPercent);
-          setOurPercent(data.redProgressPercent);
-        }
-
-        if (data.message && data.message === "LOCKED" && data.senderId !== getSender()) {
-          const { targets } = data;
-          const targetList = JSON.parse(targets);
-          targetList.forEach(({ x, y, index }) => lockPuzzle(x, y, index));
-          return;
-        }
-
-        if (data.message && data.message === "MOVE" && data.senderId !== getSender()) {
-          const { targets } = data;
-          const targetList = JSON.parse(targets);
-          targetList.forEach(({ x, y, index }) => movePuzzle(x, y, index));
-          return;
-        }
-
-        if (data.message && data.message === "UNLOCKED" && data.senderId !== getSender()) {
-          const { targets } = data;
-          const targetList = JSON.parse(targets);
-          targetList.forEach(({ x, y, index }) => unLockPuzzle(x, y, index));
-          return;
-        }
-
-        if (data.message && data.message === "ADD_PIECE") {
-          const { targets, combo, comboCnt: comboCount, redBundles } = data;
-          const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
-          addPiece({ fromIndex, toIndex }, redBundles);
-          cleanHint({ fromIndex, toIndex });
-          if (combo) {
-            effectCombo({ combo, comboCount });
+          // 매번 게임이 끝났는지 체크
+          if (Boolean(data.finished)) {
+            // disconnect();
+            console.log("게임 끝남 !");
+            // TODO : 게임 끝났을 때 effect
+            setTimeout(() => {
+              setIsOpenedDialog(true);
+            }, 1000);
+            // return;
           }
-          return;
-        }
 
-        // "FRAME(액자)" 아이템 사용
-        if (data.message && data.message === "FRAME") {
-          const { targetList, redBundles } = data;
-          usingItemFrame(targetList, redBundles);
-          return;
-        }
+          // 매번 보유아이템배열을 업데이트
+          if (data.redItemList) {
+            setItemInventory(data.redItemList);
+          }
 
-        // "HINT(힌트)" 아이템 사용
-        if (data.message && data.message === "HINT") {
-          const { targetList } = data;
-          addHint(...targetList);
-          return;
-        }
+          // timer 설정
+          if (!data.gameType && data.time) {
+            setTime(data.time);
+          }
 
-        // "MAGNET(자석)" 아이템 사용
-        if (data.message && data.message === "MAGNET") {
-          const { targetList, redBundles } = data;
-          usingItemMagnet(targetList, redBundles);
-          return;
-        }
+          // 게임정보 받기
+          if (data.gameType && data.gameType === "COOPERATION") {
+            setGameData(data);
+            return;
+          }
 
-        // 게임정보 받기
-        if (data.gameType && data.gameType === "COOPERATION") {
-          setGameData(data);
-          return;
-        }
-      });
+          // 진행도
+          // TODO : ATTACK일때 시간 초 늦게 반영되는 효과
+          if (data.redProgressPercent >= 0) {
+            console.log("진행도?", data.redProgressPercent);
+            setOurPercent(data.redProgressPercent);
+          }
 
-      // 채팅
-      socket2.subscribe(`/topic/chat/room/${roomId}`, (message) => {
-        const data = JSON.parse(message.body);
-        console.log("채팅왔다", data);
-        const { userid, chatMessage, time, teamColor } = data;
+          if (data.message && data.message === "LOCKED" && data.senderId !== getSender()) {
+            const { targets } = data;
+            const targetList = JSON.parse(targets);
+            targetList.forEach(({ x, y, index }) => lockPuzzle(x, y, index));
+            return;
+          }
 
-        const receivedMessage = { userid, chatMessage, time }; // 받은 채팅
-        setChatHistory((prevChat) => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
-      });
+          if (data.message && data.message === "MOVE" && data.senderId !== getSender()) {
+            const { targets } = data;
+            const targetList = JSON.parse(targets);
+            targetList.forEach(({ x, y, index }) => movePuzzle(x, y, index));
+            return;
+          }
 
-      // 서버로 메시지 전송
-      socket2.publish({
-        destination: "/app/game/message",
-        body: JSON.stringify({
-          type: "ENTER",
-          roomId: getRoomId(),
-          sender: getSender(),
-        }),
-      });
+          if (data.message && data.message === "UNLOCKED" && data.senderId !== getSender()) {
+            const { targets } = data;
+            const targetList = JSON.parse(targets);
+            targetList.forEach(({ x, y, index }) => unLockPuzzle(x, y, index));
+            return;
+          }
 
-      // send(
-      //   "/app/game/message",
-      //   {},
-      //   JSON.stringify({
-      //     type: "ENTER",
-      //     roomId: getRoomId(),
-      //     sender: getSender(),
-      //   }),
-      // );
-    }),
-      socket2.activate();
+          if (data.message && data.message === "ADD_PIECE") {
+            const { targets, combo, comboCnt: comboCount, redBundles } = data;
+            const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
+            addPiece({ fromIndex, toIndex }, redBundles);
+            cleanHint({ fromIndex, toIndex });
+            if (combo) {
+              effectCombo({ combo, comboCount });
+            }
+            return;
+          }
 
-    // connect(
-    //   () => {
-    //     console.log("@@@@@@@@@@@@@@@@ 인게임 소켓 연결 @@@@@@@@@@@@@@@@@@");
-    //     subscribe(`/topic/game/room/${roomId}`, (message) => {
-    //       const data = JSON.parse(message.body);
-    //       // console.log(data);
+          // "FRAME(액자)" 아이템 사용
+          if (data.message && data.message === "FRAME") {
+            const { targetList, redBundles } = data;
+            usingItemFrame(targetList, redBundles);
+            return;
+          }
 
-    //       // 매번 게임이 끝났는지 체크
-    //       if (Boolean(data.finished)) {
-    //         // disconnect();
-    //         console.log("게임 끝남 !");
-    //         // TODO : 게임 끝났을 때 effect
-    //         setTimeout(() => {
-    //           setIsOpenedDialog(true);
-    //         }, 1000);
-    //         // return;
-    //       }
+          // "HINT(힌트)" 아이템 사용
+          if (data.message && data.message === "HINT") {
+            const { targetList } = data;
+            addHint(...targetList);
+            return;
+          }
 
-    //       // 매번 보유아이템배열을 업데이트
-    //       if (data.redItemList) {
-    //         setItemInventory(data.redItemList);
-    //       }
+          // "MAGNET(자석)" 아이템 사용
+          if (data.message && data.message === "MAGNET") {
+            const { targetList, redBundles } = data;
+            usingItemMagnet(targetList, redBundles);
+            return;
+          }
 
-    //       // timer 설정
-    //       if (!data.gameType && data.time) {
-    //         setTime(data.time);
-    //       }
+          // 게임정보 받기
+          if (data.gameType && data.gameType === "COOPERATION") {
+            setGameData(data);
+            return;
+          }
+        });
 
-    //       // 게임정보 받기
-    //       if (data.gameType && data.gameType === "COOPERATION") {
-    //         setGameData(data);
-    //         return;
-    //       }
+        // 채팅
+        subscribe(`/topic/chat/room/${roomId}`, (message) => {
+          const data = JSON.parse(message.body);
+          console.log("채팅왔다", data);
+          const { userid, chatMessage, time, teamColor } = data;
 
-    //       // 진행도
-    //       // TODO : ATTACK일때 시간 초 늦게 반영되는 효과
-    //       if (data.redProgressPercent >= 0) {
-    //         console.log("진행도?", data.redProgressPercent);
-    //         setOurPercent(data.redProgressPercent);
-    //       }
+          const receivedMessage = { userid, chatMessage, time }; // 받은 채팅
+          setChatHistory((prevChat) => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
+        });
 
-    //       if (data.message && data.message === "LOCKED" && data.senderId !== getSender()) {
-    //         const { targets } = data;
-    //         const targetList = JSON.parse(targets);
-    //         targetList.forEach(({ x, y, index }) => lockPuzzle(x, y, index));
-    //         return;
-    //       }
-
-    //       if (data.message && data.message === "MOVE" && data.senderId !== getSender()) {
-    //         const { targets } = data;
-    //         const targetList = JSON.parse(targets);
-    //         targetList.forEach(({ x, y, index }) => movePuzzle(x, y, index));
-    //         return;
-    //       }
-
-    //       if (data.message && data.message === "UNLOCKED" && data.senderId !== getSender()) {
-    //         const { targets } = data;
-    //         const targetList = JSON.parse(targets);
-    //         targetList.forEach(({ x, y, index }) => unLockPuzzle(x, y, index));
-    //         return;
-    //       }
-
-    //       if (data.message && data.message === "ADD_PIECE") {
-    //         const { targets, combo, comboCnt: comboCount, redBundles } = data;
-    //         const [fromIndex, toIndex] = targets.split(",").map((piece) => Number(piece));
-    //         addPiece({ fromIndex, toIndex }, redBundles);
-    //         cleanHint({ fromIndex, toIndex });
-    //         if (combo) {
-    //           effectCombo({ combo, comboCount });
-    //         }
-    //         return;
-    //       }
-
-    //       // "FRAME(액자)" 아이템 사용
-    //       if (data.message && data.message === "FRAME") {
-    //         const { targetList, redBundles } = data;
-    //         usingItemFrame(targetList, redBundles);
-    //         return;
-    //       }
-
-    //       // "HINT(힌트)" 아이템 사용
-    //       if (data.message && data.message === "HINT") {
-    //         const { targetList } = data;
-    //         addHint(...targetList);
-    //         return;
-    //       }
-
-    //       // "MAGNET(자석)" 아이템 사용
-    //       if (data.message && data.message === "MAGNET") {
-    //         const { targetList, redBundles } = data;
-    //         usingItemMagnet(targetList, redBundles);
-    //         return;
-    //       }
-
-    //       // 게임정보 받기
-    //       if (data.gameType && data.gameType === "COOPERATION") {
-    //         setGameData(data);
-    //         return;
-    //       }
-    //     });
-
-    //     // 채팅
-    //     subscribe(`/topic/chat/room/${roomId}`, (message) => {
-    //       const data = JSON.parse(message.body);
-    //       console.log("채팅왔다", data);
-    //       const { userid, chatMessage, time, teamColor } = data;
-
-    //       const receivedMessage = { userid, chatMessage, time }; // 받은 채팅
-    //       setChatHistory((prevChat) => [...prevChat, receivedMessage]); // 채팅 기록에 새로운 채팅 추가
-    //     });
-
-    //     // 서버로 메시지 전송
-    //     send(
-    //       "/app/game/message",
-    //       {},
-    //       JSON.stringify({
-    //         type: "ENTER",
-    //         roomId: getRoomId(),
-    //         sender: getSender(),
-    //       }),
-    //     );
-    //   },
-    //   () => {
-    //     console.log("@@@@@@@@@@@@@@@@@@@@@socket error 발생@@@@@@@@@@@@@@@@@@@@@");
-    //     // window.alert("게임이 종료되었거나 입장할 수 없습니다.");
-    //     // navigate(`/game/cooperation`, {
-    //     //   replace: true,
-    //     // });
-    //   },
-    // );
+        // 서버로 메시지 전송
+        send(
+          "/app/game/message",
+          {},
+          JSON.stringify({
+            type: "ENTER",
+            roomId: getRoomId(),
+            sender: getSender(),
+          }),
+        );
+      },
+      () => {
+        console.log("@@@@@@@@@@@@@@@@@@@@@socket error 발생@@@@@@@@@@@@@@@@@@@@@");
+        // window.alert("게임이 종료되었거나 입장할 수 없습니다.");
+        // navigate(`/game/cooperation`, {
+        //   replace: true,
+        // });
+      },
+    );
   };
 
   useEffect(() => {

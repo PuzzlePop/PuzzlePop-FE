@@ -4,7 +4,6 @@ import FindChange from "@/components/PlayPuzzle/PuzzleCanvas/Puzzle/FindChange";
 import { getRoomId, getSender } from "../../../../socket-utils/storage";
 import { socket } from "../../../../socket-utils/socket";
 import comboEffectPath from "@/assets/comboEffect.gif";
-import { socket2 } from "../../../../socket-utils/socket2";
 
 // let first = true;
 
@@ -60,9 +59,10 @@ const moveTile = () => {
       const puzzleGroup = getPuzzleGroup(event);
 
       // socket 전송
-      socket2.publish({
-        destination: "/app/game/message",
-        body: JSON.stringify({
+      send(
+        "/app/game/message",
+        {},
+        JSON.stringify({
           type: "GAME",
           roomId: getRoomId(),
           sender: getSender(),
@@ -71,21 +71,7 @@ const moveTile = () => {
           position_x: gtile[0].position.x,
           position_y: gtile[0].position.y,
         }),
-      });
-
-      // send(
-      //   "/app/game/message",
-      //   {},
-      //   JSON.stringify({
-      //     type: "GAME",
-      //     roomId: getRoomId(),
-      //     sender: getSender(),
-      //     message: "MOUSE_DOWN",
-      //     targets: JSON.stringify(puzzleGroup),
-      //     position_x: gtile[0].position.x,
-      //     position_y: gtile[0].position.y,
-      //   }),
-      // );
+      );
     };
 
     gtile[0].onMouseDrag = (event) => {
@@ -122,9 +108,10 @@ const moveTile = () => {
       const puzzleGroup = getPuzzleGroup(event);
 
       // socket 전송
-      socket2.publish({
-        destination: "/app/game/message",
-        body: JSON.stringify({
+      send(
+        "/app/game/message",
+        {},
+        JSON.stringify({
           type: "GAME",
           roomId: getRoomId(),
           sender: getSender(),
@@ -133,21 +120,7 @@ const moveTile = () => {
           position_x: gtile[0].position.x,
           position_y: gtile[0].position.y,
         }),
-      });
-
-      // send(
-      //   "/app/game/message",
-      //   {},
-      //   JSON.stringify({
-      //     type: "GAME",
-      //     roomId: getRoomId(),
-      //     sender: getSender(),
-      //     message: "MOUSE_DRAG",
-      //     targets: JSON.stringify(puzzleGroup),
-      //     position_x: gtile[0].position.x,
-      //     position_y: gtile[0].position.y,
-      //   }),
-      // );
+      );
     };
 
     gtile[0].onMouseEnter = (event) => {
@@ -181,9 +154,10 @@ const findNearTileGroup = () => {
     tile[0].onMouseUp = (event) => {
       const puzzleGroup = getPuzzleGroup(event);
       // socket 전송
-      socket2.publish({
-        destination: "/app/game/message",
-        body: JSON.stringify({
+      send(
+        "/app/game/message",
+        {},
+        JSON.stringify({
           type: "GAME",
           roomId: getRoomId(),
           sender: getSender(),
@@ -192,21 +166,7 @@ const findNearTileGroup = () => {
           position_x: tile[0].position.x,
           position_y: tile[0].position.y,
         }),
-      });
-
-      // send(
-      //   "/app/game/message",
-      //   {},
-      //   JSON.stringify({
-      //     type: "GAME",
-      //     roomId: getRoomId(),
-      //     sender: getSender(),
-      //     message: "MOUSE_UP",
-      //     targets: JSON.stringify(puzzleGroup),
-      //     position_x: tile[0].position.x,
-      //     position_y: tile[0].position.y,
-      //   }),
-      // );
+      );
 
       const group = tile[1];
       if (group !== undefined) {
@@ -431,28 +391,17 @@ export const uniteTiles = (
   direction = -1,
 ) => {
   if (isSender) {
-    socket2.publish({
-      destination: "/app/game/message",
-      body: JSON.stringify({
+    send(
+      "/app/game/message",
+      {},
+      JSON.stringify({
         type: "GAME",
         roomId: getRoomId(),
         sender: getSender(),
         message: "ADD_PIECE",
         targets: nowIndex.toString() + "," + preIndex.toString(),
       }),
-    });
-
-    // send(
-    //   "/app/game/message",
-    //   {},
-    //   JSON.stringify({
-    //     type: "GAME",
-    //     roomId: getRoomId(),
-    //     sender: getSender(),
-    //     message: "ADD_PIECE",
-    //     targets: nowIndex.toString() + "," + preIndex.toString(),
-    //   }),
-    // );
+    );
   }
 
   const nowGroup = config.groupTiles[nowIndex][1];
