@@ -1,6 +1,6 @@
 import { Point } from "paper/dist/paper-core";
 import comboEffectPath from "@/assets/effects/comboEffect.gif";
-import { socket } from "../socket-utils/socket";
+import { socket } from "../socket-utils/socket2";
 import { getRoomId, getSender } from "../socket-utils/storage";
 import { getPuzzleGroup } from "./getPuzzleGroup";
 import { uniteTiles } from "./uniteTiles";
@@ -133,7 +133,7 @@ const sendFitTilePosition = (tile, tileIdx) => {
       roomId: getRoomId(),
       sender: getSender(),
       message: "MOUSE_DRAG",
-      targets: JSON.stringify({ x: tile.position.x, y: tile.position.y, index: tileIdx }),
+      targets: JSON.stringify([{ x: tile.position.x, y: tile.position.y, index: tileIdx }]),
       position_x: tile.position.x,
       position_y: tile.position.y,
     }),
