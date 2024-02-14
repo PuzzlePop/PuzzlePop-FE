@@ -133,7 +133,7 @@ const sendFitTilePosition = (tile, tileIdx) => {
       roomId: getRoomId(),
       sender: getSender(),
       message: "MOUSE_DRAG",
-      targets: JSON.stringify({ x: tile.position.x, y: tile.position.y, index: tileIdx }),
+      targets: JSON.stringify([{ x: tile.position.x, y: tile.position.y, index: tileIdx }]),
       position_x: tile.position.x,
       position_y: tile.position.y,
     }),
