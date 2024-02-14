@@ -41,6 +41,7 @@ export default function BattleGameListPage() {
 
 
   const quickMatching = () => {
+    alert("hi")
     send(
       "/app/game/message",
       {},
