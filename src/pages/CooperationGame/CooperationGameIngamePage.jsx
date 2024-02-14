@@ -18,7 +18,7 @@ import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import { useHint } from "@/hooks/useHint";
 
 import comboAudioPath from "@/assets/audio/combo.mp3";
-import cooperationBackgroundPath from "@/assets/cooperationBackground.gif";
+import cooperationBackgroundPath from "@/assets/backgrounds/cooperationBackground.gif";
 
 import { Box, Dialog, DialogTitle } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";

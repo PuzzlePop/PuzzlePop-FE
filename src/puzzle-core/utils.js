@@ -1,5 +1,5 @@
-import { Point } from "paper/dist/paper-core";
-import { groupFit, uniteTiles2 } from "./uniteTiles";
+import { Point, Color } from "paper/dist/paper-core";
+import { uniteTiles2 } from "./uniteTiles";
 
 export const getPuzzlePosition = (puzzle) => {
   if (puzzle.position) {
@@ -54,7 +54,7 @@ export const cleanBorderStyle = ({ config }) => {
   config.groupTiles.forEach((gtile, index) => {
     const isGrouping = gtile[1] !== undefined;
     if (isGrouping) {
-      config.tiles[index].strokeColor = undefined;
+      config.tiles[index].strokeColor = new Color("#ddd");
     }
   });
   return config;

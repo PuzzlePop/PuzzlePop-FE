@@ -12,7 +12,7 @@ import { getSender, getRoomId } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { request } from "@/apis/requestBuilder";
 
-import backgroundPath from "@/assets/background.gif";
+import backgroundPath from "@/assets/backgrounds/background.gif";
 
 const { connect, send, subscribe } = socket;
 
@@ -57,10 +57,20 @@ export default function CooperationGameWaitingPage() {
           type: "ENTER",
           roomId: getRoomId(),
           sender: getSender(),
+          member: getCookie("userId") ? true : false
         }),
       );
     });
   };
+
+  //쿠키 확인
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+      return parts.pop().split(';').shift();
+    }
+  }
 
   const initialize = async () => {
     try {
