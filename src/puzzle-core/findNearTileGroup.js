@@ -1,6 +1,6 @@
 import { Point } from "paper/dist/paper-core";
 import comboEffectPath from "@/assets/effects/comboEffect.gif";
-import { socket } from "../socket-utils/socket";
+import { socket } from "../socket-utils/socket2";
 import { getRoomId, getSender } from "../socket-utils/storage";
 import { getPuzzleGroup } from "./getPuzzleGroup";
 import { uniteTiles } from "./uniteTiles";

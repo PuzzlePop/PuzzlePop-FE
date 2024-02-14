@@ -9,7 +9,7 @@ import GameWaitingBoard from "@/components/GameWaiting/GameWaitingBoard";
 import Loading from "@/components/Loading";
 
 import { getSender, getRoomId, setTeam } from "@/socket-utils/storage";
-import { socket } from "@/socket-utils/socket";
+import { socket } from "@/socket-utils/socket2";
 import { request } from "@/apis/requestBuilder";
 
 import backgroundPath from "@/assets/backgrounds/battleBackground.gif";

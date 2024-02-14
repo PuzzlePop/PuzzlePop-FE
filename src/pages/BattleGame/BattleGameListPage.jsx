@@ -9,9 +9,9 @@ import GameRoomListBoard from "@/components/GameRoomList/GameRoomListBoard";
 import { request } from "@/apis/requestBuilder";
 import { getSender } from "@/socket-utils/storage";
 import backgroundPath from "@/assets/backgrounds/battleBackground.gif";
-import { socket } from "../../socket-utils/socket";
+import { socket } from "../../socket-utils/socket2";
 
-const {send, subscribe} = socket;
+const { send, subscribe } = socket;
 
 export default function BattleGameListPage() {
   const [roomList, setRoomList] = useState([]);
@@ -35,10 +35,9 @@ export default function BattleGameListPage() {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) {
-      return parts.pop().split(';').shift();
+      return parts.pop().split(";").shift();
     }
   }
-
 
   const quickMatching = () => {
     send(
@@ -47,7 +46,7 @@ export default function BattleGameListPage() {
       JSON.stringify({
         type: "QUICK",
         sender: getSender(),
-        member: getCookie("userId") ? true : false
+        member: getCookie("userId") ? true : false,
       }),
     );
 
@@ -55,13 +54,12 @@ export default function BattleGameListPage() {
     subscribe(`/topic/game/room/quick/${getSender()}`, (message) => {
       const data = JSON.parse(message.body);
       if (data === "WAITING") {
-        alert("waiting")
+        alert("waiting");
       } else {
         console.log(data);
       }
     });
-
-  }
+  };
   return (
     <Wrapper>
       <Header />
