@@ -22,7 +22,8 @@ export const attackFire = (targets, targetList, deleted, bundles) => {
 
   // fire 당하는 팀의 효과
   if (targets === getTeam().toUpperCase()) {
-    if (targetList.length === 0) {
+    if (targetList === null || targetList.length === 0) {
+      // 해당되는 target이 없을 경우 알림 해야함
       return;
     }
     console.log("fire 맞을거임");
@@ -86,7 +87,8 @@ export const attackRocket = (targets, targetList, deleted) => {
 
   // rocket 당하는 팀의 효과
   if (targets === getTeam().toUpperCase()) {
-    if (targetList.length === 0) {
+    if (targetList === null || targetList.length === 0) {
+      // 해당되는 target이 없을 경우 알림 해야함
       return;
     }
     console.log("rocket 맞을거임");
@@ -153,6 +155,24 @@ export const attackRocket = (targets, targetList, deleted) => {
     if (targetList && targets === getTeam().toUpperCase()) {
       console.log("rocket 발동 !!");
       usingItemRocket(targetList);
+    }
+  }, 2000);
+};
+
+//
+export const attackEarthquake = (targets, targetList, deleted) => {
+  // // earthquake 당하는 팀의 효과
+  // if (targets === getTeam().toUpperCase()) {
+
+  // } else { // earthquake 발동하는 팀의 효과
+
+  // }
+
+  setTimeout(() => {
+    // console.log();
+    if (targetList && targets === getTeam().toUpperCase()) {
+      console.log("earthquake 발동 !!");
+      usingItemEarthquake(targetList, deleted);
     }
   }, 2000);
 };

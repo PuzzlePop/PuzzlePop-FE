@@ -13,7 +13,7 @@ import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import { configStore } from "@/puzzle-core";
-import { attackFire, attackRocket } from "@/puzzle-core/attackItem";
+import { attackFire, attackRocket, attackEarthquake } from "@/puzzle-core/attackItem";
 import { updateGroupByBundles } from "@/puzzle-core/utils";
 
 import comboAudioPath from "@/assets/audio/combo.mp3";
@@ -299,24 +299,8 @@ export default function BattleGameIngamePage() {
             if (randomItem.name === "FIRE") {
               console.log("랜덤 아이템 fire 였어!");
 
-              const attackedTeamBundles = getTeam() === "red" ? redBundles : blueBundles;
+              const attackedTeamBundles = targets === "RED" ? redBundles : blueBundles;
               attackFire(targets, targetList, deleted, attackedTeamBundles);
-              // // fire 당하는 팀의 효과
-              // if (targets === getTeam().toUpperCase()) {
-
-              // } else { // fire 발동하는 팀의 효과
-
-              // }
-
-              // setTimeout(() => {
-              //   console.log("레드팀 번들", redBundles);
-              //   console.log("블루팀 번들", blueBundles);
-              //   if (targetList && targets === getTeam().toUpperCase()) {
-              //     console.log("fire 발동 !!");
-              //     const attackedTeamBundles = getTeam() === "red" ? redBundles : blueBundles;
-              //     usingItemFire(attackedTeamBundles, targetList);
-              //   }
-              // }, 2000);
             }
 
             if (randomItem.name === "ROCKET") {
@@ -359,6 +343,24 @@ export default function BattleGameIngamePage() {
             // dropRandomItem 삭제
             if (dropRandomItemElement.current.parentNode) {
               dropRandomItemElement.current.parentNode.removeChild(dropRandomItemElement.current);
+            }
+            const { targets, targetList, deleted, randomItem, redBundles, blueBundles } = data;
+
+            console.log("거울로 맞는 아이템", currentDropRandomItem.current);
+
+            if (currentDropRandomItem.current === "FIRE") {
+              console.log("거울로 불 지르기를 맞았어!!!");
+
+              const attackedTeamBundles = targets === "RED" ? redBundles : blueBundles;
+              attackFire(targets, targetList, deleted, attackedTeamBundles);
+            } else if (currentDropRandomItem.current === "ROCKET") {
+              console.log("거울로 로켓을 맞았어!!!");
+
+              attackRocket(targets, targetList, deleted);
+            } else if (currentDropRandomItem.current === "EARTHQUAKE") {
+              console.log("거울로 지진을 맞았어!!!");
+
+              attackEarthquake(targets, targetList, deleted);
             }
           }
 
