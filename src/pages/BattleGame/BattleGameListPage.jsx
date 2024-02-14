@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { IconButton } from "@mui/material";
+import { IconButton, Button } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -43,9 +43,8 @@ export default function BattleGameListPage() {
       {},
       JSON.stringify({
         type: "QUICK",
-        roomId: getRoomId(),
         sender: getSender(),
-        member: getCookie("userId")
+        member: getCookie("userId") ? true : false
       }),
     );
 
