@@ -57,7 +57,7 @@ export default function CooperationGameWaitingPage() {
           type: "ENTER",
           roomId: getRoomId(),
           sender: getSender(),
-          member: getCookie("userId") ? true : false
+          member: getCookie("userId") ? true : false,
         }),
       );
     });
@@ -68,7 +68,7 @@ export default function CooperationGameWaitingPage() {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) {
-      return parts.pop().split(';').shift();
+      return parts.pop().split(";").shift();
     }
   }
 

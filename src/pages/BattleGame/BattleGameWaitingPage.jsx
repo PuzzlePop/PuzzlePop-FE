@@ -29,6 +29,7 @@ export default function BattleGameWaitingPage() {
 
   const connectSocket = async () => {
     // websocket 연결 시도
+
     connect(() => {
       console.log("@@@@@@@@@@@@@@@@ 대기실 소켓 연결 @@@@@@@@@@@@@@@@@@");
 
@@ -67,7 +68,7 @@ export default function BattleGameWaitingPage() {
           type: "ENTER",
           roomId: getRoomId(),
           sender: getSender(),
-          member: getCookie("userId") ? true : false
+          member: getCookie("userId") ? true : false,
         }),
       );
     });
@@ -78,7 +79,7 @@ export default function BattleGameWaitingPage() {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) {
-      return parts.pop().split(';').shift();
+      return parts.pop().split(";").shift();
     }
   }
 
