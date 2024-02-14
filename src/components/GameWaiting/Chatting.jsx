@@ -6,6 +6,7 @@ import { socket } from "@/socket-utils/socket";
 import { TextField, Button } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
+import { socket2 } from "../../socket-utils/socket2";
 
 const { send } = socket;
 
@@ -17,17 +18,26 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
   const handleMessageSend = (e) => {
     e.preventDefault();
     if (getSender() && message) {
-      send(
-        `/app/game/message`,
-        {},
-        JSON.stringify({
+      socket2.publish({
+        destination: `/app/game/message`,
+        body: JSON.stringify({
           roomId: getRoomId(),
           sender: getSender(),
           message,
           type: "CHAT",
         }),
-      );
-      setMessage("");
+      });
+      // send(
+      //   `/app/game/message`,
+      //   {},
+      //   JSON.stringify({
+      //     roomId: getRoomId(),
+      //     sender: getSender(),
+      //     message,
+      //     type: "CHAT",
+      //   }),
+      // );
+      // setMessage("");
     }
   };
 

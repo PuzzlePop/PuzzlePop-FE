@@ -8,6 +8,7 @@ import SelectImgAndPiece from "@/components/GameWaiting/SelectImgAndPiece";
 import Chatting from "@/components/GameWaiting/Chatting";
 import { getSender, getTeam, setTeam, setTeamSocket } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket";
+import { socket2 } from "../../socket-utils/socket2";
 
 const { send } = socket;
 
@@ -66,16 +67,26 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category,
 
   const handleGameStart = () => {
     if (getSender()) {
-      send(
-        `/app/game/message`,
-        {},
-        JSON.stringify({
+      socket2.publish({
+        destination: `/app/game/message`,
+        body: JSON.stringify({
           roomId: gameId,
           sender: getSender(),
           message: "GAME_START",
           type: "GAME",
         }),
-      );
+      });
+
+      // send(
+      //   `/app/game/message`,
+      //   {},
+      //   JSON.stringify({
+      //     roomId: gameId,
+      //     sender: getSender(),
+      //     message: "GAME_START",
+      //     type: "GAME",
+      //   }),
+      // );
     }
   };
 
