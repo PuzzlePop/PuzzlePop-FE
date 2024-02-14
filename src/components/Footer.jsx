@@ -7,9 +7,9 @@ import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import ChecklistIcon from '@mui/icons-material/Checklist';
-import FriendList from "@/components/User/FriendList";
-import FriendRequests from "@/components/User/FriendRequests";
-import FriendSearch from "@/components/User/FriendSearch";
+import FriendList from "@/components/Friend/FriendList";
+import FriendRequests from "@/components/Friend/FriendRequests";
+import FriendSearch from "@/components/Friend/FriendSearch";
 
 export default function Footer() {
   const [friendListOpen, setFriendListOpen] = useState(false);
