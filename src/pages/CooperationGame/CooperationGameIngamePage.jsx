@@ -12,12 +12,16 @@ import Timer from "@/components/GameIngame/Timer";
 import Chatting from "@/components/GameWaiting/Chatting";
 
 import { configStore } from "@/puzzle-core";
+import { addAudio } from "@/puzzle-core/attackItem";
 import { socket } from "@/socket-utils/socket2";
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import { useHint } from "@/hooks/useHint";
 
 import comboAudioPath from "@/assets/audio/combo.mp3";
+import hintAudioPath from "@/assets/audio/hint.mp3";
+import magnetAudioPath from "@/assets/audio/magnet.mp3";
+import frameAudioPath from "@/assets/audio/frame.mp3";
 import cooperationBackgroundPath from "@/assets/backgrounds/cooperationBackground.gif";
 
 import { Box, Dialog, DialogTitle, Snackbar } from "@mui/material";
@@ -167,6 +171,7 @@ export default function CooperationGameIngamePage() {
               );
               return;
             }
+            addAudio(frameAudioPath);
             if (targetList.length < 7) {
               setSnackMessage("액자 아이템이 사용됐어요.");
               usingItemFrame(targetList, redBundles);
@@ -181,6 +186,7 @@ export default function CooperationGameIngamePage() {
           if (data.message && data.message === "HINT") {
             const { targetList } = data;
             addHint(...targetList);
+            addAudio(hintAudioPath);
             setSnackMessage("반짝이는 두 개의 인접한 퍼즐을 맞춰봐요!");
             return;
           }
@@ -192,6 +198,7 @@ export default function CooperationGameIngamePage() {
               setSnackMessage("운이 없게도 자석 아이템을 사용했지만 아무 효과도 없었다...");
               return;
             }
+            addAudio(magnetAudioPath);
             setSnackMessage("자석 아이템 사용!");
             usingItemMagnet(targetList, redBundles);
             return;
