@@ -65,7 +65,7 @@ export default function ItemInventory({ prevItemInventory, itemInventory, onUseI
                     src={getImageSource(item.itemName)}
                     alt={item.itemName}
                   />
-                  <div>{item.koreanName}</div>
+                  <div style={{ fontSize: "16px" }}>{item.koreanName}</div>
                 </>
               ) : (
                 <EmptyItem alt="빈 아이템" />
@@ -146,5 +146,5 @@ const EmptyItem = styled.div`
   background-color: #f2f2f2;
   opacity: 0.5;
   pointer-events: none;
-  margin-bottom: 30px;
+  margin-bottom: 26px;
 `;
