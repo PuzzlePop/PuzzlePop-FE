@@ -1,26 +1,30 @@
-import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { getTeam } from "@/socket-utils/storage";
 import { Typography } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
+import { useMemo } from "react";
 
 export default function Timer({ num, isCooperation = false }) {
-  const [min, setMin] = useState(0);
-  const [sec, setSec] = useState(0);
+  const isPressing = useMemo(() => {
+    return !isCooperation && num <= 30; // 배틀게임이고, 30초 이하라면
+  }, [isCooperation, num]);
+
+  const min = useMemo(() => {
+    return String(Math.floor(num / 60));
+  }, [num]);
+
+  const sec = useMemo(() => {
+    const tempSec = num % 60;
+    return tempSec <= 9 ? `0${tempSec}` : String(tempSec);
+  }, [num]);
 
   const teamColor = isCooperation ? deepPurple[300] : getTeam() === "red" ? red[300] : blue[300];
 
-  useEffect(() => {
-    setMin(Math.floor(num / 60));
-    const tempSec = num % 60;
-
-    if (tempSec <= 9) {
-      setSec("0" + tempSec);
-    } else {
-      setSec(tempSec);
-    }
-  }, [num]);
+  const TypoStyle = {
+    color: isPressing ? "tomato" : teamColor,
+    fontWeight: isPressing ? 800 : 500,
+  };
 
   const theme = createTheme({
     typography: {
@@ -31,7 +35,7 @@ export default function Timer({ num, isCooperation = false }) {
   return (
     <ThemeProvider theme={theme}>
       <Wrapper>
-        <Typography variant="h3" sx={{ color: teamColor }}>
+        <Typography variant="h3" sx={TypoStyle}>
           {min} : {sec}
         </Typography>
       </Wrapper>
