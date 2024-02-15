@@ -20,7 +20,7 @@ import { setRoomId, setSender, setTeam } from "@/socket-utils/storage";
 
 export default function CreateRoomButton({ category }) {
   const navigate = useNavigate();
-  const [roomTitle, setRoomTitle] = useState("");
+  const [roomTitle, setRoomTitle] = useState("퍼즐 한 판 !!");
   const [roomSize, setRoomSize] = useState(2);
   const [isOpenedModal, setIsOpenedModal] = useState(false);
 
@@ -47,7 +47,7 @@ export default function CreateRoomButton({ category }) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) {
-      return parts.pop().split(';').shift();
+      return parts.pop().split(";").shift();
     }
   }
 
@@ -55,7 +55,7 @@ export default function CreateRoomButton({ category }) {
     if (!roomTitle) {
       return;
     }
-    
+
     let sender = getCookie("userId"); // 쿠키에서 userId 가져오기
     if (!sender) {
       sender = window.prompt("닉네임을 입력해주세요");

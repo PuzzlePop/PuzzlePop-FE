@@ -8,6 +8,7 @@ import Timer from "@/components/GameIngame/Timer";
 import PrograssBar from "@/components/GameIngame/ProgressBar";
 import Chatting from "@/components/GameWaiting/Chatting";
 import ItemInventory from "@/components/ItemInventory";
+import ResultModal from "@/components/GameIngame/ResultModal";
 
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket2";
@@ -21,7 +22,7 @@ import redTeamBackgroundPath from "@/assets/backgrounds/redTeamBackground.gif";
 import blueTeamBackgroundPath from "@/assets/backgrounds/blueTeamBackground.gif";
 import dropRandomItemPath from "@/assets/effects/dropRandomItem.gif";
 
-import { Box, Dialog, DialogTitle, Snackbar } from "@mui/material";
+import { Box, Dialog, DialogTitle, DialogContent, Snackbar } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
 import { useHint } from "@/hooks/useHint";
@@ -178,6 +179,7 @@ export default function BattleGameIngamePage() {
       );
     }
   };
+  // const temp = true;
 
   const connectSocket = async () => {
     connect(
@@ -187,14 +189,26 @@ export default function BattleGameIngamePage() {
           const data = JSON.parse(message.body);
           console.log(data);
 
+          // console.log(
+          //   data.finished,
+          //   Boolean(data.finished),
+          //   data.redProgressPercent === 100,
+          //   data.blueProgressPercent === 100,
+          //   data.time,
+          // );
+          // console.log(
+          //   Boolean(data.finished) ||
+          //     data.redProgressPercent === 100 ||
+          //     data.blueProgressPercent === 100 ||
+          //     (data.time !== undefined && data.time <= 0),
+          // );
+
           // 매번 게임이 끝났는지 체크
-          if (
-            Boolean(data.finished) ||
-            data.redProgressPercent === 100 ||
-            data.blueProgressPercent === 100
-          ) {
+          if (data.finished === true) {
+            // if (temp === true) {
             // disconnect();
             console.log("게임 끝남 !"); // TODO : 게임 끝났을 때 effect
+            console.log(data, gameData);
             setTimeout(() => {
               setIsOpenedDialog(true);
             }, 1000);
@@ -617,6 +631,15 @@ export default function BattleGameIngamePage() {
               <DialogTitle>게임 결과</DialogTitle>
             </Dialog>
           </ThemeProvider>
+
+          {/* <ResultModal
+            isOpenedDialog={isOpenedDialog}
+            handleCloseGame={handleCloseGame}
+            ourPercent={ourPercent}
+            enemyPercent={enemyPercent}
+            ourTeam={gameData[`${getTeam()}Team`]}
+            
+          /> */}
         </>
       )}
     </Wrapper>
