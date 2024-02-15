@@ -471,13 +471,13 @@ export default function BattleGameIngamePage() {
               dropRandomItemElement.current.parentNode.removeChild(dropRandomItemElement.current);
             }
 
-            if (data.targets === getTeam()) {
-              setSnackMessage(`🛡️쉴드로 ${currentDropRandomItem.current}을 막았어요!🛡️`);
+            if (getTeam() === "red") {
+              setRedSnackMessage(`🛡️와우 쉴드로 ${currentDropRandomItem.current}을 막았어요!🛡️`);
             } else {
-              setSnackMessage(`🛡️상대팀이 쉴드로 ${currentDropRandomItem.current}을 막았어요!🛡️`);
+              setBlueSnackMessage(
+                `🛡️아쉽게도 상대팀의 쉴드에 ${currentDropRandomItem.current} 공격이 막혔네요...🛡️`,
+              );
             }
-
-            setSnackOpen(true);
           }
 
           if (data.message && data.message === "MIRROR") {
@@ -486,8 +486,13 @@ export default function BattleGameIngamePage() {
             if (dropRandomItemElement.current.parentNode) {
               dropRandomItemElement.current.parentNode.removeChild(dropRandomItemElement.current);
             }
-
             attackItemSwitch(data, true);
+
+            if (getTeam() === "red") {
+              setRedSnackMessage(`거울 효과 발동!`);
+            } else {
+              setBlueSnackMessage(`상대팀의 거울 아이템으로 공격이 반사됐어요...`);
+            }
           }
 
           // drop random Item 생성
