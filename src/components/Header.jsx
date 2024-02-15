@@ -56,7 +56,7 @@ export default function Header() {
 
   const moveLogin = async () => {
     // window.alert("아직 개발 중인 기능이에요 😂");
-    const SERVER_URL = "https://i10a304.p.ssafy.io/api"
+    const SERVER_URL = "https://i10a304.p.ssafy.io/api";
 
     if (isLoggedIn) {
       // 로그인 상태이면 로그아웃 처리
@@ -72,8 +72,13 @@ export default function Header() {
 
   const moveProfile = async () => {
     const userId = getCookie("userId");
-    navigate(`/user/${userId}`)
-  }
+    if (!userId) {
+      alert("잘못된 접근입니다.");
+      navigate("/");
+    } else {
+      navigate(`/user/${userId}`);
+    }
+  };
 
   return (
     <HeaderBar>
@@ -86,12 +91,13 @@ export default function Header() {
           <ImageIcon imageSource={HeaderRankImage} size="md" onClick={() => navigate("/rank")} />
           {/* <ImageIcon imageSource={HeaderShopImage} size="md" onClick={() => navigate("/shop")} /> */}
           <ThemeProvider theme={theme}>
-            <Button variant="text" sx={{ px: 2.5 }} size="large" onClick={moveProfile}>
-              User
-            </Button>
-            
-            <Button variant="text" sx={{ px: 2.5 }} size="large" onClick={moveLogin}>
-              {isLoggedIn ? "Log out" : "Log in"}
+            {getCookie("userId") && isLoggedIn && (
+              <Button variant="text" size="large" onClick={moveProfile}>
+                mypage
+              </Button>
+            )}
+            <Button variant="text" size="large" onClick={moveLogin}>
+              {isLoggedIn ? "Logout" : "Login"}
             </Button>
           </ThemeProvider>
         </nav>

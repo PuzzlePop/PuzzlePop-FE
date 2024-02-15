@@ -108,6 +108,31 @@ export default function BattleGameIngamePage() {
   const dropRandomItemElement = useRef(null);
   const currentDropRandomItem = useRef(null);
 
+  const numOfUsingItemRed = {
+    positiveItem: useRef(0),
+    attackItem: useRef(0),
+  };
+  const numOfUsingItemBlue = {
+    positiveItem: useRef(0),
+    attackItem: useRef(0),
+  };
+
+  const changeNumOfUsing = (targets, isPositive) => {
+    if (isPositive) {
+      if (targets === "RED") {
+        numOfUsingItemRed.positiveItem.current += 1;
+      } else {
+        numOfUsingItemBlue.positiveItem.current += 1;
+      }
+    } else {
+      if (targets === "RED") {
+        numOfUsingItemRed.attackItem.current += 1;
+      } else {
+        numOfUsingItemBlue.attackItem.current += 1;
+      }
+    }
+  };
+
   const isLoaded = useMemo(() => {
     return gameData && gameData[`${getTeam()}Puzzle`] && gameData[`${getTeam()}Puzzle`].board;
   }, [gameData]);
@@ -156,6 +181,9 @@ export default function BattleGameIngamePage() {
     console.log(data);
     const { targets, targetList, deleted, randomItem, redBundles, blueBundles } = data;
     const attackedTeamBundles = targets === "RED" ? redBundles : blueBundles;
+
+    const usingTargets = targets === "RED" ? "BLUE" : "RED";
+    changeNumOfUsing(usingTargets, false);
 
     if (randomItem.name === "FIRE") {
       console.log("랜덤 아이템 fire 였어!");
@@ -296,6 +324,7 @@ export default function BattleGameIngamePage() {
             }
             setTeamSnackMessage("자석 아이템 사용!");
             usingItemMagnet(targetList, targetBundles);
+            changeNumOfUsing(targets, true);
             return;
           }
 
@@ -337,6 +366,7 @@ export default function BattleGameIngamePage() {
               blueAddHint(...targetList);
             }
             setTeamSnackMessage("반짝이는 두 개의 인접한 퍼즐을 맞춰봐요!");
+            changeNumOfUsing(targets, true);
             return;
           }
 
@@ -689,6 +719,8 @@ export default function BattleGameIngamePage() {
             enemyPercent={enemyPercent}
             ourTeam={gameData[`${getTeam()}Team`].players}
             enemyTeam={getTeam() === "red" ? gameData.blueTeam.players : gameData.redTeam.players}
+            numOfUsingItemRed={numOfUsingItemRed}
+            numOfUsingItemBlue={numOfUsingItemBlue}
           />
         </>
       )}

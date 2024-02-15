@@ -278,6 +278,8 @@ export default function ProfilePage() {
 }
 
 const Wrapper = styled.div`
-  height: 1000px;
+  min-height: 100vh; /* 최소 화면 높이를 100vh로 설정 */
   background-image: url(${backgroundPath});
+  display: flex;
+  flex-direction: column;
 `;
