@@ -179,7 +179,7 @@ export default function BattleGameIngamePage() {
       );
     }
   };
-  // const temp = true;
+  const temp = true;
 
   const connectSocket = async () => {
     connect(
@@ -204,8 +204,8 @@ export default function BattleGameIngamePage() {
           // );
 
           // 매번 게임이 끝났는지 체크
-          if (data.finished === true) {
-            // if (temp === true) {
+          // if (data.finished === true) {
+          if (temp === true) {
             // disconnect();
             console.log("게임 끝남 !"); // TODO : 게임 끝났을 때 effect
             console.log(data, gameData);
@@ -626,20 +626,20 @@ export default function BattleGameIngamePage() {
             message={snackMessage}
           />
 
-          <ThemeProvider theme={theme}>
+          {/* <ThemeProvider theme={theme}>
             <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
               <DialogTitle>게임 결과</DialogTitle>
             </Dialog>
-          </ThemeProvider>
+          </ThemeProvider> */}
 
-          {/* <ResultModal
+          <ResultModal
             isOpenedDialog={isOpenedDialog}
             handleCloseGame={handleCloseGame}
             ourPercent={ourPercent}
             enemyPercent={enemyPercent}
-            ourTeam={gameData[`${getTeam()}Team`]}
-            
-          /> */}
+            ourTeam={gameData[`${getTeam()}Team`].players}
+            enemyTeam={getTeam() === "red" ? gameData.blueTeam.players : gameData.redTeam.players}
+          />
         </>
       )}
     </Wrapper>

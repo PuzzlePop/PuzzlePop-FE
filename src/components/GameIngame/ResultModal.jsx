@@ -13,6 +13,7 @@ export default function ResultModal({
   ourTeam,
   enemyTeam,
 }) {
+  console.log(ourTeam, enemyTeam);
   const theme = createTheme({
     typography: {
       fontFamily: "'Galmuri11', sans-serif",
@@ -29,6 +30,17 @@ export default function ResultModal({
             {ourTeam.map((player) => {
               <Grid item xs={3}>
                 <PlayerCard player={player} color={getTeam()} gameId={getRoomId()} />
+              </Grid>;
+            })}
+          </Grid>
+          <Grid container>
+            {enemyTeam.map((player) => {
+              <Grid item xs={3}>
+                <PlayerCard
+                  player={player}
+                  color={getTeam() === "red" ? "red" : "blue"}
+                  gameId={getRoomId()}
+                />
               </Grid>;
             })}
           </Grid>
