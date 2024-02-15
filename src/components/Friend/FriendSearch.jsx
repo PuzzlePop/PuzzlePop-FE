@@ -39,7 +39,8 @@ export default function FriendSearch() {
     const userId = getCookie("userId");
 
     if(!userId) {
-      alert("로그인한 사용자만 이용할 수 있는 기능입니다.");
+      alert("로그인이 필요합니다.");
+      return;
     }
 
     const response = await request.post(`/friend`, {

@@ -148,7 +148,11 @@ export default function RankPage() {
       case "winningRate":
         return (
           <>
-            <h1>{(ranking.win_count / ranking.played_game_count) * 100}%</h1>
+            <h1>
+              {Number.isInteger((ranking.win_count / ranking.played_game_count) * 100) ?
+              (ranking.win_count / ranking.played_game_count) * 100 : ((ranking.win_count /
+              ranking.played_game_count) * 100).toFixed(2)} %
+            </h1>
             WIN <b>{ranking.win_count}</b> | PLAY <b>{ranking.played_game_count}</b>
           </>
         );
@@ -316,6 +320,10 @@ const UserDefaultProfileCard = styled.div`
   #profileInfo,
   #profileLinkBtn {
     margin-right: 20px;
+  }
+  #profileImg {
+    max-width: 80px;
+    max-height: 80px;
   }
 `;
 

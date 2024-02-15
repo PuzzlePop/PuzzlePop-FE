@@ -14,7 +14,7 @@ export default function FriendList() {
   const fetchFriendList = async (userId) => {
     if(!userId) {
       alert("로그인이 필요합니다.");
-      navigate("/");
+      return;
     }
     const response = await request.post(`/friend/list/accepted`, { id: userId }); // TODO: 현재 로그인 중인 사용자 ID로 교체할 것
     const { data: friendList } = response;
