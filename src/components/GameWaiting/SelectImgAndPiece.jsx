@@ -17,6 +17,10 @@ import { deepPurple } from "@mui/material/colors";
 import { request, requestFile } from "@/apis/requestBuilder";
 import { getSender, getRoomId } from "@/socket-utils/storage";
 
+import { socket } from "@/socket-utils/socket2";
+import { useGameInfo } from "../../hooks/useGameInfo";
+const { send } = socket;
+
 let idx = 1;
 const dummyData = [
   {
@@ -67,8 +71,10 @@ const dummyData = [
 
 export default function SelectImgAndPiece({ src, allowedPiece }) {
   const [open, setOpen] = useState(false);
-  const [selectedImg, setSelectedImg] = useState(src);
+  const [selectedImg, setSelectedImg] = useState(`data:image/jpeg;base64,${src}`);
   // const [selectedPieceNum, setSelectedPieceNum] = useState(allowedPiece[0]);
+
+  const { image, setImage } = useGameInfo()
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -88,6 +94,10 @@ export default function SelectImgAndPiece({ src, allowedPiece }) {
       setSelectedImg(
         "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
       );
+      setImage("https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp")
+    } else {
+      setSelectedImg(`data:image/jpeg;base64,${src}`)
+      setImage(`data:image/jpeg;base64,${src}`)
     }
   }, []);
 
@@ -121,7 +131,7 @@ export default function SelectImgAndPiece({ src, allowedPiece }) {
     <ThemeProvider theme={theme}>
       <InnerBox>
         <Typography sx={{ mt: 1 }}>그림 선택</Typography>
-        <ImgButton src={selectedImg} onClick={handleClickOpen} />
+        <ImgButton src={image} onClick={handleClickOpen} />
         {/* <FormControl sx={{ m: 1, minWidth: "80%" }}>
           <InputLabel id="piece-num-label">피스 수</InputLabel>
           <PieceSelect
@@ -196,7 +206,13 @@ function ImgDialog({ onClose, selectedImg, open }) {
         },
         uuid: getRoomId(),
       });
-
+      
+      send(`/app/game/message`,{},
+        JSON.stringify({
+          roomId: getRoomId(),
+          type: "IMAGE",
+        })
+      )
       onClose(src);
     } catch (e) {
       console.log(e);
