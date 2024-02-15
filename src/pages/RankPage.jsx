@@ -114,7 +114,7 @@ export default function RankPage() {
           {currentRankings.map((ranking, index) => (
             <Card key={index}>
               <h1>
-                <MilitaryTechIcon /> {index + 1}위
+                <MilitaryTechIcon /> {indexOfFirstItem + index + 1}위
               </h1>
               <div>
                 <UserDefaultProfileCard>
