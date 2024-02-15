@@ -73,13 +73,13 @@ export default function BattleGameIngamePage() {
   const {
     hintList: redHintList,
     addHint: redAddHint,
-    closeHint: redCloseHint,
+    setHintList: setRedHintList,
     cleanHint: redCleanHint,
   } = useHint();
   const {
     hintList: blueHintList,
     addHint: blueAddHint,
-    closeHint: blueCloseHint,
+    setHintList: setBlueHintList,
     cleanHint: blueCleanHint,
   } = useHint();
 
@@ -566,7 +566,7 @@ export default function BattleGameIngamePage() {
               />
               {document.querySelector("#canvasContainer") &&
                 createPortal(
-                  <Hint hintList={redHintList} onClose={redCloseHint} />,
+                  <Hint hintList={redHintList} setHintList={setRedHintList} />,
                   document.querySelector("#canvasContainer"),
                 )}
             </>
@@ -579,7 +579,7 @@ export default function BattleGameIngamePage() {
               />
               {document.querySelector("#canvasContainer") &&
                 createPortal(
-                  <Hint hintList={blueHintList} onClose={blueCloseHint} />,
+                  <Hint hintList={blueHintList} setHintList={setBlueHintList} />,
                   document.querySelector("#canvasContainer"),
                 )}
             </>
