@@ -13,6 +13,7 @@ import { socket } from "@/socket-utils/socket2";
 import { request } from "@/apis/requestBuilder";
 
 import backgroundPath from "@/assets/backgrounds/background.gif";
+import { useGameInfo } from "../../hooks/useGameInfo";
 
 const { connect, send, subscribe } = socket;
 
@@ -21,6 +22,8 @@ export default function CooperationGameWaitingPage() {
   const { roomId } = useParams();
   const [gameData, setGameData] = useState(null);
   const [chatHistory, setChatHistory] = useState([]); // 채팅 기록을 저장하는 상태 추가
+
+  const { setImage } = useGameInfo();
 
   const isLoading = useMemo(() => {
     return gameData === null;
@@ -40,6 +43,13 @@ export default function CooperationGameWaitingPage() {
           return;
         }
         setGameData(data);
+        if (data.picture.encodedString === "짱구.jpg") {
+          setImage(
+            "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+          );
+        } else {
+          setImage(`data:image/jpeg;base64,${data.picture.encodedString}`);
+        }
       });
 
       subscribe(`/topic/chat/room/${roomId}`, (message) => {
