@@ -14,6 +14,12 @@ export default function Hint({ hintList, setHintList }) {
     [setHintList],
   );
 
+  const sleepRemove = (id) => {
+    setTimeout(() => {
+      handleClickHint(id);
+    }, 1500);
+  };
+
   const canvasCurrentRectX = useMemo(() => {
     const { x } = window.document.querySelector("canvas").getBoundingClientRect();
     return x;
@@ -28,6 +34,7 @@ export default function Hint({ hintList, setHintList }) {
           x={canvasCurrentRectX + x - getConfig().tileWidth * 2}
           y={y - getConfig().tileWidth * 2}
           onClick={() => handleClickHint(id)}
+          onMouseEnter={() => sleepRemove(id)}
         />
       ))}
     </>
@@ -35,6 +42,7 @@ export default function Hint({ hintList, setHintList }) {
 }
 
 const HintImage = styled.img`
+  z-index: 99;
   position: absolute;
   left: ${({ x }) => `${x}px`};
   top: ${({ y }) => `${y}px`};
