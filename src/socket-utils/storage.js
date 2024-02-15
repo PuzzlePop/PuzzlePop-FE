@@ -1,4 +1,4 @@
-import { socket } from "./socket";
+import { socket } from "./socket2";
 
 const { send } = socket;
 

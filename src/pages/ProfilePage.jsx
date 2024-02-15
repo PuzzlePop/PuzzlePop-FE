@@ -1,11 +1,11 @@
 import { useParams } from "react-router-dom";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 import UserAPI from "../apis/CustomUserAPI";
 import RecordAPI from "../apis/CustomRecordAPI";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import backgroundPath from "@/assets/backgrounds/background.gif";
-
 
 export default function ProfilePage() {
   const { userId } = useParams();
@@ -15,45 +15,43 @@ export default function ProfilePage() {
   const [searchNickName, setSearchNickName] = useState("");
   const [searchedUsersByEmail, setSearchedUsersByEmail] = useState([]);
   const [searchedUsersByNickName, setSearchedUsersByNickName] = useState([]);
-  
+
   const searchUsersByEmail = async () => {
     // UserController 매개변수 변경 예정
     await UserAPI.searchUserByEmail(searchEmail)
-      .then(response => setSearchedUsersByEmail(response))
-      .catch(error => console.debug(error));
+      .then((response) => setSearchedUsersByEmail(response))
+      .catch((error) => console.debug(error));
   };
 
   const searchUsersByNickName = async () => {
     // UserController 매개변수 변경 예정
     await UserAPI.searchUsersByNickName(searchNickName)
-      .then(response => setSearchedUsersByNickName(response))
-      .catch(error => console.debug(error));
+      .then((response) => setSearchedUsersByNickName(response))
+      .catch((error) => console.debug(error));
   };
 
   useEffect(() => {
     // UserController 매개변수 변경 예정
     UserAPI.fetchUser(userId)
-      .then(response => setUser(response))
-      .catch(error => console.debug(error));
+      .then((response) => setUser(response))
+      .catch((error) => console.debug(error));
 
     // 302 FOUND 오류 추후 OK로 변경 예정
     UserAPI.fetchUsers()
-      .then(response => setUsers(response))
-      .catch(error => console.debug(error));
+      .then((response) => setUsers(response))
+      .catch((error) => console.debug(error));
   }, [userId]);
-
-
 
   const [recordId, setRecordId] = useState(1);
   const [record, setRecord] = useState({});
   const [records, setRecords] = useState([]);
   const [recordInfo, setRecordInfo] = useState({});
 
-  const getRecordById = async () => {    
+  const getRecordById = async () => {
     // DB 데이터 없어서 현재 오류남 (RecordId = 1)
     RecordAPI.fetchRecord(recordId)
-      .then(response => setRecord(response))
-      .catch(error => console.debug(error));
+      .then((response) => setRecord(response))
+      .catch((error) => console.debug(error));
   };
 
   useEffect(() => {
@@ -62,11 +60,11 @@ export default function ProfilePage() {
     //   .then(response => setRecord(response))
     //   .catch(error => console.debug(error));
     RecordAPI.fetchRecords(userId)
-      .then(response => setRecords(response))
-      .catch(error => console.debug(error));
+      .then((response) => setRecords(response))
+      .catch((error) => console.debug(error));
     RecordAPI.fetchRecordInfo(userId)
-      .then(response => setRecordInfo(response))
-      .catch(error => console.debug(error));
+      .then((response) => setRecordInfo(response))
+      .catch((error) => console.debug(error));
   }, [userId]);
 
   return (
@@ -142,7 +140,6 @@ export default function ProfilePage() {
       `}</style>
       <div className="box"></div>
       <div className="container">
-        
         {/* <div className="search-container">
         <div className="left-box"></div>
           <input type="text" value={searchNickName} onChange={(e) => setSearchNickName(e.target.value)} />
@@ -151,23 +148,21 @@ export default function ProfilePage() {
         <div className="user-container">
           <div className="user-info">
             <img src={user.img_path} alt="User Image" />
-            <div>{user.family_name}{user.given_name}</div>
-            
+            <div>
+              {user.family_name}
+              {user.given_name}
+            </div>
           </div>
           <div className="user-info">
-            <div>email: {user.email}</div>
             <div>닉네임 : {user.nickname}</div>
+            <div>email: {user.email}</div>
             <div>국적 : {user.locale}</div>
-            <div>상태 : {user.online_status}</div>
+            {/* <div>상태 : {user.online_status}</div> */}
             {/* <div>보유 골드 : {user.gold}</div> */}
           </div>
         </div>
       </div>
 
-
-      
-
-      
       {/* <hr />
       <h2>Search UserInfo by email = {searchEmail}</h2>
       검색할 이메일: 
@@ -277,6 +272,7 @@ export default function ProfilePage() {
       <div>total_matched_piece_count: {recordInfo.total_matched_piece_count}</div>
       <div>played_battle_game_count: {recordInfo.played_battle_game_count}</div>
       <div>played_game_count: {recordInfo.played_game_count}</div> */}
+      <Footer />
     </Wrapper>
   );
 }
