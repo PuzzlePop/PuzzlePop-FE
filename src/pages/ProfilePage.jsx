@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 import UserAPI from "../apis/CustomUserAPI";
 import RecordAPI from "../apis/CustomRecordAPI";
 import { useEffect, useState } from "react";
@@ -277,6 +278,7 @@ export default function ProfilePage() {
       <div>total_matched_piece_count: {recordInfo.total_matched_piece_count}</div>
       <div>played_battle_game_count: {recordInfo.played_battle_game_count}</div>
       <div>played_game_count: {recordInfo.played_game_count}</div> */}
+      <Footer/>
     </Wrapper>
   );
 }
