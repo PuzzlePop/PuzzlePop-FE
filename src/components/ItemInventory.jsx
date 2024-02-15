@@ -2,6 +2,8 @@ import { useCallback, useEffect } from "react";
 import styled from "styled-components";
 import Draggable from "react-draggable";
 import { match } from "../_lib/utils";
+import { addAudio } from "../puzzle-core/attackItem";
+
 import frameImage from "@/assets/inventory-items/item_frame.png";
 import hintImage from "@/assets/inventory-items/item_hint.png";
 import magnetImage from "@/assets/inventory-items/item_magnet.png";
@@ -61,7 +63,8 @@ export default function ItemInventory({ prevItemInventory, itemInventory, onUseI
                 <>
                   <Item
                     className="bounce"
-                    onClick={() => _useItem(index + 1)}
+                    // onClick={() => _useItem(index + 1)}
+                    onMouseDown={() => _useItem(index + 1)}
                     src={getImageSource(item.itemName)}
                     alt={item.itemName}
                   />

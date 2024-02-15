@@ -7,7 +7,24 @@ import rocketPath from "@/assets/effects/rocket.gif";
 import explosionPath from "@/assets/effects/explosion.gif";
 import tornadoPath from "@/assets/effects/tornado.gif";
 
+import fireAudioPath from "@/assets/audio/fire.mp3";
+import rocketAudioPath from "@/assets/audio/rocket.wav";
+import tornadoAudioPath from "@/assets/audio/tornado.mp3";
+
 const { getConfig, usingItemFire, usingItemRocket, usingItemEarthquake } = configStore;
+
+export const addAudio = (audioPath) => {
+  const audio = new Audio(audioPath);
+  audio.loop = false;
+  audio.crossOrigin = "anonymous";
+  // audio.volume = 0.5;
+  audio.load();
+  try {
+    audio.play();
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 // 불 지르기 맞는 or 보내는 효과 + usingItemFire 함수 호출
 export const attackFire = (
@@ -67,6 +84,7 @@ export const attackFire = (
       fireImgCopy.style.top = `${y}px`;
 
       canvasContainer.appendChild(fireImgCopy);
+      addAudio(fireAudioPath);
 
       setTimeout(() => {
         if (fireImgCopy.parentNode) {
@@ -83,6 +101,7 @@ export const attackFire = (
     fireImg.style.top = "750px";
 
     canvasContainer.appendChild(fireImg);
+    addAudio(fireAudioPath);
 
     setTimeout(() => {
       console.log("불 효과 삭제");
@@ -151,6 +170,7 @@ export const attackRocket = (
     rocketImg.style.transform = "translate(-50%, -50%) rotate(180deg)";
 
     canvasContainer.appendChild(rocketImg);
+    addAudio(rocketAudioPath);
 
     // 1초 뒤 폭발효과 더함
     const explosionImg = document.createElement("img");
@@ -188,6 +208,7 @@ export const attackRocket = (
     rocketImg.style.transform = "translate(-50%, -50%)";
 
     canvasContainer.appendChild(rocketImg);
+    addAudio(rocketAudioPath);
 
     setTimeout(() => {
       console.log("로켓 효과 삭제");
@@ -253,6 +274,7 @@ export const attackEarthquake = (
     tornadoImg.style.animation = "tornado-animation 1.2s linear forwards";
 
     canvasContainer.appendChild(tornadoImg);
+    addAudio(tornadoAudioPath);
 
     setTimeout(() => {
       console.log("earthquake 발동 !!");
@@ -272,6 +294,7 @@ export const attackEarthquake = (
     tornadoImg.style.animation = "tornado-send-animation 1.2s linear forwards";
 
     canvasContainer.appendChild(tornadoImg);
+    addAudio(tornadoAudioPath);
 
     setTimeout(() => {
       console.log("지진 효과 발동 !!");

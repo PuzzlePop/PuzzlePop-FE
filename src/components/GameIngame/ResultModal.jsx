@@ -1,12 +1,15 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import styled from "styled-components";
 
 import { PlayerCard } from "@/components/GameWaiting/PlayerCard";
 import { getTeam, getRoomId } from "@/socket-utils/storage";
+import { addAudio } from "@/puzzle-core/attackItem";
 import { useGameInfo } from "@/hooks/useGameInfo";
 
 import winPath from "@/assets/effects/win.gif";
 import youLostPath from "@/assets/effects/youLose.png";
+import winAudioPath from "@/assets/audio/win.mp3";
+import loseAudioPath from "@/assets/audio/lose.mp3";
 
 import {
   Box,
@@ -52,6 +55,16 @@ export default function ResultModal({
     win: winPath,
     lose: youLostPath,
   };
+
+  useEffect(() => {
+    if (isOpenedDialog) {
+      if (resultState === "win") {
+        addAudio(winAudioPath);
+      } else {
+        addAudio(loseAudioPath);
+      }
+    }
+  }, [isOpenedDialog]);
 
   return (
     <ThemeProvider theme={theme}>

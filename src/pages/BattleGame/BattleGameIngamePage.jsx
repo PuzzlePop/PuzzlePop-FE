@@ -14,10 +14,13 @@ import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket2";
 import { parsePuzzleShapes } from "@/socket-utils/parsePuzzleShapes";
 import { configStore } from "@/puzzle-core";
-import { attackFire, attackRocket, attackEarthquake } from "@/puzzle-core/attackItem";
+import { attackFire, attackRocket, attackEarthquake, addAudio } from "@/puzzle-core/attackItem";
 import { updateGroupByBundles } from "@/puzzle-core/utils";
 
 import comboAudioPath from "@/assets/audio/combo.mp3";
+import hintAudioPath from "@/assets/audio/hint.mp3";
+import magnetAudioPath from "@/assets/audio/magnet.mp3";
+import frameAudioPath from "@/assets/audio/frame.mp3";
 import redTeamBackgroundPath from "@/assets/backgrounds/redTeamBackground.gif";
 import blueTeamBackgroundPath from "@/assets/backgrounds/blueTeamBackground.gif";
 import dropRandomItemPath from "@/assets/effects/dropRandomItem.gif";
@@ -322,6 +325,7 @@ export default function BattleGameIngamePage() {
               setTeamSnackMessage("운이 없게도 자석 아이템을 사용했지만 아무 효과도 없었다...");
               return;
             }
+            addAudio(magnetAudioPath);
             setTeamSnackMessage("자석 아이템 사용!");
             usingItemMagnet(targetList, targetBundles);
             changeNumOfUsing(targets, true);
@@ -343,6 +347,7 @@ export default function BattleGameIngamePage() {
               );
               return;
             }
+            addAudio(frameAudioPath);
             if (targetList.length < 7) {
               setTeamSnackMessage("액자 아이템이 사용됐어요.");
               usingItemFrame(targetList, targetBundles);
@@ -365,6 +370,7 @@ export default function BattleGameIngamePage() {
             if (targets === "BLUE") {
               blueAddHint(...targetList);
             }
+            addAudio(hintAudioPath);
             setTeamSnackMessage("반짝이는 두 개의 인접한 퍼즐을 맞춰봐요!");
             changeNumOfUsing(targets, true);
             return;
