@@ -58,11 +58,15 @@ export default function ItemInventory({ prevItemInventory, itemInventory, onUseI
           {itemInventory.map((item, index) => (
             <ItemSpace key={index}>
               {item ? (
-                <Item
-                  onClick={() => _useItem(index + 1)}
-                  src={getImageSource(item.itemName)}
-                  alt={item.itemName}
-                />
+                <>
+                  <Item
+                    className="bounce"
+                    onClick={() => _useItem(index + 1)}
+                    src={getImageSource(item.itemName)}
+                    alt={item.itemName}
+                  />
+                  <div>{item.koreanName}</div>
+                </>
               ) : (
                 <EmptyItem alt="빈 아이템" />
               )}
@@ -142,4 +146,5 @@ const EmptyItem = styled.div`
   background-color: #f2f2f2;
   opacity: 0.5;
   pointer-events: none;
+  margin-bottom: 30px;
 `;

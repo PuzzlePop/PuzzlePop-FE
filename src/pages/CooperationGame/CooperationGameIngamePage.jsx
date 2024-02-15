@@ -48,7 +48,7 @@ export default function CooperationGameIngamePage() {
   const [pictureSrc, setPictureSrc] = useState("");
 
   const { prevItemInventory, itemInventory, updateInventory } = useInventory();
-  const { hintList, addHint, closeHint, cleanHint } = useHint();
+  const { hintList, addHint, setHintList, cleanHint } = useHint();
 
   const isLoaded = useMemo(() => {
     return gameData && gameData[`${getTeam()}Puzzle`] && gameData[`${getTeam()}Puzzle`].board;
@@ -294,7 +294,7 @@ export default function CooperationGameIngamePage() {
           />
           {document.querySelector("#canvasContainer") &&
             createPortal(
-              <Hint hintList={hintList} onClose={closeHint} />,
+              <Hint hintList={hintList} setHintList={setHintList} />,
               document.querySelector("#canvasContainer"),
             )}
 

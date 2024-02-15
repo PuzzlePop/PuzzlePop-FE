@@ -1,15 +1,12 @@
 import { useCallback, useState } from "react";
 import { getPuzzlePositionByIndex } from "../puzzle-core/utils";
 import { configStore } from "../puzzle-core";
+import { v4 as uuidv4 } from "uuid";
 
 const { getConfig } = configStore;
 
 export const useHint = () => {
   const [hintList, setHintList] = useState([]);
-
-  const closeHint = useCallback((id) => {
-    setHintList((prev) => prev.filter((hint) => hint.id !== id));
-  }, []);
 
   const addHint = (puzzleIndexA, puzzleIndexB) => {
     try {
@@ -19,6 +16,7 @@ export const useHint = () => {
       });
       const [x1, y1] = getPuzzlePositionByIndex({ config: getConfig(), puzzleIndex: puzzleIndexA });
       const [x2, y2] = getPuzzlePositionByIndex({ config: getConfig(), puzzleIndex: puzzleIndexB });
+
       setHintList((prev) => [
         ...prev,
         makeHint({ x: x1, y: y1, puzzleIndex: puzzleIndexA }),
@@ -38,13 +36,13 @@ export const useHint = () => {
   return {
     hintList,
     addHint,
-    closeHint,
+    setHintList,
     cleanHint,
   };
 };
 
 const makeHint = ({ x, y, puzzleIndex }) => ({
-  id: `${x}${y}`,
+  id: uuidv4(),
   x,
   y,
   puzzleIndex,
