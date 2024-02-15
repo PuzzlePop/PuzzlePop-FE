@@ -321,6 +321,10 @@ const UserDefaultProfileCard = styled.div`
   #profileLinkBtn {
     margin-right: 20px;
   }
+  #profileImg {
+    max-width: 80px;
+    max-height: 80px;
+  }
 `;
 
 const PaginationContainer = styled.div`
