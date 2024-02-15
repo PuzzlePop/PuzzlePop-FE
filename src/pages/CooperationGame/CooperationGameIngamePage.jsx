@@ -84,19 +84,6 @@ export default function CooperationGameIngamePage() {
     );
   }, []);
 
-  const getGameInfo = () => {
-    send(
-      "/app/game/message",
-      {},
-      JSON.stringify({
-        type: "GAME",
-        message: "GAME_INFO",
-        roomId: getRoomId(),
-        sender: getSender(),
-      }),
-    );
-  };
-
   const connectSocket = async () => {
     connect(
       () => {
@@ -284,7 +271,6 @@ export default function CooperationGameIngamePage() {
         <Loading message="게임 정보 받아오는 중..." />
       ) : (
         <>
-          <button onClick={() => getGameInfo()}>게임 정보좀요</button>
           <Board>
             <PlayPuzzle
               category="cooperation"
