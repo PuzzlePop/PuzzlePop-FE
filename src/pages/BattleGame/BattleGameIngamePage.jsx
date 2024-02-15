@@ -7,7 +7,7 @@ import Loading from "@/components/Loading";
 import Timer from "@/components/GameIngame/Timer";
 import PrograssBar from "@/components/GameIngame/ProgressBar";
 import Chatting from "@/components/GameWaiting/Chatting";
-import ItemController from "@/components/ItemController";
+import ItemInventory from "@/components/ItemInventory";
 
 import { getRoomId, getSender, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket2";
@@ -27,6 +27,8 @@ import { red, blue, deepPurple } from "@mui/material/colors";
 import { useHint } from "@/hooks/useHint";
 import Hint from "@/components/GameItemEffects/Hint";
 import { createPortal } from "react-dom";
+import { useSnackbar } from "../../hooks/useSnackbar";
+import { useInventory } from "../../hooks/useInventory";
 
 const { connect, send, subscribe, disconnect } = socket;
 const {
@@ -48,16 +50,26 @@ export default function BattleGameIngamePage() {
   const { roomId } = useParams();
   const [gameData, setGameData] = useState(null);
   const [isOpenedDialog, setIsOpenedDialog] = useState(false);
-  const [snackOpen, setSnackOpen] = useState(false);
-  const [snackMessage, setSnackMessage] = useState("");
 
   const [time, setTime] = useState(0);
   const [ourPercent, setOurPercent] = useState(0);
   const [enemyPercent, setEnemyPercent] = useState(0);
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
-  const [redItemInventory, setRedItemInventory] = useState([null, null, null, null, null]);
-  const [blueItemInventory, setBlueItemInventory] = useState([null, null, null, null, null]);
+
+  const {
+    prevItemInventory: prevRedItemInventory,
+    itemInventory: redItemInventory,
+    updateInventory: setRedItemInventory,
+  } = useInventory();
+  const {
+    prevItemInventory: prevBlueItemInventory,
+    itemInventory: blueItemInventory,
+    updateInventory: setBlueItemInventory,
+  } = useInventory();
+
+  const { isShowSnackbar, setIsShowSnackbar, snackMessage, setSnackMessage } = useSnackbar();
+
   const {
     hintList: redHintList,
     addHint: redAddHint,
@@ -86,7 +98,7 @@ export default function BattleGameIngamePage() {
   };
 
   const handleSnackClose = () => {
-    setSnackOpen(false);
+    setIsShowSnackbar(false);
   };
 
   const initializeGame = (data) => {
@@ -94,7 +106,7 @@ export default function BattleGameIngamePage() {
     console.log("gamedata is here!", gameData, data);
   };
 
-  const handleSendUseItemMessage = useCallback((keyNumber) => {
+  const handleUseItem = useCallback((keyNumber) => {
     send(
       "/app/game/message",
       {},
@@ -332,13 +344,13 @@ export default function BattleGameIngamePage() {
                 deleted,
                 attackedTeamBundles,
                 setSnackMessage,
-                setSnackOpen,
+                setIsShowSnackbar,
               );
             }
 
             if (randomItem.name === "ROCKET") {
               console.log("랜덤 아이템 rocket 였어!");
-              attackRocket(targets, targetList, deleted, setSnackMessage, setSnackOpen);
+              attackRocket(targets, targetList, deleted, setSnackMessage, setIsShowSnackbar);
             }
 
             if (randomItem.name === "EARTHQUAKE") {
@@ -346,7 +358,7 @@ export default function BattleGameIngamePage() {
 
               console.log("지진 발동", data);
 
-              attackEarthquake(targets, targetList, deleted, setSnackMessage, setSnackOpen);
+              attackEarthquake(targets, targetList, deleted, setSnackMessage, setIsShowSnackbar);
             }
           }
 
@@ -380,7 +392,7 @@ export default function BattleGameIngamePage() {
             } else if (currentDropRandomItem.current === "EARTHQUAKE") {
               console.log("거울로 지진을 맞았어!!!");
 
-              attackEarthquake(targets, targetList, deleted, setSnackMessage, setSnackOpen);
+              attackEarthquake(targets, targetList, deleted, setSnackMessage, setIsShowSnackbar);
             }
           }
 
@@ -547,9 +559,10 @@ export default function BattleGameIngamePage() {
 
           {getTeam() === "red" ? (
             <>
-              <ItemController
+              <ItemInventory
+                prevItemInventory={prevRedItemInventory}
                 itemInventory={redItemInventory}
-                onSendUseItemMessage={handleSendUseItemMessage}
+                onUseItem={handleUseItem}
               />
               {document.querySelector("#canvasContainer") &&
                 createPortal(
@@ -559,9 +572,10 @@ export default function BattleGameIngamePage() {
             </>
           ) : (
             <>
-              <ItemController
+              <ItemInventory
+                prevItemInventory={prevBlueItemInventory}
                 itemInventory={blueItemInventory}
-                onSendUseItemMessage={handleSendUseItemMessage}
+                onUseItem={handleUseItem}
               />
               {document.querySelector("#canvasContainer") &&
                 createPortal(
@@ -573,7 +587,7 @@ export default function BattleGameIngamePage() {
 
           <Snackbar
             anchorOrigin={{ vertical: "top", horizontal: "center" }}
-            open={snackOpen}
+            open={isShowSnackbar}
             autoHideDuration={3000}
             onClose={handleSnackClose}
             message={snackMessage}

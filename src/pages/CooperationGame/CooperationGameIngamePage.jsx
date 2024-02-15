@@ -5,7 +5,7 @@ import styled from "styled-components";
 
 import PlayPuzzle from "@/components/PlayPuzzle";
 import Loading from "@/components/Loading";
-import ItemController from "@/components/ItemController";
+import ItemInventory from "@/components/ItemInventory";
 import Hint from "@/components/GameItemEffects/Hint";
 import PrograssBar from "@/components/GameIngame/ProgressBar";
 import Timer from "@/components/GameIngame/Timer";
@@ -23,6 +23,7 @@ import cooperationBackgroundPath from "@/assets/backgrounds/cooperationBackgroun
 import { Box, Dialog, DialogTitle } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
+import { useInventory } from "../../hooks/useInventory";
 
 const { connect, send, subscribe, disconnect } = socket;
 const {
@@ -45,8 +46,9 @@ export default function CooperationGameIngamePage() {
   const [ourPercent, setOurPercent] = useState(0);
   const [chatHistory, setChatHistory] = useState([]);
   const [pictureSrc, setPictureSrc] = useState("");
-  const [itemInventory, setItemInventory] = useState([null, null, null, null, null]);
-  const { hintList, addHint, closeHint, cleanHint } = useHint();
+
+  const { prevItemInventory, itemInventory, updateInventory } = useInventory();
+  const { hintList, addHint, setHintList, cleanHint } = useHint();
 
   const isLoaded = useMemo(() => {
     return gameData && gameData[`${getTeam()}Puzzle`] && gameData[`${getTeam()}Puzzle`].board;
@@ -59,7 +61,7 @@ export default function CooperationGameIngamePage() {
     });
   };
 
-  const handleSendUseItemMessage = useCallback((keyNumber) => {
+  const handleUseItem = useCallback((keyNumber) => {
     send(
       "/app/game/message",
       {},
@@ -92,7 +94,7 @@ export default function CooperationGameIngamePage() {
         console.log("@@@@@@@@@@@@@@@@ 인게임 소켓 연결 @@@@@@@@@@@@@@@@@@");
         subscribe(`/topic/game/room/${roomId}`, (message) => {
           const data = JSON.parse(message.body);
-          // console.log(data);
+          console.log(data);
 
           // 매번 게임이 끝났는지 체크
           if (Boolean(data.finished)) {
@@ -107,7 +109,7 @@ export default function CooperationGameIngamePage() {
 
           // 매번 보유아이템배열을 업데이트
           if (data.redItemList) {
-            setItemInventory(data.redItemList);
+            updateInventory(data.redItemList);
           }
 
           // timer 설정
@@ -285,13 +287,14 @@ export default function CooperationGameIngamePage() {
             </Col>
           </Board>
 
-          <ItemController
+          <ItemInventory
+            prevItemInventory={prevItemInventory}
             itemInventory={itemInventory}
-            onSendUseItemMessage={handleSendUseItemMessage}
+            onUseItem={handleUseItem}
           />
           {document.querySelector("#canvasContainer") &&
             createPortal(
-              <Hint hintList={hintList} onClose={closeHint} />,
+              <Hint hintList={hintList} setHintList={setHintList} />,
               document.querySelector("#canvasContainer"),
             )}
 

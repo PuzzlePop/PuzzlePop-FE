@@ -5,19 +5,13 @@ import { configStore } from "../../puzzle-core";
 
 const { getConfig } = configStore;
 
-export default function Hint({ onClose, hintList }) {
+// TODO: 다른 사람 화면에는 힌트 위치가 다른 이슈가 있음..
+export default function Hint({ hintList, setHintList }) {
   const handleClickHint = useCallback(
     (id) => {
-      console.log(
-        id,
-        hintList.find((hint) => hint, id === id),
-      );
-
-      if (onClose) {
-        onClose(id);
-      }
+      setHintList((prev) => prev.filter((hint) => hint.id !== id));
     },
-    [onClose, hintList],
+    [setHintList],
   );
 
   const canvasCurrentRectX = useMemo(() => {
@@ -41,7 +35,6 @@ export default function Hint({ onClose, hintList }) {
 }
 
 const HintImage = styled.img`
-  z-index: 99;
   position: absolute;
   left: ${({ x }) => `${x}px`};
   top: ${({ y }) => `${y}px`};

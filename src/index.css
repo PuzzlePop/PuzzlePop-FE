@@ -53,3 +53,24 @@ li {
     transform: translate(400px, -400px);
   }
 }
+
+.bounce {
+  position: relative;
+  animation: bounce 1s;
+}
+
+@keyframes bounce {
+  33% {
+    top: 0;
+    height: 40px;
+  }
+  50% {
+    top: 0;
+    height: 52px;
+  }
+
+  0%,
+  100% {
+    top: 0;
+  }
+}
