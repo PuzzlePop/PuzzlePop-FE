@@ -16,7 +16,7 @@ export function Routes() {
       {/* <Route path="/shop" element={<ShopPage />} /> */}
       {/* <Route path="/options" element={<OptionsPage />} /> */}
       <Route path="/user/:userId" element={<ProfilePage />} />
-      <Route path="/game" element={<CooperationGame.ListPage />} />
+      <Route path="/game" element={<BattleGame.ListPage />} />
       {/* <Route path="/game/single" element={<SingleGame.ListPage />} />
       <Route path="/game/single/:puzzleId" element={<SingleGame.IngamePage />} /> */}
       <Route path="/game/cooperation" element={<CooperationGame.ListPage />} />

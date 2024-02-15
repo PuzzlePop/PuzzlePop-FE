@@ -6,7 +6,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 
 export default function GamePageNavigation() {
-  const url = useLocation().pathname.split("/")[2] || "cooperation";
+  const url = useLocation().pathname.split("/")[2] || "battle";
   const isGame = useLocation().pathname.split("/")[1] === "game" ? true : false;
   const [value, setValue] = useState(url);
 
@@ -54,13 +54,13 @@ export default function GamePageNavigation() {
               sx={{ marginLeft: "10%" }}
             /> */}
             <Tab
-              label="협동"
-              value="cooperation"
+              label="배틀"
+              value="battle"
               component={Link}
-              to="/game/cooperation"
+              to="/game/battle"
               sx={{ marginLeft: "10%" }}
             />
-            <Tab label="배틀" value="battle" component={Link} to="/game/battle" />
+            <Tab label="협동" value="cooperation" component={Link} to="/game/cooperation" />
           </Tabs>
         )}
       </ThemeProvider>

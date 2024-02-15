@@ -25,9 +25,11 @@ export default function HomePage() {
 }
 
 const HomeImg = styled.img`
-  width: 100vw;
+  height: 150vh;
   position: fixed;
-  top: 67px;
+  top: -160px;
+  left: 52%;
+  transform: translate(-50%, 0);
   z-index: -1;
   opacity: 0.3;
 `;
