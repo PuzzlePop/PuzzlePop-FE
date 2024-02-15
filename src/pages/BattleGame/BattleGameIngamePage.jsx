@@ -145,7 +145,7 @@ export default function BattleGameIngamePage() {
         deleted,
         attackedTeamBundles,
         setSnackMessage,
-        setSnackOpen,
+        setIsShowSnackbar,
         isMirror,
       );
     }
@@ -158,7 +158,7 @@ export default function BattleGameIngamePage() {
         deleted,
         attackedTeamBundles,
         setSnackMessage,
-        setSnackOpen,
+        setIsShowSnackbar,
         isMirror,
       );
     }
@@ -174,12 +174,12 @@ export default function BattleGameIngamePage() {
         deleted,
         attackedTeamBundles,
         setSnackMessage,
-        setSnackOpen,
+        setIsShowSnackbar,
         isMirror,
       );
     }
   };
-  const temp = true;
+  // const temp = true;
 
   const connectSocket = async () => {
     connect(
@@ -204,8 +204,8 @@ export default function BattleGameIngamePage() {
           // );
 
           // 매번 게임이 끝났는지 체크
-          // if (data.finished === true) {
-          if (temp === true) {
+          if (data.finished === true) {
+            // if (temp === true) {
             // disconnect();
             console.log("게임 끝남 !"); // TODO : 게임 끝났을 때 effect
             console.log(data, gameData);
