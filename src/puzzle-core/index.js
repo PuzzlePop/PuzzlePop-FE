@@ -2,6 +2,7 @@ import Paper from "paper";
 import { Point } from "paper/dist/paper-core";
 import { initializeConfig } from "./initializeConfig";
 import {
+  itemFire,
   itemFrame,
   itemMagnet,
   removeItemStyleToPiece,
@@ -89,37 +90,39 @@ const createPuzzleConfig = () => {
 
   // 공격형 아이템 fire
   const usingItemFire = (bundles, targetList) => {
+    config = itemFire({ config, bundles, targetList });
+
     // bundles의 인덱스만 담은 object
-    const bundlesIdxList = [];
+    // const bundlesIdxList = [];
 
-    bundles.forEach((group) => {
-      const idxList = [];
-      group.forEach((g) => {
-        idxList.push(g.index);
-      });
-      bundlesIdxList.push(idxList);
-    });
+    // bundles.forEach((group) => {
+    //   const idxList = [];
+    //   group.forEach((g) => {
+    //     idxList.push(g.index);
+    //   });
+    //   bundlesIdxList.push(idxList);
+    // });
 
-    // 불 지르기로 없어지는 타겟 list 그룹 해제
-    config.groupTiles.forEach((gtile) => {
-      // 일단 모두 그룹 해제
-      gtile[1] = undefined;
-      // target이면 랜덤 위치에 떨어뜨림
-      if (targetList.includes(gtile[2])) {
-        const randomX = Math.random() * 960 + 20;
-        const randomY = Math.random() * 710 + 20;
-        config.tiles[gtile[2]].position = new Point(randomX, randomY);
-      }
-    });
+    // // 불 지르기로 없어지는 타겟 list 그룹 해제
+    // config.groupTiles.forEach((gtile) => {
+    //   // 일단 모두 그룹 해제
+    //   gtile[1] = undefined;
+    //   // target이면 랜덤 위치에 떨어뜨림
+    //   if (targetList.includes(gtile[2])) {
+    //     const randomX = Math.random() * 960 + 20;
+    //     const randomY = Math.random() * 710 + 20;
+    //     config.tiles[gtile[2]].position = new Point(randomX, randomY);
+    //   }
+    // });
 
-    // 남아있는 그룹 번호 다시 쓰기
-    bundlesIdxList.forEach((list, groupNum) => {
-      console.log(groupNum, "번째 그룹", list);
-      list.forEach((i) => {
-        console.log(config.groupTiles[i]);
-        config.groupTiles[i][1] = groupNum;
-      });
-    });
+    // // 남아있는 그룹 번호 다시 쓰기
+    // bundlesIdxList.forEach((list, groupNum) => {
+    //   console.log(groupNum, "번째 그룹", list);
+    //   list.forEach((i) => {
+    //     console.log(config.groupTiles[i]);
+    //     config.groupTiles[i][1] = groupNum;
+    //   });
+    // });
   };
 
   // 공격형 아이템 rocket
@@ -155,14 +158,7 @@ const createPuzzleConfig = () => {
   };
 
   const usingItemMagnet = (targetList, bundles = []) => {
-    const result = itemMagnet({ config, targetList, bundles });
-
-    if (result === null) {
-      // TODO: Toast를 통해 자석을 사용할 곳이 없다면 UI 보여주기
-      return;
-    }
-
-    config = result;
+    config = itemMagnet({ config, targetList, bundles });
   };
 
   return {
