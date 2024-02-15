@@ -186,6 +186,7 @@ export default function RankPage() {
           {/* Buttons for filtering rankings */}
           <ButtonContainer>
             <Button
+              size="large"
               variant="contained"
               onClick={() => setCurrentRankingType("playedGameCount")}
               sx={{
@@ -199,6 +200,7 @@ export default function RankPage() {
               플레이 게임 수
             </Button>
             <Button
+              size="large"
               variant="contained"
               onClick={() => setCurrentRankingType("winningRate")}
               sx={{
@@ -213,6 +215,7 @@ export default function RankPage() {
             </Button>
 
             <Button
+              size="large"
               variant="contained"
               onClick={() => setCurrentRankingType("soloBattleWinCount")}
               sx={{
@@ -226,6 +229,7 @@ export default function RankPage() {
               1:1 배틀 승리 수
             </Button>
             <Button
+              size="large"
               variant="contained"
               onClick={() => setCurrentRankingType("teamBattleWinCount")}
               sx={{
@@ -260,15 +264,18 @@ export default function RankPage() {
             </StyledButton>
           </PaginationContainer>
         </ThemeProvider>
+        <Footer />
       </Wrapper>
-      {/* <Footer /> */}
     </>
   );
 }
 
 const Wrapper = styled.div`
-  height: 100%;
+  width: 100%;
+  min-height: 100vh; /* 최소 화면 높이를 100vh로 설정 */
   background-image: url(${backgroundPath});
+  display: flex;
+  flex-direction: column;
 `;
 
 const ButtonContainer = styled.div`
@@ -316,7 +323,8 @@ const PaginationContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 10px;
+  margin-bottom: 60px;
 
   & > * {
     margin: 0 5px;
