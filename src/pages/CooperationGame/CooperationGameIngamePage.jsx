@@ -20,10 +20,11 @@ import { useHint } from "@/hooks/useHint";
 import comboAudioPath from "@/assets/audio/combo.mp3";
 import cooperationBackgroundPath from "@/assets/backgrounds/cooperationBackground.gif";
 
-import { Box, Dialog, DialogTitle } from "@mui/material";
+import { Box, Dialog, DialogTitle, Snackbar } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 import { useInventory } from "../../hooks/useInventory";
+import { useSnackbar2 } from "../../hooks/useSnackbar2";
 
 const { connect, send, subscribe, disconnect } = socket;
 const {
@@ -49,6 +50,14 @@ export default function CooperationGameIngamePage() {
 
   const { prevItemInventory, itemInventory, updateInventory } = useInventory();
   const { hintList, addHint, setHintList, cleanHint } = useHint();
+  const {
+    isShowSnackbar,
+    onClose: onCloseSnackbar,
+    setSnackMessage,
+    snackMessage,
+  } = useSnackbar2({
+    autoClosing: true,
+  });
 
   const isLoaded = useMemo(() => {
     return gameData && gameData[`${getTeam()}Puzzle`] && gameData[`${getTeam()}Puzzle`].board;
@@ -165,6 +174,18 @@ export default function CooperationGameIngamePage() {
           // "FRAME(액자)" 아이템 사용
           if (data.message && data.message === "FRAME") {
             const { targetList, redBundles } = data;
+            if (targetList.length === 0) {
+              setSnackMessage(
+                "액자 효과를 받을 퍼즐이 하나도 없네요... 다음에는 조금 더 아껴놨다가 써보세요.",
+              );
+              return;
+            }
+            if (targetList.length < 7) {
+              setSnackMessage("액자 아이템이 사용됐어요.");
+              usingItemFrame(targetList, redBundles);
+              return;
+            }
+            setSnackMessage("액자 효과는 굉장했다!!!");
             usingItemFrame(targetList, redBundles);
             return;
           }
@@ -173,12 +194,18 @@ export default function CooperationGameIngamePage() {
           if (data.message && data.message === "HINT") {
             const { targetList } = data;
             addHint(...targetList);
+            setSnackMessage("반짝이는 두 개의 인접한 퍼즐을 맞춰봐요!");
             return;
           }
 
           // "MAGNET(자석)" 아이템 사용
           if (data.message && data.message === "MAGNET") {
             const { targetList, redBundles } = data;
+            if (targetList.length === 0) {
+              setSnackMessage("운이 없게도 자석 아이템을 사용했지만 아무 효과도 없었다...");
+              return;
+            }
+            setSnackMessage("자석 아이템 사용!");
             usingItemMagnet(targetList, redBundles);
             return;
           }
@@ -297,6 +324,14 @@ export default function CooperationGameIngamePage() {
               <Hint hintList={hintList} setHintList={setHintList} />,
               document.querySelector("#canvasContainer"),
             )}
+
+          <Snackbar
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            open={isShowSnackbar}
+            autoHideDuration={3000}
+            onClose={onCloseSnackbar}
+            message={snackMessage}
+          />
 
           <ThemeProvider theme={theme}>
             <Dialog open={isOpenedDialog} onClose={handleCloseGame}>

@@ -30,6 +30,7 @@ import Hint from "@/components/GameItemEffects/Hint";
 import { createPortal } from "react-dom";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import { useInventory } from "../../hooks/useInventory";
+import { useSnackbar2 } from "../../hooks/useSnackbar2";
 
 const { connect, send, subscribe, disconnect } = socket;
 const {
@@ -69,7 +70,27 @@ export default function BattleGameIngamePage() {
     updateInventory: setBlueItemInventory,
   } = useInventory();
 
-  const { isShowSnackbar, setIsShowSnackbar, snackMessage, setSnackMessage } = useSnackbar();
+  const { isShowSnackbar, setIsShowSnackbar, snackMessage, setSnackMessage } = useSnackbar({
+    autoClosing: true,
+  });
+
+  const {
+    isShowSnackbar: isShowRedSnackbar,
+    onClose: onCloseRedSnackbar,
+    setSnackMessage: setRedSnackMessage,
+    snackMessage: redSnackMessage,
+  } = useSnackbar2({
+    autoClosing: true,
+  });
+
+  const {
+    isShowSnackbar: isShowBlueSnackbar,
+    onClose: onCloseBlueSnackbar,
+    setSnackMessage: setBlueSnackMessage,
+    snackMessage: BlueSnackMessage,
+  } = useSnackbar2({
+    autoClosing: true,
+  });
 
   const {
     hintList: redHintList,
@@ -263,20 +284,59 @@ export default function BattleGameIngamePage() {
           // "MAGNET(자석)" 아이템 사용
           if (data.message && data.message === "MAGNET") {
             const { targetList, redBundles, blueBundles, targets } = data;
-            if (targets === getTeam().toUpperCase()) {
-              const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
-              usingItemMagnet(targetList, targetBundles);
+            if (targets !== getTeam().toUpperCase()) {
+              return;
             }
+            const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
+            const setTeamSnackMessage =
+              getTeam() === "red" ? setRedSnackMessage : setBlueSnackMessage;
+            if (targetList.length === 0) {
+              setTeamSnackMessage("운이 없게도 자석 아이템을 사용했지만 아무 효과도 없었다...");
+              return;
+            }
+            setTeamSnackMessage("자석 아이템 사용!");
+            usingItemMagnet(targetList, targetBundles);
             return;
           }
 
           // "FRAME(액자)" 아이템 사용
           if (data.message && data.message === "FRAME") {
             const { targetList, redBundles, blueBundles, targets } = data;
-            if (targets === getTeam().toUpperCase()) {
-              const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
-              usingItemFrame(targetList, targetBundles);
+            if (targets !== getTeam().toUpperCase()) {
+              return;
             }
+            const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
+            const setTeamSnackMessage =
+              getTeam() === "red" ? setRedSnackMessage : setBlueSnackMessage;
+            if (targetList.length === 0) {
+              setTeamSnackMessage(
+                "액자 효과를 받을 퍼즐이 하나도 없네요... 다음에는 조금 더 아껴놨다가 써보세요.",
+              );
+              return;
+            }
+            if (targetList.length < 7) {
+              setTeamSnackMessage("액자 아이템이 사용됐어요.");
+              usingItemFrame(targetList, targetBundles);
+              return;
+            }
+            setTeamSnackMessage("액자 효과는 굉장했다!!!");
+            usingItemFrame(targetList, targetBundles);
+            return;
+          }
+
+          // "HINT(힌트)" 아이템 사용
+          if (data.message && data.message === "HINT") {
+            const { targetList, targets } = data;
+            const setTeamSnackMessage =
+              targets === "RED" ? setRedSnackMessage : setBlueSnackMessage;
+            if (targets === "RED") {
+              redAddHint(...targetList);
+            }
+
+            if (targets === "BLUE") {
+              blueAddHint(...targetList);
+            }
+            setTeamSnackMessage("반짝이는 두 개의 인접한 퍼즐을 맞춰봐요!");
             return;
           }
 
@@ -361,30 +421,6 @@ export default function BattleGameIngamePage() {
 
               return;
             }
-          }
-
-          // "HINT(힌트)" 아이템 사용
-          if (data.message && data.message === "HINT") {
-            const { targetList, targets } = data;
-            if (targets === "RED") {
-              redAddHint(...targetList);
-            }
-
-            if (targets === "BLUE") {
-              blueAddHint(...targetList);
-            }
-
-            return;
-          }
-
-          // "MAGNET(자석)" 아이템 사용
-          if (data.message && data.message === "MAGNET") {
-            const { targetList, redBundles, blueBundles, targets } = data;
-            if (targets === getTeam().toUpperCase()) {
-              const targetBundles = getTeam() === "red" ? redBundles : blueBundles;
-              usingItemMagnet(targetList, targetBundles);
-            }
-            return;
           }
 
           // 공격형 아이템 공격 성공
@@ -602,6 +638,13 @@ export default function BattleGameIngamePage() {
                   <Hint hintList={redHintList} setHintList={setRedHintList} />,
                   document.querySelector("#canvasContainer"),
                 )}
+              <Snackbar
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                open={isShowRedSnackbar}
+                autoHideDuration={1500}
+                onClose={onCloseRedSnackbar}
+                message={redSnackMessage}
+              />
             </>
           ) : (
             <>
@@ -615,6 +658,13 @@ export default function BattleGameIngamePage() {
                   <Hint hintList={blueHintList} setHintList={setBlueHintList} />,
                   document.querySelector("#canvasContainer"),
                 )}
+              <Snackbar
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                open={isShowBlueSnackbar}
+                autoHideDuration={1500}
+                onClose={onCloseBlueSnackbar}
+                message={BlueSnackMessage}
+              />
             </>
           )}
 
