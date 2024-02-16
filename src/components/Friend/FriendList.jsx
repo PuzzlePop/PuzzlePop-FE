@@ -49,9 +49,9 @@ export default function FriendList() {
           </div>
         </UserInfo>
         <IconWrapper>
-          <IconButton aria-label="dmBtn" onClick={() => navigate(`/dm/${item.friend_id}`)}>
+          {/* <IconButton aria-label="dmBtn" onClick={() => navigate(`/dm/${item.friend_id}`)}>
             <ChatIcon />
-          </IconButton>
+          </IconButton> */}
           <IconButton
             aria-label="profileBtn"
             onClick={() => navigate(`/user/${item.friend_user_info.id}`)}
