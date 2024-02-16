@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { IconButton, Button } from "@mui/material";
+import { IconButton, Button, createTheme, ThemeProvider } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -11,8 +11,78 @@ import { getSender } from "@/socket-utils/storage";
 import backgroundPath from "@/assets/backgrounds/battleBackground.gif";
 import { socket } from "../../socket-utils/socket2";
 import { setRoomId, setSender, setTeam } from "../../socket-utils/storage";
+import { deepPurple } from "@mui/material/colors";
 
 const { connect, send, subscribe, disconnect } = socket;
+
+const theme = createTheme({
+  typography: {
+    fontFamily: "'Galmuri11', sans-serif",
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          color: deepPurple[700],
+          fontSize: "15px",
+          height: "80%",
+          backgroundColor: "#fff",
+          "&:hover": {
+            backgroundColor: deepPurple[100],
+          },
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          margin: "3% auto",
+
+          "& label": {
+            color: deepPurple[200],
+          },
+          "& label.Mui-focused": {
+            color: deepPurple[700],
+          },
+          "& .MuiOutlinedInput-root": {
+            color: deepPurple[700],
+            "& fieldset": {
+              borderColor: deepPurple[200],
+            },
+            "&:hover fieldset": {
+              borderColor: deepPurple[400],
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: deepPurple[700],
+            },
+          },
+          "& .MuiFormHelperText-root": {
+            color: deepPurple[400],
+          },
+        },
+      },
+    },
+    MuiFormLabel: {
+      styleOverrides: {
+        root: {
+          color: deepPurple[200],
+          "&.Mui-focused": {
+            color: deepPurple[400],
+          },
+        },
+      },
+    },
+    MuiRadio: {
+      styleOverrides: {
+        root: {
+          "&.Mui-checked": {
+            color: deepPurple[400],
+          },
+        },
+      },
+    },
+  },
+});
 
 export default function BattleGameListPage() {
   const [roomList, setRoomList] = useState([]);
@@ -36,10 +106,9 @@ export default function BattleGameListPage() {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) {
-      return parts.pop().split(';').shift();
+      return parts.pop().split(";").shift();
     }
   }
-
 
   const quickMatching = () => {
     const sender = getCookie("userId");
@@ -56,7 +125,7 @@ export default function BattleGameListPage() {
         JSON.stringify({
           type: "QUICK",
           sender: sender,
-          member: true
+          member: true,
         }),
       );
 
@@ -67,25 +136,19 @@ export default function BattleGameListPage() {
           alert("waiting");
         } else if (data.message === "GAME_START") {
           setRoomId(data.targets);
-          setSender(sender)
+          setSender(sender);
           if (data.team === "RED") {
-            setTeam("red")
+            setTeam("red");
           } else {
-            setTeam("blue")
+            setTeam("blue");
           }
           window.location.replace(`/game/battle/ingame/${data.targets}`);
         }
       });
-      
-      
 
       //응답 메시지 파싱
-    })
-    
-
-    
-
-  }
+    });
+  };
   return (
     <Wrapper>
       <Header />
@@ -97,7 +160,20 @@ export default function BattleGameListPage() {
         <IconButton aria-label="refresh" onClick={refetchAllRoom} sx={{ marginRight: "auto" }}>
           <RefreshIcon />
         </IconButton>
-        <Button onClick={quickMatching}>빠른 1 VS 1 매칭</Button>
+        <ThemeProvider theme={theme}>
+          <Button
+            variant="outlined"
+            onClick={quickMatching}
+            style={{
+              marginRight: "10px",
+              fontWeight: 800,
+
+              color: deepPurple[700],
+            }}
+          >
+            빠른 1 VS 1 매칭
+          </Button>
+        </ThemeProvider>
         <CreateRoomButton category="battle" />
       </div>
 
