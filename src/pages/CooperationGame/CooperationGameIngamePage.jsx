@@ -6,7 +6,7 @@ import styled from "styled-components";
 import PlayPuzzle from "@/components/PlayPuzzle";
 import Loading from "@/components/Loading";
 import ItemInventory from "@/components/ItemInventory";
-import Hint from "@/components/GameItemEffects/Hint";
+import Hint from "../../components/Hint";
 import PrograssBar from "@/components/GameIngame/ProgressBar";
 import Timer from "@/components/GameIngame/Timer";
 import Chatting from "@/components/GameWaiting/Chatting";

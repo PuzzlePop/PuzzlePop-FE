@@ -29,7 +29,7 @@ import { Box, Dialog, DialogTitle, DialogContent, Snackbar } from "@mui/material
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
 import { useHint } from "@/hooks/useHint";
-import Hint from "@/components/GameItemEffects/Hint";
+import Hint from "../../components/Hint";
 import { createPortal } from "react-dom";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import { useInventory } from "../../hooks/useInventory";
