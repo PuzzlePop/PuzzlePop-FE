@@ -47,7 +47,7 @@ const Container = styled.div`
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 1);
 `;
 
 const Top = styled.div`
