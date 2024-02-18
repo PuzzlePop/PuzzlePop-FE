@@ -629,112 +629,114 @@ export default function BattleGameIngamePage() {
     },
   });
 
+  if (!isLoaded) {
+    return (
+      <Wrapper>
+        <Loading message="게임 정보 받아오는 중..." />
+      </Wrapper>
+    );
+  }
+
   return (
     <Wrapper>
-      {!isLoaded ? (
-        <Loading message="게임 정보 받아오는 중..." />
-      ) : (
-        <>
-          <Board id="gameBoard">
-            <PlayPuzzle
-              category="battle"
-              shapes={parsePuzzleShapes(
-                gameData[`${getTeam()}Puzzle`].board,
-                gameData.picture.widthPieceCnt,
-                gameData.picture.lengthPieceCnt,
-              )}
-              board={gameData[`${getTeam()}Puzzle`].board}
-              picture={gameData.picture}
-            />
-            <Row>
-              <ProgressWrapper>
-                <PrograssBar percent={ourPercent} isEnemy={false} />
-              </ProgressWrapper>
-              <ProgressWrapper>
-                <PrograssBar percent={enemyPercent} isEnemy={true} />
-              </ProgressWrapper>
-            </Row>
-
-            <Col>
-              <Timer num={time} />
-              <h3>이 그림을 맞춰주세요!</h3>
-              <img
-                src={pictureSrc}
-                alt="퍼즐 그림"
-                style={{ width: "100%", borderRadius: "10px", margin: "5px" }}
-              />
-              <Chatting chatHistory={chatHistory} isIngame={true} isBattle={true} />
-            </Col>
-          </Board>
-
-          {getTeam() === "red" ? (
-            <>
-              <ItemInventory
-                prevItemInventory={prevRedItemInventory}
-                itemInventory={redItemInventory}
-                onUseItem={handleUseItem}
-              />
-              {document.querySelector("#canvasContainer") &&
-                createPortal(
-                  <Hint hintList={redHintList} setHintList={setRedHintList} />,
-                  document.querySelector("#canvasContainer"),
-                )}
-              <Snackbar
-                anchorOrigin={{ vertical: "top", horizontal: "center" }}
-                open={isShowRedSnackbar}
-                autoHideDuration={1500}
-                onClose={onCloseRedSnackbar}
-                message={redSnackMessage}
-              />
-            </>
-          ) : (
-            <>
-              <ItemInventory
-                prevItemInventory={prevBlueItemInventory}
-                itemInventory={blueItemInventory}
-                onUseItem={handleUseItem}
-              />
-              {document.querySelector("#canvasContainer") &&
-                createPortal(
-                  <Hint hintList={blueHintList} setHintList={setBlueHintList} />,
-                  document.querySelector("#canvasContainer"),
-                )}
-              <Snackbar
-                anchorOrigin={{ vertical: "top", horizontal: "center" }}
-                open={isShowBlueSnackbar}
-                autoHideDuration={1500}
-                onClose={onCloseBlueSnackbar}
-                message={BlueSnackMessage}
-              />
-            </>
+      <Board id="gameBoard">
+        <PlayPuzzle
+          category="battle"
+          shapes={parsePuzzleShapes(
+            gameData[`${getTeam()}Puzzle`].board,
+            gameData.picture.widthPieceCnt,
+            gameData.picture.lengthPieceCnt,
           )}
+          board={gameData[`${getTeam()}Puzzle`].board}
+          picture={gameData.picture}
+        />
+        <Row>
+          <ProgressWrapper>
+            <PrograssBar percent={ourPercent} isEnemy={false} />
+          </ProgressWrapper>
+          <ProgressWrapper>
+            <PrograssBar percent={enemyPercent} isEnemy={true} />
+          </ProgressWrapper>
+        </Row>
 
+        <Col>
+          <Timer num={time} />
+          <h3>이 그림을 맞춰주세요!</h3>
+          <img
+            src={pictureSrc}
+            alt="퍼즐 그림"
+            style={{ width: "100%", borderRadius: "10px", margin: "5px" }}
+          />
+          <Chatting chatHistory={chatHistory} isIngame={true} isBattle={true} />
+        </Col>
+      </Board>
+
+      {getTeam() === "red" ? (
+        <>
+          <ItemInventory
+            prevItemInventory={prevRedItemInventory}
+            itemInventory={redItemInventory}
+            onUseItem={handleUseItem}
+          />
+          {document.querySelector("#canvasContainer") &&
+            createPortal(
+              <Hint hintList={redHintList} setHintList={setRedHintList} />,
+              document.querySelector("#canvasContainer"),
+            )}
           <Snackbar
             anchorOrigin={{ vertical: "top", horizontal: "center" }}
-            open={isShowSnackbar}
-            autoHideDuration={3000}
-            onClose={handleSnackClose}
-            message={snackMessage}
+            open={isShowRedSnackbar}
+            autoHideDuration={1500}
+            onClose={onCloseRedSnackbar}
+            message={redSnackMessage}
           />
+        </>
+      ) : (
+        <>
+          <ItemInventory
+            prevItemInventory={prevBlueItemInventory}
+            itemInventory={blueItemInventory}
+            onUseItem={handleUseItem}
+          />
+          {document.querySelector("#canvasContainer") &&
+            createPortal(
+              <Hint hintList={blueHintList} setHintList={setBlueHintList} />,
+              document.querySelector("#canvasContainer"),
+            )}
+          <Snackbar
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            open={isShowBlueSnackbar}
+            autoHideDuration={1500}
+            onClose={onCloseBlueSnackbar}
+            message={BlueSnackMessage}
+          />
+        </>
+      )}
 
-          {/* <ThemeProvider theme={theme}>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={isShowSnackbar}
+        autoHideDuration={3000}
+        onClose={handleSnackClose}
+        message={snackMessage}
+      />
+
+      {/* <ThemeProvider theme={theme}>
             <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
               <DialogTitle>게임 결과</DialogTitle>
             </Dialog>
           </ThemeProvider> */}
 
-          <ResultModal
-            isOpenedDialog={isOpenedDialog}
-            handleCloseGame={handleCloseGame}
-            ourPercent={ourPercent}
-            enemyPercent={enemyPercent}
-            ourTeam={gameData[`${getTeam()}Team`].players}
-            enemyTeam={getTeam() === "red" ? gameData.blueTeam.players : gameData.redTeam.players}
-            numOfUsingItemRed={numOfUsingItemRed}
-            numOfUsingItemBlue={numOfUsingItemBlue}
-          />
-        </>
-      )}
+      <ResultModal
+        isOpenedDialog={isOpenedDialog}
+        handleCloseGame={handleCloseGame}
+        ourPercent={ourPercent}
+        enemyPercent={enemyPercent}
+        ourTeam={gameData[`${getTeam()}Team`].players}
+        enemyTeam={getTeam() === "red" ? gameData.blueTeam.players : gameData.redTeam.players}
+        numOfUsingItemRed={numOfUsingItemRed}
+        numOfUsingItemBlue={numOfUsingItemBlue}
+      />
     </Wrapper>
   );
 }
