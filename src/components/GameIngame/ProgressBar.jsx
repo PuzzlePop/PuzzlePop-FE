@@ -22,7 +22,7 @@ export default function PrograssBar({ percent, isEnemy }) {
 }
 
 const BorderLinearProgress = styled(LinearProgress)`
-  width: 16px;
+  width: 40px;
   height: 750px;
   border-radius: 8px;
 `;

@@ -22,8 +22,6 @@ export default function ProfilePage() {
       .catch((error) => console.debug(error));
   }, [userId]);
 
-
-
   const getRecordById = async () => {
     RecordAPI.fetchRecord(recordId)
       .then((response) => setRecord(response))
@@ -114,7 +112,11 @@ export default function ProfilePage() {
       <div className="container">
         <div className="user-container">
           <div className="user-info">
-            <img src={user.img_path} alt="User Image" style={{ borderRadius: '50%', maxWidth: '100%', height: 'auto' }}/>
+            <img
+              src={user.img_path}
+              alt="User Image"
+              style={{ borderRadius: "50%", maxWidth: "100%", height: "auto" }}
+            />
             <div>
               {user.family_name}
               {user.given_name}
@@ -127,11 +129,19 @@ export default function ProfilePage() {
             {/* <div>상태 : {user.online_status}</div> */}
             {/* <div>보유 골드 : {user.gold}</div> */}
             <div>플레이 게임 수: {recordInfo.played_game_count}</div>
-            <div>배틀 게임 승률: {Number.isInteger((recordInfo.win_count / recordInfo.played_battle_game_count) * 100) ?
-              (recordInfo.win_count / recordInfo.played_battle_game_count) * 100 : ((recordInfo.win_count /
-              recordInfo.played_battle_game_count) * 100).toFixed(2)} %
+            <div>
+              배틀 게임 승률:{" "}
+              {Number.isInteger((recordInfo.win_count / recordInfo.played_battle_game_count) * 100)
+                ? (recordInfo.win_count / recordInfo.played_battle_game_count) * 100
+                : ((recordInfo.win_count / recordInfo.played_battle_game_count) * 100).toFixed(
+                    2,
+                  )}{" "}
+              %
             </div>
-            <div>배틀 게임 승리 횟수: {recordInfo.win_count} / 배틀 게임 플레이 수: {recordInfo.played_battle_game_count}</div>
+            <div>
+              배틀 게임 승리 횟수: {recordInfo.win_count} / 배틀 게임 플레이 수:{" "}
+              {recordInfo.played_battle_game_count}
+            </div>
           </div>
         </div>
       </div>

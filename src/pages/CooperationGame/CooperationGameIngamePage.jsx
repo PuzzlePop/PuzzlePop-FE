@@ -6,7 +6,7 @@ import styled from "styled-components";
 import PlayPuzzle from "@/components/PlayPuzzle";
 import Loading from "@/components/Loading";
 import ItemInventory from "@/components/ItemInventory";
-import Hint from "@/components/GameItemEffects/Hint";
+import Hint from "../../components/Hint";
 import PrograssBar from "@/components/GameIngame/ProgressBar";
 import Timer from "@/components/GameIngame/Timer";
 import Chatting from "@/components/GameWaiting/Chatting";
@@ -272,67 +272,69 @@ export default function CooperationGameIngamePage() {
     },
   });
 
+  if (!isLoaded) {
+    return (
+      <Wrapper>
+        <Loading message="게임 정보 받아오는 중..." />
+      </Wrapper>
+    );
+  }
+
   return (
     <Wrapper>
-      {!isLoaded ? (
-        <Loading message="게임 정보 받아오는 중..." />
-      ) : (
-        <>
-          <Board>
-            <PlayPuzzle
-              category="cooperation"
-              shapes={parsePuzzleShapes(
-                gameData[`${getTeam()}Puzzle`].board,
-                gameData.picture.widthPieceCnt,
-                gameData.picture.lengthPieceCnt,
-              )}
-              board={gameData[`${getTeam()}Puzzle`].board}
-              picture={gameData.picture}
-            />
-            <Row>
-              <ProgressWrapper>
-                <PrograssBar percent={ourPercent} isEnemy={false} />
-              </ProgressWrapper>
-            </Row>
+      <Board>
+        <PlayPuzzle
+          category="cooperation"
+          shapes={parsePuzzleShapes(
+            gameData[`${getTeam()}Puzzle`].board,
+            gameData.picture.widthPieceCnt,
+            gameData.picture.lengthPieceCnt,
+          )}
+          board={gameData[`${getTeam()}Puzzle`].board}
+          picture={gameData.picture}
+        />
+        <Row>
+          <ProgressWrapper>
+            <PrograssBar percent={ourPercent} isEnemy={false} />
+          </ProgressWrapper>
+        </Row>
 
-            <Col>
-              <Timer num={time} isCooperation="true" />
-              <h3>이 그림을 맞춰주세요!</h3>
-              <img
-                src={pictureSrc}
-                alt="퍼즐 그림"
-                style={{ width: "100%", borderRadius: "10px", margin: "5px" }}
-              />
-              <Chatting chatHistory={chatHistory} isIngame={true} isBattle={false} />
-            </Col>
-          </Board>
-
-          <ItemInventory
-            prevItemInventory={prevItemInventory}
-            itemInventory={itemInventory}
-            onUseItem={handleUseItem}
+        <Col>
+          <Timer num={time} isCooperation="true" />
+          <h3>이 그림을 맞춰주세요!</h3>
+          <img
+            src={pictureSrc}
+            alt="퍼즐 그림"
+            style={{ width: "100%", borderRadius: "10px", margin: "5px" }}
           />
-          {document.querySelector("#canvasContainer") &&
-            createPortal(
-              <Hint hintList={hintList} setHintList={setHintList} />,
-              document.querySelector("#canvasContainer"),
-            )}
+          <Chatting chatHistory={chatHistory} isIngame={true} isBattle={false} />
+        </Col>
+      </Board>
 
-          <Snackbar
-            anchorOrigin={{ vertical: "top", horizontal: "center" }}
-            open={isShowSnackbar}
-            autoHideDuration={3000}
-            onClose={onCloseSnackbar}
-            message={snackMessage}
-          />
+      <ItemInventory
+        prevItemInventory={prevItemInventory}
+        itemInventory={itemInventory}
+        onUseItem={handleUseItem}
+      />
+      {document.querySelector("#canvasContainer") &&
+        createPortal(
+          <Hint hintList={hintList} setHintList={setHintList} />,
+          document.querySelector("#canvasContainer"),
+        )}
 
-          <ThemeProvider theme={theme}>
-            <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
-              <DialogTitle>게임 결과</DialogTitle>
-            </Dialog>
-          </ThemeProvider>
-        </>
-      )}
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={isShowSnackbar}
+        autoHideDuration={3000}
+        onClose={onCloseSnackbar}
+        message={snackMessage}
+      />
+
+      <ThemeProvider theme={theme}>
+        <Dialog open={isOpenedDialog} onClose={handleCloseGame}>
+          <DialogTitle>게임 결과</DialogTitle>
+        </Dialog>
+      </ThemeProvider>
     </Wrapper>
   );
 }

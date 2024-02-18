@@ -3,10 +3,10 @@ import styled from "styled-components";
 import { Box, AppBar, Button, Typography, Drawer } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
-import PersonSearchIcon from '@mui/icons-material/PersonSearch';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import ChecklistIcon from '@mui/icons-material/Checklist';
+import PersonSearchIcon from "@mui/icons-material/PersonSearch";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import ChecklistIcon from "@mui/icons-material/Checklist";
 import FriendList from "@/components/Friend/FriendList";
 import FriendRequests from "@/components/Friend/FriendRequests";
 import FriendSearch from "@/components/Friend/FriendSearch";
@@ -59,15 +59,15 @@ export default function Footer() {
       <FooterBar>
         <ButtonGroup>
           <Button onClick={toggleFriendList}>
-            <PeopleAltIcon/>
+            <PeopleAltIcon />
             친구 목록
           </Button>
           <Button onClick={toggleFriendRequests}>
-            <ChecklistIcon/>
+            <ChecklistIcon />
             받은 요청
           </Button>
           <Button onClick={toggleFriendSearch}>
-            <PersonAddIcon/>
+            <PersonAddIcon />
             유저 검색
           </Button>
         </ButtonGroup>

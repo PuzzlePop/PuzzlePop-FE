@@ -8,6 +8,7 @@ import SelectImgAndPiece from "@/components/GameWaiting/SelectImgAndPiece";
 import Chatting from "@/components/GameWaiting/Chatting";
 import { getSender, getTeam, setTeam, setTeamSocket } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket2";
+import FromWaitingRoomToIngameLoading from "../FromWaitingRoomToIngameLoading";
 
 const { send } = socket;
 
@@ -17,6 +18,8 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category,
   const [snackOpen, setSnackOpen] = useState(false);
   const [snackMessage, setSnackMessage] = useState("");
   const { redTeam, blueTeam, gameId, gameName, picture, roomSize } = data;
+
+  const [isShowToIngameLoadingModal, setIsShowToIngameLoadingModal] = useState(false);
 
   // 배틀의 경우 [red팀 빈칸 수, blue팀 빈칸 수]
   // 협동의 경우 방 빈칸 수
@@ -64,19 +67,25 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category,
     return result;
   };
 
+  const gameStartCallback = () => {
+    send(
+      `/app/game/message`,
+      {},
+      JSON.stringify({
+        roomId: gameId,
+        sender: getSender(),
+        message: "GAME_START",
+        type: "GAME",
+      }),
+    );
+  };
+
   const handleGameStart = () => {
-    if (getSender()) {
-      send(
-        `/app/game/message`,
-        {},
-        JSON.stringify({
-          roomId: gameId,
-          sender: getSender(),
-          message: "GAME_START",
-          type: "GAME",
-        }),
-      );
+    if (!getSender()) {
+      window.alert("방을 다시 생성해주세요.");
+      return;
     }
+    setIsShowToIngameLoadingModal(true);
   };
 
   const handleChangeTeam = (value) => {
@@ -130,108 +139,113 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category,
   });
 
   return (
-    <ThemeProvider theme={theme}>
-      <Wrapper container={true}>
-        <ColGrid item={true} xs={8}>
-          {/* 방 번호, 방 제목, 인원수 header */}
-          <InnerBox sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            {/* <Typography component="div" variant="subtitle2">
+    <>
+      <ThemeProvider theme={theme}>
+        <Wrapper container={true}>
+          <ColGrid item={true} xs={8}>
+            {/* 방 번호, 방 제목, 인원수 header */}
+            <InnerBox sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              {/* <Typography component="div" variant="subtitle2">
             {gameId}번방
           </Typography> */}
-            <Typography component="div" variant="h6">
-              {gameName}
-            </Typography>
-            <Typography component="div" variant="subtitle1" sx={{ marginLeft: "auto" }}>
-              {redTeam.players.length + blueTeam.players.length} / {roomSize}
-            </Typography>
-          </InnerBox>
-
-          {/* 대기실에 있는 player들 card */}
-          <InnerBox>
-            {category === "battle" ? (
-              // 왜 여기서 unique key warning이 뜨는지 모르겠음...
-              <Grid container={true} sx={{ marginTop: "2%" }}>
-                {redTeam.players.map((player) => (
-                  <Grid key={player.id} item={true} xs={3} sx={{ paddingRight: "8px" }}>
-                    <PlayerCard player={player} gameId={gameId} color="red" />
-                  </Grid>
-                ))}
-                {makeEmptyPlayer(emptyPlayerCount[0])}
-                {makeXPlayer()}
-                {blueTeam.players.map((player) => (
-                  <Grid key={player.id} item={true} xs={3} sx={{ paddingRight: "8px" }}>
-                    <PlayerCard player={player} gameId={gameId} color="blue" />
-                  </Grid>
-                ))}
-                {makeEmptyPlayer(emptyPlayerCount[1])}
-                {makeXPlayer()}
-              </Grid>
-            ) : (
-              // 왜 여기서 unique key warning이 뜨는지 모르겠음...22
-              <Grid container={true} sx={{ marginTop: "2%" }}>
-                {redTeam.players.map((player) => {
-                  return (
-                    <Grid key={player.id} item={true} xs={3} sx={{ paddingRight: "8px" }}>
-                      <PlayerCard player={player} gameId={gameId} />
-                    </Grid>
-                  );
-                })}
-                {makeEmptyPlayer(emptyPlayerCount)}
-                {makeXPlayer()}
-              </Grid>
-            )}
-          </InnerBox>
-
-          {/* 텍스트 채팅 */}
-          <InnerBox style={{ padding: "1% 2% 0 2%" }}>
-            <Chatting chatHistory={chatHistory} />
-          </InnerBox>
-        </ColGrid>
-
-        {/* 퍼즐 이미지 선택, 피스 수 선택 */}
-        <ColGrid item={true} xs={4}>
-          <SelectImgAndPiece src={picture.encodedString} />
-          {category === "battle" && (
-            <InnerBox>
-              <Typography variant="subtitle1" sx={{ textAlign: "center" }}>
-                팀 선택
+              <Typography component="div" variant="h6">
+                {gameName}
               </Typography>
-
-              <Box sx={{ display: "flex" }}>
-                {/* 팀 선택 버튼들, 추후 socket 연결하여 플레이어의 팀 정보 수정해야 함 */}
-                <TeamButton
-                  variant="contained"
-                  color="redTeam"
-                  disableElevation
-                  onClick={() => handleChangeTeam("red")}
-                >
-                  Red
-                </TeamButton>
-                <TeamButton
-                  variant="contained"
-                  color="blueTeam"
-                  disableElevation
-                  onClick={() => handleChangeTeam("blue")}
-                >
-                  Blue
-                </TeamButton>
-              </Box>
+              <Typography component="div" variant="subtitle1" sx={{ marginLeft: "auto" }}>
+                {redTeam.players.length + blueTeam.players.length} / {roomSize}
+              </Typography>
             </InnerBox>
-          )}
-          <StartButton variant="contained" size="large" color="purple" onClick={handleGameStart}>
-            GAME START
-          </StartButton>
-        </ColGrid>
-      </Wrapper>
 
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        open={snackOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackClose}
-        message={snackMessage}
-      />
-    </ThemeProvider>
+            {/* 대기실에 있는 player들 card */}
+            <InnerBox>
+              {category === "battle" ? (
+                // 왜 여기서 unique key warning이 뜨는지 모르겠음...
+                <Grid container={true} sx={{ marginTop: "2%" }}>
+                  {redTeam.players.map((player) => (
+                    <Grid key={player.id} item={true} xs={3} sx={{ paddingRight: "8px" }}>
+                      <PlayerCard player={player} gameId={gameId} color="red" />
+                    </Grid>
+                  ))}
+                  {makeEmptyPlayer(emptyPlayerCount[0])}
+                  {makeXPlayer()}
+                  {blueTeam.players.map((player) => (
+                    <Grid key={player.id} item={true} xs={3} sx={{ paddingRight: "8px" }}>
+                      <PlayerCard player={player} gameId={gameId} color="blue" />
+                    </Grid>
+                  ))}
+                  {makeEmptyPlayer(emptyPlayerCount[1])}
+                  {makeXPlayer()}
+                </Grid>
+              ) : (
+                // 왜 여기서 unique key warning이 뜨는지 모르겠음...22
+                <Grid container={true} sx={{ marginTop: "2%" }}>
+                  {redTeam.players.map((player) => {
+                    return (
+                      <Grid key={player.id} item={true} xs={3} sx={{ paddingRight: "8px" }}>
+                        <PlayerCard player={player} gameId={gameId} />
+                      </Grid>
+                    );
+                  })}
+                  {makeEmptyPlayer(emptyPlayerCount)}
+                  {makeXPlayer()}
+                </Grid>
+              )}
+            </InnerBox>
+
+            {/* 텍스트 채팅 */}
+            <InnerBox style={{ padding: "1% 2% 0 2%" }}>
+              <Chatting chatHistory={chatHistory} />
+            </InnerBox>
+          </ColGrid>
+
+          {/* 퍼즐 이미지 선택, 피스 수 선택 */}
+          <ColGrid item={true} xs={4}>
+            <SelectImgAndPiece src={picture.encodedString} />
+            {category === "battle" && (
+              <InnerBox>
+                <Typography variant="subtitle1" sx={{ textAlign: "center" }}>
+                  팀 선택
+                </Typography>
+
+                <Box sx={{ display: "flex" }}>
+                  {/* 팀 선택 버튼들, 추후 socket 연결하여 플레이어의 팀 정보 수정해야 함 */}
+                  <TeamButton
+                    variant="contained"
+                    color="redTeam"
+                    disableElevation
+                    onClick={() => handleChangeTeam("red")}
+                  >
+                    Red
+                  </TeamButton>
+                  <TeamButton
+                    variant="contained"
+                    color="blueTeam"
+                    disableElevation
+                    onClick={() => handleChangeTeam("blue")}
+                  >
+                    Blue
+                  </TeamButton>
+                </Box>
+              </InnerBox>
+            )}
+            <StartButton variant="contained" size="large" color="purple" onClick={handleGameStart}>
+              GAME START
+            </StartButton>
+          </ColGrid>
+        </Wrapper>
+
+        <Snackbar
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          open={snackOpen}
+          autoHideDuration={3000}
+          onClose={handleSnackClose}
+          message={snackMessage}
+        />
+      </ThemeProvider>
+      {isShowToIngameLoadingModal ? (
+        <FromWaitingRoomToIngameLoading cb={gameStartCallback} />
+      ) : null}
+    </>
   );
 }
 

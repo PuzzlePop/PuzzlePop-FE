@@ -29,23 +29,27 @@ export default function CooperationGameListPage() {
   }, []);
 
   return (
-    <Wrapper>
-      <Header />
-
-      <div
-        style={{ display: "flex", alignItems: "center", width: "950px", margin: "3% auto 0 auto" }}
-      >
-        <h1>협동 플레이</h1>
-        <IconButton aria-label="refresh" onClick={refetchAllRoom} sx={{ marginRight: "auto" }}>
-          <RefreshIcon />
-        </IconButton>
-        <CreateRoomButton category="cooperation" />
-      </div>
-
-      <GameRoomListBoard category="cooperation" roomList={roomList} />
-
-      <Footer />
-    </Wrapper>
+    <>
+      <Wrapper>
+        <Header />
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            width: "950px",
+            margin: "3% auto 0 auto",
+          }}
+        >
+          <h1>협동 플레이</h1>
+          <IconButton aria-label="refresh" onClick={refetchAllRoom} sx={{ marginRight: "auto" }}>
+            <RefreshIcon />
+          </IconButton>
+          <CreateRoomButton category="cooperation" />
+        </div>
+        <GameRoomListBoard category="cooperation" roomList={roomList} />
+        <Footer />
+      </Wrapper>
+    </>
   );
 }
 

@@ -24,7 +24,7 @@ export default function BattleGameWaitingPage() {
   const [gameData, setGameData] = useState(null);
   const [chatHistory, setChatHistory] = useState([]); // 채팅 기록을 저장하는 상태 추가
 
-  const { setImage } = useGameInfo()
+  const { setImage } = useGameInfo();
 
   const isLoading = useMemo(() => {
     return gameData === null;
@@ -55,9 +55,11 @@ export default function BattleGameWaitingPage() {
         }
         setGameData(data);
         if (data.picture.encodedString === "짱구.jpg") {
-          setImage("https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp")
+          setImage(
+            "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+          );
         } else {
-          setImage(`data:image/jpeg;base64,${data.picture.encodedString}`)
+          setImage(`data:image/jpeg;base64,${data.picture.encodedString}`);
         }
       });
 
@@ -117,20 +119,26 @@ export default function BattleGameWaitingPage() {
     // eslint-disable-next-line
   }, []);
 
+  if (isLoading) {
+    return (
+      <Wrapper>
+        <Header />
+        <Loading message="방 정보 불러오는 중..." />
+        <Footer />
+      </Wrapper>
+    );
+  }
+
   return (
     <Wrapper>
       <Header />
-      {isLoading ? (
-        <Loading message="방 정보 불러오는 중..." />
-      ) : (
-        <GameWaitingBoard
-          player={getSender()}
-          data={gameData}
-          allowedPiece={allowedPiece}
-          category="battle"
-          chatHistory={chatHistory}
-        />
-      )}
+      <GameWaitingBoard
+        player={getSender()}
+        data={gameData}
+        allowedPiece={allowedPiece}
+        category="battle"
+        chatHistory={chatHistory}
+      />
       <Footer />
     </Wrapper>
   );

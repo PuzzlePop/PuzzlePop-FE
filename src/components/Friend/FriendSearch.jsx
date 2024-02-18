@@ -26,10 +26,10 @@ export default function FriendSearch() {
   };
 
   const getCookie = (name) => {
-    const cookies = document.cookie.split('; ');
+    const cookies = document.cookie.split("; ");
     for (let i = 0; i < cookies.length; i++) {
       const cookie = cookies[i].trim();
-      if (cookie.startsWith(name + '=')) {
+      if (cookie.startsWith(name + "=")) {
         return cookie.substring(name.length + 1);
       }
     }
@@ -38,23 +38,22 @@ export default function FriendSearch() {
   const sendFriendRequest = async (toUser) => {
     const userId = getCookie("userId");
 
-    if(!userId) {
+    if (!userId) {
       alert("로그인이 필요합니다.");
       return;
     }
 
     const response = await request.post(`/friend`, {
-      from_user_id: userId,// 쿠키에서 꺼낸 userId
+      from_user_id: userId, // 쿠키에서 꺼낸 userId
       to_user_id: toUser.id, // 넘어온 userId
-      request_status: "requested"
+      request_status: "requested",
     });
     console.log(response.data);
-    if(response.data) {
+    if (response.data) {
       alert("친구 요청 완료!");
     } else {
       alert("친구 요청에 실패했습니다.");
     }
-
   };
 
   const handleSearchInputChange = (e) => {
@@ -62,7 +61,7 @@ export default function FriendSearch() {
   };
 
   const handleEnterKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       fetchSearchResultList();
     }
   };

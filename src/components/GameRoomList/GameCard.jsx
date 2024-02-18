@@ -44,12 +44,11 @@ export default function GameCard({ room, category }) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) {
-      return parts.pop().split(';').shift();
+      return parts.pop().split(";").shift();
     }
   }
-  
-  const enterRoom = async (roomId) => {
 
+  const enterRoom = async (roomId) => {
     let sender = getCookie("userId"); // 쿠키에서 userId 가져오기
     if (!sender) {
       sender = window.prompt("닉네임을 입력해주세요");
@@ -93,7 +92,7 @@ export default function GameCard({ room, category }) {
 
     try {
       enterRoom(event.currentTarget.id);
-    } catch(e) {
+    } catch (e) {
       setSnackOpen(e.response.data);
       setSnackOpen(true);
     }
