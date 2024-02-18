@@ -78,7 +78,6 @@ export default function GameWaitingBoard({ player, data, allowedPiece, category,
         type: "GAME",
       }),
     );
-    setIsShowToIngameLoadingModal(false);
   };
 
   const handleGameStart = () => {
