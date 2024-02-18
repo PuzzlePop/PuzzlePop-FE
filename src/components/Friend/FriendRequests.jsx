@@ -9,12 +9,11 @@ import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 
 export default function FriendRequests() {
   const navigate = useNavigate();
-//   const request_status = "requested";
+  //   const request_status = "requested";
   const [friendRequestList, setFriendRequestList] = useState([]);
 
-
   const fetchFriendRequestList = async (userId) => {
-    if(!userId) {
+    if (!userId) {
       alert("로그인이 필요합니다.");
       return;
     }
@@ -41,14 +40,14 @@ export default function FriendRequests() {
 
   useEffect(() => {
     fetchFriendRequestList(getCookie("userId"));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getCookie = (name) => {
-    const cookies = document.cookie.split('; ');
+    const cookies = document.cookie.split("; ");
     for (let i = 0; i < cookies.length; i++) {
       const cookie = cookies[i].trim();
-      if (cookie.startsWith(name + '=')) {
+      if (cookie.startsWith(name + "=")) {
         return cookie.substring(name.length + 1);
       }
     }

@@ -74,7 +74,7 @@ export default function SelectImgAndPiece({ src, allowedPiece }) {
   const [selectedImg, setSelectedImg] = useState(`data:image/jpeg;base64,${src}`);
   // const [selectedPieceNum, setSelectedPieceNum] = useState(allowedPiece[0]);
 
-  const { image, setImage } = useGameInfo()
+  const { image, setImage } = useGameInfo();
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -94,10 +94,12 @@ export default function SelectImgAndPiece({ src, allowedPiece }) {
       setSelectedImg(
         "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
       );
-      setImage("https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp")
+      setImage(
+        "https://i.namu.wiki/i/1zQlFS0_ZoofiPI4-mcmXA8zXHEcgFiAbHcnjGr7RAEyjwMHvDbrbsc8ekjZ5iWMGyzJrGl96Fv5ZIgm6YR_nA.webp",
+      );
     } else {
-      setSelectedImg(`data:image/jpeg;base64,${src}`)
-      setImage(`data:image/jpeg;base64,${src}`)
+      setSelectedImg(`data:image/jpeg;base64,${src}`);
+      setImage(`data:image/jpeg;base64,${src}`);
     }
   }, []);
 
@@ -206,13 +208,15 @@ function ImgDialog({ onClose, selectedImg, open }) {
         },
         uuid: getRoomId(),
       });
-      
-      send(`/app/game/message`,{},
+
+      send(
+        `/app/game/message`,
+        {},
         JSON.stringify({
           roomId: getRoomId(),
           type: "IMAGE",
-        })
-      )
+        }),
+      );
       onClose(src);
     } catch (e) {
       console.log(e);

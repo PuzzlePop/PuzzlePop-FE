@@ -14,5 +14,5 @@ export const request = axios.create({
 export const requestFile = axios.create({
   baseURL: SERVER_END_POINT,
   timeout: 3000,
-  headers: {'Content-Type': 'multipart/form-data'}
-})
+  headers: { "Content-Type": "multipart/form-data" },
+});

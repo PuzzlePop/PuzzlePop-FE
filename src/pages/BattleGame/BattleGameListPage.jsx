@@ -36,10 +36,9 @@ export default function BattleGameListPage() {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) {
-      return parts.pop().split(';').shift();
+      return parts.pop().split(";").shift();
     }
   }
-
 
   const quickMatching = () => {
     const sender = getCookie("userId");
@@ -56,7 +55,7 @@ export default function BattleGameListPage() {
         JSON.stringify({
           type: "QUICK",
           sender: sender,
-          member: true
+          member: true,
         }),
       );
 
@@ -67,25 +66,19 @@ export default function BattleGameListPage() {
           alert("waiting");
         } else if (data.message === "GAME_START") {
           setRoomId(data.targets);
-          setSender(sender)
+          setSender(sender);
           if (data.team === "RED") {
-            setTeam("red")
+            setTeam("red");
           } else {
-            setTeam("blue")
+            setTeam("blue");
           }
           window.location.replace(`/game/battle/ingame/${data.targets}`);
         }
       });
-      
-      
 
       //응답 메시지 파싱
-    })
-    
-
-    
-
-  }
+    });
+  };
   return (
     <Wrapper>
       <Header />
