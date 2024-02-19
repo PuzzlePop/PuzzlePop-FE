@@ -376,7 +376,7 @@ const onComboSound = () => {
   const audio = new Audio(comboAudioPath);
   audio.loop = false;
   audio.crossOrigin = "anonymous";
-  // audio.volume = 0.5;
+  audio.volume = 0.4;
   audio.load();
   try {
     audio.play();

@@ -17,7 +17,7 @@ export const addAudio = (audioPath) => {
   const audio = new Audio(audioPath);
   audio.loop = false;
   audio.crossOrigin = "anonymous";
-  // audio.volume = 0.5;
+  audio.volume = 0.4;
   audio.load();
   try {
     audio.play();
