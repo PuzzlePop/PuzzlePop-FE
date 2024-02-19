@@ -3,7 +3,7 @@ import styled from "styled-components";
 import GameOpenVidu from "@/components/GameIngame/openvidu/GameOpenVidu";
 import { getSender, getRoomId, getTeam } from "@/socket-utils/storage";
 import { socket } from "@/socket-utils/socket2";
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, Typography } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
 
@@ -84,10 +84,11 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
     : getTeam() === "red"
       ? red[300]
       : blue[300];
+  const currentChatTheme = !isBattle ? deepPurple[100] : getTeam() === "red" ? red[100] : blue[100];
 
   return (
     <ThemeProvider theme={theme}>
-      <Wrapper $isIngame={isIngame}>
+      <Wrapper $isIngame={isIngame} $color={currentScrollbarTheme}>
         {chatHistory && (
           <div
             ref={chatElement}
@@ -98,13 +99,38 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
               scrollbarColor: `${currentScrollbarTheme} rgba(255, 255, 255, 0)`,
             }}
           >
+            {isIngame && (
+              <>
+                <ChatDiv $color={currentChatTheme}>
+                  <Typography variant="body2">게임 시작! 🧩</Typography>
+                </ChatDiv>
+                <ChatDiv $color={currentChatTheme}>
+                  <Typography variant="body2">
+                    팀원들과 이곳에서 이야기를 나누며 전략을 세워 보세요 🧐
+                  </Typography>
+                </ChatDiv>
+                <hr />
+              </>
+            )}
+
             {/* 채팅 기록을 화면에 출력 */}
-            {chatHistory.map((chat, index) => (
-              <div key={index}>
-                <strong>{chat.userid}: </strong>
-                {chat.chatMessage}
-              </div>
-            ))}
+            {chatHistory.map((chat, index) => {
+              if (chat.userid === getSender()) {
+                return (
+                  <MyChatDiv key={index} $color={currentChatTheme}>
+                    <strong>{chat.userid}: </strong>
+                    {chat.chatMessage}
+                  </MyChatDiv>
+                );
+              } else {
+                return (
+                  <ChatDiv key={index} $color={currentChatTheme}>
+                    <strong>{chat.userid}: </strong>
+                    {chat.chatMessage}
+                  </ChatDiv>
+                );
+              }
+            })}
           </div>
         )}
 
@@ -139,14 +165,25 @@ export default function Chatting({ chatHistory, isIngame = false, isBattle = fal
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
   height: ${(props) => {
     if (props.$isIngame) {
-      return "750px";
+      return "";
     } else {
       return "200px";
     }
   }};
   margin: 0 3px;
+  border: ${(props) => {
+    if (props.$isIngame) {
+      return `1px solid ${props.$color}`;
+    } else {
+      return "";
+    }
+  }};
+  border-radius: 10px;
+
+  overflow-y: hidden;
 `;
 
 const Form = styled.form`
@@ -168,6 +205,62 @@ const ChatInput = styled(TextField)`
 
 const ChatBtn = styled(Button)`
   width: 16%;
-  margin-left: 4px;
+  margin: 0 4px;
   height: 40px;
+`;
+
+const ChatDiv = styled.div`
+  position: relative;
+  margin: 15px;
+  padding: 10px;
+  // width:400px;
+  background-color: ${(props) => {
+    return props.$color;
+  }};
+  border-radius: 10px;
+
+  &:after {
+    border-top: 10px solid
+      ${(props) => {
+        return props.$color;
+      }};
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 0px solid transparent;
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 20px;
+  }
+`;
+
+const MyChatDiv = styled.div`
+  position: relative;
+  margin: 15px;
+  padding: 10px;
+  // width:400px;
+  background-color: white;
+  border: 1px solid ${(props) => props.$color};
+  border-radius: 10px;
+
+  &:after {
+    border-top: 10px solid white;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 0px solid transparent;
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    right: 20px;
+  }
+  &:before {
+    border-top: 10px solid ${(props) => props.$color};
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 0px solid transparent;
+    content: "";
+    position: absolute;
+    bottom: -11px;
+    right: 20px;
+  }
 `;
