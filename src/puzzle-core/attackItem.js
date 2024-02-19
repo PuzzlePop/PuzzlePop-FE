@@ -97,7 +97,7 @@ export const attackFire = (
     // fire 발동하는 팀의 효과
     console.log("fire 보낼거임");
 
-    fireImg.style.left = "1040px";
+    fireImg.style.left = "1080px";
     fireImg.style.top = "750px";
 
     canvasContainer.appendChild(fireImg);

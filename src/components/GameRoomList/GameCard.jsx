@@ -215,7 +215,7 @@ export default function GameCard({ room, category }) {
         open={isOpenedNicknameModal}
         handleClose={handleClose}
         handleKeyUp={handleKeyUp}
-        createRoom={(e) => handleClick(e, started, gameId)}
+        createRoom={(e) => handleClick(e, gameId)}
         id={gameId}
         started={started.toString()}
         gameId={gameId}
