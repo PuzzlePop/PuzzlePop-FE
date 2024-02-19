@@ -17,6 +17,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { deepPurple } from "@mui/material/colors";
 import { request } from "@/apis/requestBuilder";
 import { setRoomId, setSender, setTeam } from "@/socket-utils/storage";
+import NicknameModal from "./NicknameModal";
 
 export default function CreateRoomButton({ category }) {
   const navigate = useNavigate();
@@ -24,10 +25,15 @@ export default function CreateRoomButton({ category }) {
   const [roomSize, setRoomSize] = useState(2);
   const [isOpenedModal, setIsOpenedModal] = useState(false);
 
+  const [nickname, setNickname] = useState("");
+  const [isOpenedNicknameModal, setIsOpenedNicknameModal] = useState(false);
+
   const handleClose = () => {
     setRoomTitle("");
     setRoomSize(2);
     setIsOpenedModal(false);
+    setNickname("");
+    setIsOpenedNicknameModal(false);
   };
 
   const handleKeyUp = (e) => {
@@ -58,7 +64,10 @@ export default function CreateRoomButton({ category }) {
 
     let sender = getCookie("userId"); // 쿠키에서 userId 가져오기
     if (!sender) {
-      sender = window.prompt("닉네임을 입력해주세요");
+      setIsOpenedModal(false);
+      setIsOpenedNicknameModal(true);
+      // sender = window.prompt("닉네임을 입력해주세요");
+      sender = nickname;
       if (!sender) {
         return;
       }
@@ -187,6 +196,7 @@ export default function CreateRoomButton({ category }) {
                 value={roomTitle}
                 onChange={(e) => setRoomTitle(e.target.value)}
                 onKeyUp={handleKeyUp}
+                autoFocus
                 sx={{ width: "100%" }}
               />
             </Grid>
@@ -224,6 +234,16 @@ export default function CreateRoomButton({ category }) {
           </Grid>
         </Box>
       </Modal>
+
+      {/* 닉네임 모달 */}
+      <NicknameModal
+        nickname={nickname}
+        setNickname={setNickname}
+        open={isOpenedNicknameModal}
+        handleClose={handleClose}
+        handleKeyUp={handleKeyUp}
+        createRoom={createRoom}
+      />
     </ThemeProvider>
   );
 }

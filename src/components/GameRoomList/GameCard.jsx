@@ -17,12 +17,16 @@ import { deepPurple } from "@mui/material/colors";
 import { setRoomId, setSender, setTeam } from "@/socket-utils/storage";
 import { request } from "../../apis/requestBuilder";
 import { isAxiosError } from "axios";
+import NicknameModal from "./NicknameModal";
 
 export default function GameCard({ room, category }) {
   const navigate = useNavigate();
   const [imgSrc, setImgSrc] = useState("");
   const [snackOpen, setSnackOpen] = useState(false);
   const [snackMessage, setSnackMessage] = useState("");
+
+  const [nickname, setNickname] = useState("");
+  const [isOpenedNicknameModal, setIsOpenedNicknameModal] = useState(false);
 
   const {
     admin,
@@ -40,6 +44,17 @@ export default function GameCard({ room, category }) {
 
   const chipMessage = `${parseInt(roomSize / 2)} : ${parseInt(roomSize / 2)}`;
 
+  const handleClose = () => {
+    setNickname("");
+    setIsOpenedNicknameModal(false);
+  };
+
+  const handleKeyUp = (e, gameId) => {
+    if (e.keyCode === 13) {
+      handleClick(e, gameId);
+    }
+  };
+
   function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
@@ -51,13 +66,16 @@ export default function GameCard({ room, category }) {
   const enterRoom = async (roomId) => {
     let sender = getCookie("userId"); // 쿠키에서 userId 가져오기
     if (!sender) {
-      sender = window.prompt("닉네임을 입력해주세요");
+      setIsOpenedNicknameModal(true);
+      // sender = window.prompt("닉네임을 입력해주세요");
+      sender = nickname;
       if (!sender) {
         return;
       }
     }
 
     setSender(sender);
+    console.log(sender, roomId);
     setRoomId(roomId);
     setTeam("red");
 
@@ -78,7 +96,7 @@ export default function GameCard({ room, category }) {
     }
   };
 
-  const handleClick = (event, started) => {
+  const handleClick = (event, id) => {
     // if (started) {
     //   setSnackMessage("이미 게임이 시작된 방입니다!");
     //   setSnackOpen(true);
@@ -91,7 +109,17 @@ export default function GameCard({ room, category }) {
     // }
 
     try {
-      enterRoom(event.currentTarget.id);
+      // enterRoom(event.currentTarget.id);
+      let sender = getCookie("userId"); // 쿠키에서 userId 가져오기
+      if (!sender) {
+        setIsOpenedNicknameModal(true);
+        // sender = window.prompt("닉네임을 입력해주세요");
+        sender = nickname;
+        enterRoom(id);
+        if (!sender) {
+          return;
+        }
+      }
     } catch (e) {
       setSnackOpen(e.response.data);
       setSnackOpen(true);
@@ -179,6 +207,20 @@ export default function GameCard({ room, category }) {
           </CardContent>
         </MyCardActionArea>
       </MyCard>
+
+      {/* 닉네임 모달 */}
+      <NicknameModal
+        nickname={nickname}
+        setNickname={setNickname}
+        open={isOpenedNicknameModal}
+        handleClose={handleClose}
+        handleKeyUp={handleKeyUp}
+        createRoom={(e) => handleClick(e, started, gameId)}
+        id={gameId}
+        started={started.toString()}
+        gameId={gameId}
+      />
+
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={snackOpen}
