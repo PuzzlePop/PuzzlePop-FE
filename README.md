@@ -1,6 +1,10 @@
 # 🧩 온라인 배틀 퍼즐 게임 Puzzle-Pop!
 ![image.png](./readmeImg/main.gif)
 
+# Video (Youtube)
+
+https://www.youtube.com/watch?v=RBEFKkN09YA
+
 #  Overview
 정적이고 맞추기만 하는 퍼즐 게임은 이제 그만!
 
