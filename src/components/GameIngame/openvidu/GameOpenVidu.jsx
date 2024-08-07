@@ -8,7 +8,7 @@ import MicOffIcon from "@mui/icons-material/MicOff";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { red, blue, deepPurple } from "@mui/material/colors";
 
-const OPENVIDU_SERVER_URL = "https://i10a304.p.ssafy.io:4443/openvidu/";
+const OPENVIDU_SERVER_URL = import.meta.env.VITE_SERVER_END_POINT;
 const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
 const GameOpenVidu = ({ gameId, playerName, color = "purple" }) => {

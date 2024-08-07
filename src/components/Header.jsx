@@ -56,7 +56,7 @@ export default function Header() {
 
   const moveLogin = async () => {
     // window.alert("아직 개발 중인 기능이에요 😂");
-    const SERVER_URL = "https://i10a304.p.ssafy.io/api";
+    const SERVER_URL = import.meta.env.VITE_SERVER_END_POINT;
 
     if (isLoggedIn) {
       // 로그인 상태이면 로그아웃 처리

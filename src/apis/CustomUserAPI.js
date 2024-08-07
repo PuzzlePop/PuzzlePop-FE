@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const UserAPI = axios.create({
-  baseURL: "https://i10a304.p.ssafy.io/api",
+  baseURL: import.meta.env.VITE_SERVER_END_POINT,
   // baseURL: 'http://localhost:8080',
   timeout: 5000,
   headers: {
